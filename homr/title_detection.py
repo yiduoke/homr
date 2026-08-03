@@ -1,6 +1,7 @@
 import re
 import threading
 from concurrent.futures import Future, ThreadPoolExecutor
+from typing import NamedTuple
 
 from rapidocr import RapidOCR
 
@@ -11,6 +12,33 @@ from homr.model import Staff
 _reader: RapidOCR | None = None
 _reader_lock = threading.Lock()
 _executor: ThreadPoolExecutor = ThreadPoolExecutor(max_workers=1)
+
+# Words which mark the text above a staff as a tempo indication rather than a title.
+# Only used to tell the two apart, no beats per minute are derived from them: the
+# conventional BPM for a given term differs between sources, so guessing one here
+# would put a number into the MusicXML which isn't in the score.
+TEMPO_TERMS = frozenset(
+    {
+        # Italian
+        "grave", "largo", "larghissimo", "larghetto", "largamente", "lento",
+        "adagio", "adagietto", "andante", "andantino", "moderato", "allegretto",
+        "allegro", "allegrissimo", "vivace", "vivacissimo", "presto",
+        "prestissimo", "maestoso", "animato", "sostenuto", "tempo",
+        # German
+        "langsam", "schnell", "lebhaft", "bewegt", "breit", "massig",
+        # French
+        "lent", "vif", "large", "modere", "anime",
+        # English
+        "slow", "fast", "moderate",
+    }
+)
+
+
+class TitleAndTempo(NamedTuple):
+    """Text found above the first staff, split into a title and a tempo marking."""
+
+    title: str
+    tempo: str
 
 
 def cleanup_text(text: str) -> str:
@@ -41,7 +69,19 @@ def is_tempo_marking(text: str) -> bool:
     return sum(1 for c in text if "a" <= c.lower() <= "z") < min_letters
 
 
-def _detect_title_task(debug: Debug, top_staff: Staff) -> str:
+def is_tempo_text(text: str) -> bool:
+    """
+    True if the text reads as a tempo indication, e.g. "Allegro di molto e con brio".
+
+    A piece actually named after a tempo ("Adagio") is misread as a tempo marking
+    here. That is preferred over the previous behaviour, where every tempo was
+    misread as the title.
+    """
+    words = cleanup_text(text).lower().split()
+    return any(word in TEMPO_TERMS for word in words)
+
+
+def _detect_title_task(debug: Debug, top_staff: Staff) -> TitleAndTempo:
     _initialize_reader()
 
     if _reader is None:
@@ -59,7 +99,7 @@ def _detect_title_task(debug: Debug, top_staff: Staff) -> str:
     ocr_results = _reader(ocr_input)
 
     if ocr_results.txts is None:
-        return ""
+        return TitleAndTempo("", "")
 
     results = [
         (box, txt, score)
@@ -70,8 +110,13 @@ def _detect_title_task(debug: Debug, top_staff: Staff) -> str:
 
     filtered_results = [r for r in results if not is_tempo_marking(r[1])]
 
+    tempo_results = [r for r in filtered_results if is_tempo_text(r[1])]
+    filtered_results = [r for r in filtered_results if not is_tempo_text(r[1])]
+
+    tempo = cleanup_text(tempo_results[0][1]) if tempo_results else ""
+
     if not filtered_results:
-        return ""
+        return TitleAndTempo("", tempo)
 
     def bbox_height(bbox: list[list[float]]) -> float:
         ys = [p[1] for p in bbox]
@@ -85,7 +130,7 @@ def _detect_title_task(debug: Debug, top_staff: Staff) -> str:
         return bbox_height(bbox) / len(text)
 
     largest_text = max(filtered_results, key=font_size_score)[1]
-    return cleanup_text(largest_text)
+    return TitleAndTempo(cleanup_text(largest_text), tempo)
 
 
 def download_ocr_weights() -> None:
@@ -95,7 +140,7 @@ def download_ocr_weights() -> None:
     _initialize_reader()
 
 
-def detect_title(debug: Debug, top_staff: Staff) -> Future[str]:
+def detect_title(debug: Debug, top_staff: Staff) -> Future[TitleAndTempo]:
     """
     Runs the title detection in a separate thread and returns a Future.
     """

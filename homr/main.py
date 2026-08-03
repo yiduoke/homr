@@ -40,7 +40,7 @@ from homr.simple_logging import eprint
 from homr.staff_detection import break_wide_fragments, detect_staff, make_lines_stronger
 from homr.staff_parsing import parse_staffs
 from homr.staff_position_save_load import load_staff_positions, save_staff_positions
-from homr.title_detection import detect_title, download_ocr_weights
+from homr.title_detection import TitleAndTempo, detect_title, download_ocr_weights
 from homr.transformer.configs import Config, default_config
 from homr.type_definitions import NDArray
 
@@ -190,6 +190,7 @@ def process_image(
                 debug, image, staff_position_files, config.selected_staff
             )
             title = ""
+            tempo_text = ""
             # parse_staffs() expects a grayscale image (cv2.findContours requires it),
             # matching what the normal detect_staffs_in_image() path hands it
             # (predictions.preprocessed). Apply the same CLAHE preprocessing here so the
@@ -212,8 +213,12 @@ def process_image(
         )
 
         if not config.read_staff_positions:
-            title = title_future.result(60)
+            title, tempo_text = title_future.result(60)
         eprint("Found title:", title)
+        if tempo_text:
+            eprint("Found tempo marking:", tempo_text)
+        if xml_generator_args.tempo_text is None:
+            xml_generator_args.tempo_text = tempo_text
 
         eprint("Writing XML", result_staffs)
         xml = generate_xml(xml_generator_args, result_staffs, title)
@@ -239,7 +244,7 @@ def process_image(
 
 def detect_staffs_in_image(
     image_path: str, config: ProcessingConfig
-) -> tuple[list[MultiStaff], NDArray, Debug, Future[str], int]:
+) -> tuple[list[MultiStaff], NDArray, Debug, Future[TitleAndTempo], int]:
     predictions, debug = load_and_preprocess_predictions(
         image_path, config.enable_debug, config.enable_cache, config.segnet_use_gpu
     )
@@ -284,7 +289,7 @@ def detect_staffs_in_image(
         title_future = detect_title(debug, staffs[0])
     else:
         title_future = Future()
-        title_future.set_result("")
+        title_future.set_result(TitleAndTempo("", ""))
 
     debug.write_bounding_boxes_alternating_colors("staffs", staffs)
 

@@ -93,11 +93,16 @@ class SymbolChord:
 
 class XmlGeneratorArguments:
     def __init__(
-        self, large_page: bool | None = None, metronome: int | None = None, tempo: int | None = None
+        self,
+        large_page: bool | None = None,
+        metronome: int | None = None,
+        tempo: int | None = None,
+        tempo_text: str | None = None,
     ):
         self.large_page = large_page
         self.metronome = metronome
         self.tempo = tempo
+        self.tempo_text = tempo_text
 
 
 def build_identification() -> ET.Element:
@@ -162,6 +167,9 @@ def build_measures(
         ET.SubElement(first_attributes, "staves").text = "2"
         ET.SubElement(first_attributes, "part-symbol").text = "brace"
     if is_first_part:
+        tempo_direction = build_tempo_text_direction(args)
+        if tempo_direction is not None:
+            current_measure.append(tempo_direction)
         direction = build_add_time_direction(args)
         if direction is not None:
             current_measure.append(direction)
@@ -683,6 +691,23 @@ def _group_notes(notes: list[EncodedSymbol]) -> dict[Fraction, list[EncodedSymbo
             fraction = duration.fraction
         groups_by_duration[fraction].append(note)
     return dict(sorted(groups_by_duration.items()))
+
+
+def build_tempo_text_direction(args: XmlGeneratorArguments) -> ET.Element | None:
+    """
+    Emit a detected tempo marking such as "Grave" as words above the first measure.
+
+    No sound tempo is attached: the term is written down as it appears in the score,
+    turning it into beats per minute is left to the notation program.
+    """
+    if not args.tempo_text:
+        return None
+    direction = ET.Element("direction", placement="above")
+    direction_type = ET.SubElement(direction, "direction-type")
+    words = ET.SubElement(direction_type, "words")
+    words.set("font-weight", "bold")
+    words.text = args.tempo_text
+    return direction
 
 
 def build_add_time_direction(args: XmlGeneratorArguments) -> ET.Element | None:
