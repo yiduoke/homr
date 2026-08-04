@@ -101,8 +101,21 @@ def _ensure_same_number_of_staffs(staffs: list[MultiStaff]) -> list[MultiStaff]:
     row_lengths = {len(multi_staff.staffs) for multi_staff in staffs}
     if len(row_lengths) == 1 and next(iter(row_lengths)) > 1:
         return staffs
+    already_grouped = sum(1 for multi_staff in staffs if len(multi_staff.staffs) > 1)
     flat_staffs = _flatten_staffs(staffs)
     core = _find_periodic_core(flat_staffs)
+    if core is not None and core[0] == 1 and already_grouped:
+        # A period of 1 says "every staff stands alone", which any page satisfies
+        # once its staves all share an is_grandstaff flag - the degenerate match
+        # this function's docstring warns about. Where braces or bar lines have
+        # already joined staves into systems, that drawn evidence outranks a
+        # pattern that claims to have found nothing.
+        eprint(
+            "Ignoring a degenerate period of 1 and keeping the",
+            already_grouped,
+            "system(s) that braces or bar lines already grouped",
+        )
+        return sorted(staffs, key=lambda s: s.staffs[0].min_y)
     if core is not None:
         period, front_trim, back_trim = core
         if front_trim > 0:
@@ -122,6 +135,18 @@ def _ensure_same_number_of_staffs(staffs: list[MultiStaff]) -> list[MultiStaff]:
                 "staffs with a different layout each time, combining them into one row",
             )
         return _regroup_by_period(flat_staffs, period, front_trim, back_trim)
+    if any(len(multi_staff.staffs) > 1 for multi_staff in staffs):
+        # No period fits, but braces and bar lines already grouped some rows, and
+        # that evidence is drawn on the page rather than inferred from it. Piano
+        # writing that adds staves for a few systems (Rachmaninoff's Op. 3 No. 2
+        # goes from two to four and back) has no period to find, and breaking the
+        # page apart here would throw away correct systems to no purpose.
+        eprint(
+            "No repeating staff layout on this page, keeping the",
+            sum(1 for s in staffs if len(s.staffs) > 1),
+            "system(s) that braces or bar lines already grouped",
+        )
+        return sorted(staffs, key=lambda s: s.staffs[0].min_y)
     result: list[MultiStaff] = []
     for staff in staffs:
         result.extend(staff.break_apart())
@@ -129,7 +154,10 @@ def _ensure_same_number_of_staffs(staffs: list[MultiStaff]) -> list[MultiStaff]:
 
 
 def _get_number_of_voices(staffs: list[MultiStaff]) -> int:
-    return len(staffs[0].staffs)
+    # The widest system decides, not the first one. Piano writing that opens on two
+    # staves and expands to four for a few systems would otherwise be read at the
+    # opening width, and every staff past it dropped without a word.
+    return max((len(multi_staff.staffs) for multi_staff in staffs), default=0)
 
 
 tr_omr_max_height = default_config.max_height
@@ -348,7 +376,10 @@ def parse_staffs(
     voices = []
     regions = StaffRegions(staffs)
     for voice in range(number_of_voices):
-        staffs_for_voice = [staff.staffs[voice] for staff in staffs]
+        # Systems narrower than the widest simply have nothing at this index.
+        staffs_for_voice = [
+            multi_staff.staffs[voice] for multi_staff in staffs if voice < len(multi_staff.staffs)
+        ]
         result_for_voice = []
         for staff_index, staff in enumerate(staffs_for_voice):
             if selected_staff >= 0 and staff_index != selected_staff:
