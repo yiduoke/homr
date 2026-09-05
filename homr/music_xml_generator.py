@@ -660,7 +660,13 @@ def build_note_chord(
             is_first = False
 
         if rests:
-            assert group_duration > Fraction(0)
+            if group_duration <= Fraction(0):
+                # A zero-length rest group can't be written down and there is nothing
+                # to back up over, but it also isn't worth losing the page for: the
+                # transformer occasionally emits one on dense scores. Skip it and
+                # keep whatever else the measure had.
+                eprint("WARNING skipping rest group with non-positive duration")
+                continue
             if notes:
                 # There are other notes, so to avoid rest being merged into chord, we emit a backup
                 result.append(build_backup(group_duration, state))
