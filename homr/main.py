@@ -32,7 +32,9 @@ from homr.model import InputPredictions, MultiStaff
 from homr.music_xml_generator import XmlGeneratorArguments, generate_xml
 from homr.noise_filtering import filter_predictions
 from homr.note_detection import add_notes_to_staffs, combine_noteheads_with_stems
-from homr.onnx_providers import coreml_available, cuda_available
+from homr.onnx_providers import coreml_available, cuda_available, rocm_available
+from homr.pdf_utils import render_pdf_to_image
+from homr.relieur import process_concat
 from homr.resize import resize_image
 from homr.segmentation.config import segnet_path_onnx, segnet_path_onnx_fp16
 from homr.segmentation.inference_segnet import extract
@@ -41,7 +43,7 @@ from homr.staff_detection import break_wide_fragments, detect_staff, make_lines_
 from homr.staff_parsing import parse_staffs
 from homr.staff_position_save_load import load_staff_positions, save_staff_positions
 from homr.title_detection import TitleAndTempo, detect_title, download_ocr_weights
-from homr.transformer.configs import Config, default_config
+from homr.transformer.configs import Config, default_config, root_dir
 from homr.type_definitions import NDArray
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -159,7 +161,7 @@ class ProcessingConfig:
     write_staff_positions: bool
     read_staff_positions: bool
     selected_staff: int
-    # The transformer (encoder/decoder) only benefits from CUDA: its fp16 "GPU"
+    # The transformer (encoder/decoder) only benefits from CUDA/ROCm: its fp16 "GPU"
     # models are slower than the fp32 ones when they end up on the CPU EP, and
     # the CoreML EP cannot run the decoder. Segnet additionally supports CoreML.
     transformer_use_gpu: bool
@@ -174,7 +176,7 @@ def process_image(
     image_path: str,
     config: ProcessingConfig,
     xml_generator_args: XmlGeneratorArguments,
-) -> None:
+) -> str:
     eprint("Processing " + image_path)
     xml_file = replace_extension(image_path, ".musicxml")
     debug_cleanup: Debug | None = None
@@ -240,6 +242,7 @@ def process_image(
     finally:
         if debug_cleanup is not None:
             debug_cleanup.clean_debug_files_from_previous_runs()
+    return xml_file
 
 
 def detect_staffs_in_image(
@@ -316,7 +319,7 @@ def detect_staffs_in_image(
 
 def get_all_image_files_in_folder(folder: str) -> list[str]:
     image_files = []
-    for ext in ["png", "jpg", "jpeg", "PNG", "JPG", "JPEG"]:
+    for ext in ["png", "jpg", "jpeg", "pdf", "PNG", "JPG", "JPEG", "PDF"]:
         image_files.extend(glob.glob(os.path.join(folder, "**", f"*.{ext}"), recursive=True))
     without_teasers = [
         img
@@ -368,11 +371,41 @@ def download_weights(segnet_use_gpu: bool, transformer_use_gpu: bool, coreml_enc
                     os.remove(downloaded_zip)
 
 
+def run_homr(
+    images: list, config: ProcessingConfig, xml_generator_args: XmlGeneratorArguments
+) -> None:
+    """
+    Runs homr on all images in a list and merges them into musicxml using relieur
+    """
+    eprint("Merging", len(images), "files:", images)
+    xml_paths = []
+    filename = os.path.splitext(os.path.basename(images[0]))[0]
+    for image_file in images:
+        eprint("=========================================")
+        try:
+            xml_paths.append(process_image(image_file, config, xml_generator_args))
+            eprint("Finished", image_file)
+        except Exception as e:
+            eprint(f"An error occurred while processing {image_file}: {e}")
+            return  # Don't need to continue (save time)
+
+    if len(xml_paths) == len(images) and len(xml_paths) > 1:
+        output_path = os.path.join(root_dir, f"{filename}_merged.musicxml")
+        m, _, _ = process_concat(xml_paths)
+        ET.ElementTree(m).write(output_path, encoding="UTF-8", xml_declaration=True)
+
+        for path in xml_paths:
+            if os.path.exists(path):
+                os.remove(path)
+
+        eprint(f"Saved the generated musicxml at {output_path}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="homer", description="An optical music recognition (OMR) system"
     )
-    parser.add_argument("image", type=str, nargs="?", help="Path to the image to process")
+    parser.add_argument("image", type=str, nargs="*", help="Path to the image to process")
     parser.add_argument(
         "--init",
         action="store_true",
@@ -429,13 +462,15 @@ def main() -> None:
     force_gpu = args.gpu == GpuSupport.FORCE
     auto_gpu = args.gpu == GpuSupport.AUTO
 
-    # CUDA speeds up the whole pipeline. CoreML only helps segnet: the fp16
+    # CUDA/ROCm speeds up the whole pipeline. CoreML only helps segnet: the fp16
     # models the GPU path uses are slower on the CPU EP than the fp32 ones,
     # and the CoreML EP cannot run the decoder (see Segnet for details).
-    transformer_use_gpu = force_gpu or (auto_gpu and cuda_available())
-    segnet_use_gpu = force_gpu or (auto_gpu and (cuda_available() or coreml_available()))
+    transformer_use_gpu = force_gpu or (auto_gpu and (cuda_available() or rocm_available()))
+    segnet_use_gpu = force_gpu or (
+        auto_gpu and (cuda_available() or rocm_available() or coreml_available())
+    )
     # The CoreML encoder is a separate opt-in and only applies when the
-    # transformer isn't already on CUDA.
+    # transformer isn't already on CUDA/ROCm.
     coreml_encoder = args.coreml_encoder and not transformer_use_gpu and coreml_available()
 
     download_weights(segnet_use_gpu, transformer_use_gpu, coreml_encoder)
@@ -469,29 +504,48 @@ def main() -> None:
         eprint("No image provided")
         parser.print_help()
         sys.exit(1)
-    elif os.path.isfile(args.image):
+
+    images_to_combine = []
+    for image in args.image:
+        if os.path.isfile(image):
+            # Multiple files are getting merged
+            if image.lower().endswith(".pdf"):
+                images_to_combine += render_pdf_to_image(image)
+            else:
+                images_to_combine.append(image)
+
+        elif os.path.isdir(image):
+            # Directories are never merged
+            image_files = get_all_image_files_in_folder(image)
+            eprint("Processing", len(image_files), "files:", image_files)
+            error_files = []
+            for image_file in image_files:
+                eprint("=========================================")
+                try:
+                    if image_file.lower().endswith(".pdf"):
+                        rendered_images = render_pdf_to_image(image_file)
+                        run_homr(rendered_images, config, xml_generator_args)
+                    else:
+                        process_image(image_file, config, xml_generator_args)
+                    eprint("Finished", image_file)
+                except Exception as e:
+                    eprint(f"An error occurred while processing {image_file}: {e}")
+                    error_files.append(image_file)
+            if len(error_files) > 0:
+                eprint("Errors occurred while processing the following files:", error_files)
+
+        else:
+            eprint(f"{image} is not a valid file or directory")
+            sys.exit(2)
+
+    # Check if we have any images
+    if images_to_combine:
+        # After collectiong all images we run homr on them
         try:
-            process_image(args.image, config, xml_generator_args)
+            run_homr(images_to_combine, config, xml_generator_args)
         except InvalidProgramArgumentException as e:
             eprint(str(e))
             sys.exit(2)
-    elif os.path.isdir(args.image):
-        image_files = get_all_image_files_in_folder(args.image)
-        eprint("Processing", len(image_files), "files:", image_files)
-        error_files = []
-        for image_file in image_files:
-            eprint("=========================================")
-            try:
-                process_image(image_file, config, xml_generator_args)
-                eprint("Finished", image_file)
-            except Exception as e:
-                eprint(f"An error occurred while processing {image_file}: {e}")
-                error_files.append(image_file)
-        if len(error_files) > 0:
-            eprint("Errors occurred while processing the following files:", error_files)
-    else:
-        eprint(f"{args.image} is not a valid file or directory")
-        sys.exit(2)
 
 
 if __name__ == "__main__":
