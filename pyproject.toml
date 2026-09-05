@@ -27,7 +27,9 @@ cuda = [
   "onnxruntime-gpu[cuda,cudnn] >= 1.24.1, < 2",
 ]
 rocm = [
-  "onnxruntime-rocm @ https://repo.radeon.com/rocm/manylinux/rocm-rel-7.0/onnxruntime_rocm-1.22.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+  # The wheel only exists for CPython 3.12 on x86_64 Linux. Without the marker,
+  # resolvers that solve for every supported platform (uv) fail on the others.
+  "onnxruntime-rocm @ https://repo.radeon.com/rocm/manylinux/rocm-rel-7.0/onnxruntime_rocm-1.22.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl ; sys_platform == 'linux' and platform_machine == 'x86_64' and python_full_version >= '3.12' and python_full_version < '3.13'",
 ]
 
 [dependency-groups]

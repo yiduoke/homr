@@ -117,12 +117,20 @@ def process_concat(
                                             )
                                         attrib.remove(key)
                                 for xtime in get_children_of_type(attrib, "time"):
-                                    if last_parts_attributes[ib]["Time"] == time_attributes(xtime):
-                                        attrib.remove(xtime)
-                                        if debug:
-                                            eprint(
-                                                f"Remove time at measure {new_number} part {ib + 1}"
-                                            )
+                                    # Dropped unconditionally, not only when it repeats the
+                                    # previous page's: homr writes a time signature at the
+                                    # start of every page whether or not one is printed there,
+                                    # and its numerator is computed from the median bar length,
+                                    # so a page-start signature that *differs* from what's in
+                                    # force is far more likely a wrong guess (4/4 stamped onto a
+                                    # 2/2 or 6/8 piece) than a genuine change. Scores don't
+                                    # reprint the meter at page breaks; a real change landing
+                                    # exactly on one is the rare loss we accept.
+                                    attrib.remove(xtime)
+                                    if debug:
+                                        eprint(
+                                            f"Remove time at measure {new_number} part {ib + 1}"
+                                        )
                                 for clef in get_children_of_type(attrib, "clef"):
                                     if last_parts_attributes[ib]["Clef"] == clef_attributes(clef):
                                         attrib.remove(clef)
