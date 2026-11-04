@@ -128,9 +128,7 @@ def process_concat(
                                     # exactly on one is the rare loss we accept.
                                     attrib.remove(xtime)
                                     if debug:
-                                        eprint(
-                                            f"Remove time at measure {new_number} part {ib + 1}"
-                                        )
+                                        eprint(f"Remove time at measure {new_number} part {ib + 1}")
                                 for clef in get_children_of_type(attrib, "clef"):
                                     if last_parts_attributes[ib]["Clef"] == clef_attributes(clef):
                                         attrib.remove(clef)

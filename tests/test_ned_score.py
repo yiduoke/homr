@@ -89,6 +89,41 @@ class TestSplitGrandStaff(unittest.TestCase):
         score_part_ids = {sp.get("id") for sp in root.findall(".//score-part")}
         self.assertEqual(set(part_ids), score_part_ids)
 
+    def test_single_staff_systems_before_grand_staff_split(self) -> None:
+        # One staff for the first system, two staves from measure 2 on
+        part = """
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <staves>1</staves>
+        <clef number="1"><sign>G</sign><line>2</line></clef>
+      </attributes>
+      <note><pitch><step>E</step><octave>5</octave></pitch>
+        <duration>1</duration><type>quarter</type><voice>1</voice><staff>1</staff></note>
+    </measure>
+    <measure number="2">
+      <print new-system="yes" />
+      <attributes>
+        <staves>2</staves>
+        <clef number="1"><sign>G</sign><line>2</line></clef>
+        <clef number="2"><sign>G</sign><line>2</line></clef>
+      </attributes>
+      <note><pitch><step>C</step><octave>5</octave></pitch>
+        <duration>1</duration><type>quarter</type><voice>1</voice><staff>1</staff></note>
+      <note><pitch><step>G</step><octave>4</octave></pitch>
+        <duration>1</duration><type>quarter</type><voice>2</voice><staff>2</staff></note>
+    </measure>
+  </part>
+"""
+
+        result = _split_grand_staff(_wrap(part))
+
+        parts = ET.fromstring(result).findall("part")  # noqa: S314
+        self.assertEqual(2, len(parts))
+        self.assertEqual([1, 1], [len(m.findall("note")) for m in parts[0].findall("measure")])
+        self.assertEqual([0, 1], [len(m.findall("note")) for m in parts[1].findall("measure")])
+
     def test_no_grand_staff_returns_input_unchanged(self) -> None:
         xml_text = _wrap(_VOICE_PART)
 
@@ -146,7 +181,7 @@ class TestUnreliableArticulation(unittest.TestCase):
         self.assertEqual(_without_unreliable_articulation("staccatissimo_staccato"), "_")
 
     def test_keeps_reliable_components_of_compound_values(self) -> None:
-        self.assertEqual(_without_unreliable_articulation("accent_staccato"), "accent")
+        self.assertEqual(_without_unreliable_articulation("accentStrong_staccato"), "accentStrong")
         self.assertEqual(_without_unreliable_articulation("fermata_turn"), "fermata")
         self.assertEqual(
             _without_unreliable_articulation("accent_staccato_tenuto"), "accent_tenuto"
@@ -163,14 +198,14 @@ class TestUnreliableArticulation(unittest.TestCase):
         part = [
             EncodedSymbol("note_4", "C5", articulation="staccato"),
             EncodedSymbol("note_4", "D5", articulation="accent"),
-            EncodedSymbol("note_4", "E5", articulation="accent_staccato"),
+            EncodedSymbol("note_4", "E5", articulation="accentStrong_staccato"),
         ]
 
         result = _strip_articulation_from_parts([part])
 
         self.assertEqual(
             [s.articulation for s in result[0]],
-            ["_", "accent", "accent"],
+            ["_", "accent", "accentStrong"],
         )
         # Original symbols must not be mutated - only copies are edited.
         self.assertEqual(part[0].articulation, "staccato")

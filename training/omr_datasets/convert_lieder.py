@@ -19,17 +19,18 @@ from PIL import Image
 from homr.circle_of_fifths import strip_naturals
 from homr.download_utils import download_file, unzip_file
 from homr.simple_logging import eprint
-from homr.transformer.vocabulary import EncodedSymbol, empty
+from homr.transformer.vocabulary import EncodedSymbol, empty, is_lower_position
 from training.omr_datasets.musescore_svg import (
     SvgMusicFile,
     SvgStaff,
     get_position_from_multiple_svg_files,
 )
-from training.omr_datasets.music_xml_parser import Measure, music_xml_file_to_tokens
-from training.transformer.training_vocabulary import (
-    calc_ratio_of_tuplets,
-    token_lines_to_str,
+from training.omr_datasets.music_xml_parser import (
+    Measure,
+    music_xml_file_to_tokens,
+    normalize_barlines_and_repeats,
 )
+from training.transformer.training_vocabulary import token_lines_to_str
 
 script_location = os.path.dirname(os.path.realpath(__file__))
 git_root = Path(script_location).parent.parent.absolute()
@@ -38,6 +39,7 @@ lieder = os.path.join(dataset_root, "Lieder-main")
 quartets = os.path.join(dataset_root, "StringQuartets-main")
 lieder_train_index = os.path.join(lieder, "index.txt")
 musescore_path = os.path.join(dataset_root, "MuseScore")
+flat_data = os.path.join(lieder, "flat")
 
 
 class MusicXmlPage:
@@ -120,8 +122,16 @@ def copy_all_mscx_files(working_dir: str, dest: str) -> None:
                 shutil.copyfile(source, os.path.join(dest, file))
 
 
+def copy_mxl_files(paths: list[Path], dest: str) -> None:
+    for path in paths:
+        shutil.copyfile(path, os.path.join(dest, os.path.basename(path)))
+
+
 def create_formats(
-    source_file: str, formats: list[str], style_file: str | None = None
+    source_file: str,
+    formats: list[str],
+    style_file: str | None = None,
+    ending: str = ".mscx",
 ) -> list[dict[str, str]]:
     jobs: list[dict[str, str]] = []
 
@@ -146,8 +156,8 @@ def create_formats(
     for target_format in formats:
         dirname = os.path.dirname(source_file)
         basename = os.path.basename(source_file)
-        out_name = dirname + "/" + basename.replace(".mscx", f".{target_format}")
-        out_name_alt = dirname + "/" + basename.replace(".mscx", f"-1.{target_format}")
+        out_name = dirname + "/" + basename.replace(ending, f".{target_format}")
+        out_name_alt = dirname + "/" + basename.replace(ending, f"-1.{target_format}")
         if os.path.exists(out_name) or os.path.exists(out_name_alt):
             eprint(out_name, "already exists")
             continue
@@ -285,7 +295,7 @@ def _reset_note_positions(mscx_file: str) -> None:
 
 
 def _create_musicxml_and_svg_files() -> None:
-    dest = os.path.join(lieder, "flat")
+    dest = os.path.join(lieder, "rendered_scores")
     os.makedirs(dest, exist_ok=True)
     copy_all_mscx_files(os.path.join(lieder, "scores"), dest)
 
@@ -302,6 +312,74 @@ def _create_musicxml_and_svg_files() -> None:
         _reset_note_positions(str(file))
         style_file = _music_font_style_file(_music_font_for_file(str(file)))
         jobs = create_formats(str(file), ["musicxml", "svg"], style_file)
+        all_jobs.extend(jobs)
+
+    if len(all_jobs) == 0:
+        eprint("All musicxml were already created, going on with the next step")
+        return
+
+    eprint("Starting with", len(all_jobs), "jobs")
+
+    BATCH_SIZE = 50
+    failed_files: list[str] = []
+
+    batches = [all_jobs[i : i + BATCH_SIZE] for i in range(0, len(all_jobs), BATCH_SIZE)]
+
+    for batch_idx, batch in enumerate(batches):
+        eprint(f"Processing batch {batch_idx + 1}/{len(batches)} ({len(batch)} jobs)")
+
+        with open("job.json", "w") as f:
+            json.dump(batch, f)
+
+        if os.system(MuseScore + " --force -j job.json") == 0:  # noqa: S605
+            os.remove("job.json")
+            continue
+
+        env = os.environ.copy()
+        # No need to run GUI, so we can use offscreen backend
+        env["QT_QUICK_BACKEND"] = "software"
+        env["QT_QPA_PLATFORM"] = "offscreen"
+
+        # Batch failed - retry each job individually
+        eprint(f"Batch {batch_idx + 1} failed, retrying individually")
+        os.remove("job.json")
+
+        for job in batch:
+            with open("job.json", "w") as f:
+                json.dump([job], f)
+
+            if os.system(MuseScore + " --force -j job.json") != 0:  # noqa: S605
+                eprint("Failed:", job["in"])
+                failed_files.append(job["in"])
+
+            if os.path.exists("job.json"):
+                os.remove("job.json")
+
+    if failed_files:
+        eprint(f"\nMuseScore export finished with {len(failed_files)} failed file(s):")
+        for path in failed_files:
+            eprint(" ", path)
+    else:
+        eprint("MuseScore export completed with no failures.")
+
+
+def create_musicxml_and_svg_files_from_mxl(paths: list[Path], dest: str) -> None:
+    """
+    Used for pdmx conversion
+    """
+    copy_mxl_files(paths, dest)
+
+    mxl_paths = list(Path(dest).rglob("*.mxl"))
+
+    MuseScore = os.path.join(dataset_root, "MuseScore")
+
+    _ensure_music_font_style_files()
+
+    all_jobs = []
+
+    for file in mxl_paths:
+        style_file = _music_font_style_file(_music_font_for_file(str(file)))
+        jobs = create_formats(str(file), ["musicxml", "svg"], style_file, ".mxl")
         all_jobs.extend(jobs)
 
     if len(all_jobs) == 0:
@@ -373,7 +451,7 @@ class MeasureCutter:
         self.time = EncodedSymbol("timeSignature/4")
 
     def _position_to_staff_no(self, symbol: EncodedSymbol) -> int:
-        if symbol.position == "lower":
+        if is_lower_position(symbol.position):
             return 1
         return 0
 
@@ -389,7 +467,7 @@ class MeasureCutter:
         # renderer always draws a time signature on a fresh score - so those callers pass
         # always_include_time=True to keep the label in sync with the image.
         has_time = always_include_time
-        result: list[EncodedSymbol] = []
+        result: list[list[EncodedSymbol]] = []
         for i in range(count):
             selected_measure = self.voice.pop(0)
             is_first_measure = i == 0
@@ -419,7 +497,10 @@ class MeasureCutter:
                         has_time = True
                         time = symbol
                 else:
-                    first_measure_before_any_non_key_or_clef = False
+                    # A leading repeat can precede attributes in MusicXML. It
+                    # must not prevent those attributes replacing inherited ones.
+                    if symbol.rhythm != "repeatStart":
+                        first_measure_before_any_non_key_or_clef = False
                     measure_result.append(symbol)
 
             if is_first_measure:
@@ -430,8 +511,8 @@ class MeasureCutter:
                     if j > 0:
                         measure_result.insert(0, EncodedSymbol("chord"))
                     measure_result.insert(0, clef)
-            result.extend(measure_result)
-        return result
+            result.append(measure_result)
+        return normalize_barlines_and_repeats(result)
 
 
 def contains_only_supported_clefs(symbols: list[EncodedSymbol]) -> float:
@@ -447,9 +528,12 @@ def _split_file_into_staffs(
     splitter: list[MeasureCutter],
     just_token_files: bool,
     fail_if_image_is_missing: bool,
+    flat_folder: str,
 ) -> list[str]:
     result: list[str] = []
-    png_file = svg_file.filename.replace(".svg", ".png")
+    file_name = os.path.basename(svg_file.filename.replace(".svg", ".png"))
+    png_file = os.path.join(flat_folder, file_name)
+
     image = None
     if not just_token_files:
         target_width = 1400
@@ -477,7 +561,8 @@ def _split_file_into_staffs(
         measures = splitter[current_voice]
         staff_image_file_name = png_file.replace(".png", f"-{staff_number}.png")
         if not just_token_files:
-            y_offset = 50
+            # Before y_offset was 50 which sometimes cut off dynamics
+            y_offset = 65
             x_offset_right = 10
             x_offset_left = 40
             x = total_staff_area.x - x_offset_left
@@ -499,9 +584,7 @@ def _split_file_into_staffs(
             total_staff_area.number_of_measures
         )
 
-        if calc_ratio_of_tuplets(selected_measures) <= 0.2 and contains_only_supported_clefs(
-            selected_measures
-        ):
+        if contains_only_supported_clefs(selected_measures):
             selected_measures = strip_naturals(selected_measures)
             tokens_content = token_lines_to_str(selected_measures)
             write_text_to_file(tokens_content, token_file_name)
@@ -559,7 +642,7 @@ def get_svg_voice_count(voice: list[Measure]) -> int:
 
 
 def convert_xml_and_svg_file(
-    file: Path, just_token_files: bool, fail_if_image_is_missing: bool = True
+    file: Path, just_token_files: bool, flat_folder: str, fail_if_image_is_missing: bool = True
 ) -> list[str]:
     try:
         voices = music_xml_file_to_tokens(str(file))
@@ -595,7 +678,12 @@ def convert_xml_and_svg_file(
                 continue
             result.extend(
                 _split_file_into_staffs(
-                    number_of_voices, svg_file, splitter, just_token_files, fail_if_image_is_missing
+                    number_of_voices,
+                    svg_file,
+                    splitter,
+                    just_token_files,
+                    fail_if_image_is_missing,
+                    flat_folder,
                 )
             )
         return result
@@ -605,12 +693,29 @@ def convert_xml_and_svg_file(
         return []
 
 
+# This is really ugly but it is simple
 def _convert_file_only_token(path: Path) -> list[str]:
-    return convert_xml_and_svg_file(path, True)
+    return convert_xml_and_svg_file(path, True, flat_data)
 
 
 def _convert_token_and_image(path: Path) -> list[str]:
-    return convert_xml_and_svg_file(path, False)
+    return convert_xml_and_svg_file(path, False, flat_data)
+
+
+def convert_file_only_token_pdmx(path: Path) -> list[str]:
+    return convert_xml_and_svg_file(path, True, flat_pdmx)
+
+
+def convert_token_and_image_pdmx(path: Path) -> list[str]:
+    return convert_xml_and_svg_file(path, False, flat_pdmx)
+
+
+def convert_file_only_token_musetrainer(path: Path) -> list[str]:
+    return convert_xml_and_svg_file(path, True, flat_musetrainer)
+
+
+def convert_token_and_image_musetrainer(path: Path) -> list[str]:
+    return convert_xml_and_svg_file(path, False, flat_musetrainer)
 
 
 def convert_lieder(only_recreate_token_files: bool = False) -> None:
@@ -659,9 +764,10 @@ def convert_lieder(only_recreate_token_files: bool = False) -> None:
             os.path.join(quartets, "scores"), os.path.join(lieder, "scores"), dirs_exist_ok=True
         )
 
+    os.makedirs(flat_data, exist_ok=True)
     eprint("Indexing Lieder dataset, this can up to several hours.")
     _create_musicxml_and_svg_files()
-    music_xml_files = list(Path(os.path.join(lieder, "flat")).rglob("*.musicxml"))
+    music_xml_files = list(Path(os.path.join(lieder, "rendered_scores")).rglob("*.musicxml"))
     with open(lieder_train_index, "w") as f:
         file_number = 0
         skipped_files = 0
@@ -688,6 +794,9 @@ def convert_lieder(only_recreate_token_files: bool = False) -> None:
                     )
     eprint("Done indexing")
 
+
+from training.omr_datasets.convert_musetrainer import flat_musetrainer
+from training.omr_datasets.convert_pdmx import flat_pdmx
 
 if __name__ == "__main__":
     multiprocessing.set_start_method("spawn")

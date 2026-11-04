@@ -25,7 +25,10 @@ import editdistance
 from homr.circle_of_fifths import strip_naturals
 from homr.transformer.vocabulary import EncodedSymbol, empty, nonote, sort_token_chords
 from training.omr_datasets.humdrum_kern_parser import convert_kern_to_parts
-from training.omr_datasets.music_xml_parser import music_xml_file_to_tokens
+from training.omr_datasets.music_xml_parser import (
+    music_xml_file_to_tokens,
+    normalize_barlines_and_repeats,
+)
 
 if TYPE_CHECKING:
     import music21 as m21
@@ -134,6 +137,22 @@ def _strip_articulation_from_parts(
     return result
 
 
+def _notes_and_rests_only(parts: list[list[EncodedSymbol]]) -> list[list[EncodedSymbol]]:
+    """Keeps only notes, rests and chord links, without articulation and slur."""
+    result = []
+    for part in parts:
+        new_part = []
+        for s in part:
+            if s.rhythm != "chord" and not s.rhythm.startswith(("note_", "rest_")):
+                continue
+            kept = copy.copy(s)
+            kept.articulation = nonote
+            kept.slur = nonote
+            new_part.append(kept)
+        result.append(new_part)
+    return result
+
+
 def _strip_articulation_from_score(score: "m21.stream.Score") -> None:
     """musicdiff-path counterpart to _strip_articulation_from_parts above: mutates the
     music21 Score in place, removing only Staccato/Staccatissimo articulations and
@@ -161,7 +180,7 @@ def _strip_position(symbols: list[EncodedSymbol]) -> list[EncodedSymbol]:
 
 
 def _flatten_part(measures: Sequence[Sequence[EncodedSymbol]]) -> list[EncodedSymbol]:
-    flat = [s for measure in measures for s in measure]
+    flat = normalize_barlines_and_repeats(measures)
     return [t for chord in sort_token_chords(flat) for t in chord]
 
 
@@ -172,13 +191,15 @@ def _component_dist(a: list[EncodedSymbol], b: list[EncodedSymbol], field: str) 
 def _split_grand_staff_part(part: ET.Element) -> list[ET.Element]:
     """
     Split a single <part> with <staves>2</staves> into two single-staff <part>
-    elements. Returns [part] unchanged if it isn't a 2-staff grand staff (this
-    also covers the (currently unseen) 3+-staff case: splitting would silently
-    drop any staff beyond the second, so we leave those parts alone rather
-    than guess).
+    elements. <staves> may change within the part, e.g. single staff systems
+    followed by grand staves; the second part then has empty measures where
+    the page shows one staff. Returns [part] unchanged if it never has 2
+    staves (this also covers the (currently unseen) 3+-staff case: splitting
+    would silently drop any staff beyond the second, so we leave those parts
+    alone rather than guess).
     """
-    staves_el = part.find(".//staves")
-    if staves_el is None or int(staves_el.text or "1") != 2:
+    staves = [int(el.text or "1") for el in part.iter("staves")]
+    if not staves or max(staves) != 2:
         return [part]
 
     def _staff_num(el: ET.Element) -> int:
@@ -310,7 +331,7 @@ def _xml_parts_from_text(xml_text: str, xml_parser: str) -> list[list[EncodedSym
         f.write(xml_text)
         xml_path = f.name
     try:
-        xml_voices = music_xml_file_to_tokens(xml_path)
+        xml_voices = music_xml_file_to_tokens(xml_path, allow_octave_shifts=True)
     finally:
         os.remove(xml_path)
     return [_flatten_part(p) for p in xml_voices]
@@ -321,17 +342,17 @@ def _is_xml(text: str) -> bool:
     return stripped.startswith("<?xml") or "<score-partwise" in stripped[:500]
 
 
-def _pred_parts(raw_output: str, kern_parser: str, xml_parser: str) -> list[list[EncodedSymbol]]:
-    """Parse tool output (MusicXML or **kern) into per-part token lists.
+def _score_parts(text: str, kern_parser: str, xml_parser: str) -> list[list[EncodedSymbol]]:
+    """Parse a score (MusicXML or **kern) into per-part token lists.
 
     MusicXML is parsed with xml_parser; **kern is parsed directly with kern_parser
     - no intermediate kern->XML conversion.
     """
-    if _is_xml(raw_output):
-        xml_text = _split_grand_staff(raw_output)
+    if _is_xml(text):
+        xml_text = _split_grand_staff(text)
         raw = _xml_parts_from_text(xml_text, xml_parser)
         return [_strip_position(strip_naturals(p)) for p in raw]
-    raw = _kern_parts(raw_output, kern_parser)
+    raw = _kern_parts(text, kern_parser)
     return [_strip_position([t for chord in sort_token_chords(p) for t in chord]) for p in raw]
 
 
@@ -341,21 +362,23 @@ def _parse_output(
     kern_parser: str = "native",
     xml_parser: str = "native",
     ignore_unreliable_articulation: bool = False,
+    notes_and_rests_only: bool = False,
 ) -> tuple[list[list[EncodedSymbol]], list[list[EncodedSymbol]]]:
-    """Parse ground-truth kern and tool raw output into aligned per-part token lists.
+    """Parse ground truth (kern or MusicXML) and tool raw output into per-part token lists.
 
     ignore_unreliable_articulation: see "Known ground-truth reliability exceptions"
     above - opt-in only, set by callers benchmarking datasets with confirmed-unreliable
     articulation ground truth.
+    notes_and_rests_only: compare only notes and rests by rhythm, pitch and lift.
     """
-    kern_raw = _kern_parts(kern_text, kern_parser)
-    gt_parts = [
-        _strip_position([t for chord in sort_token_chords(p) for t in chord]) for p in kern_raw
-    ]
-    pred_parts = _pred_parts(raw_output, kern_parser, xml_parser)
+    gt_parts = _score_parts(kern_text, kern_parser, xml_parser)
+    pred_parts = _score_parts(raw_output, kern_parser, xml_parser)
     if ignore_unreliable_articulation:
         gt_parts = _strip_articulation_from_parts(gt_parts)
         pred_parts = _strip_articulation_from_parts(pred_parts)
+    if notes_and_rests_only:
+        gt_parts = _notes_and_rests_only(gt_parts)
+        pred_parts = _notes_and_rests_only(pred_parts)
     return gt_parts, pred_parts
 
 
@@ -592,7 +615,9 @@ def _musicdiff_parse_scores(
     import music21 as m21  # noqa: PLC0415
 
     with contextlib.redirect_stderr(io.StringIO()):
-        gt_raw = m21.converter.parse(kern_text, format="humdrum")
+        gt_raw = m21.converter.parse(
+            kern_text, format="musicxml" if _is_xml(kern_text) else "humdrum"
+        )
     if isinstance(gt_raw, m21.stream.Opus):
         gt_raw = gt_raw.scores[0] if gt_raw.scores else m21.stream.Score()
     gt_score: m21.stream.Score = (

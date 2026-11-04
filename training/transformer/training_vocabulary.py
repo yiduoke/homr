@@ -10,6 +10,8 @@ from homr.transformer.vocabulary import (
     Vocabulary,
     empty,
     has_rhythm_symbol_a_position,
+    is_lower_position,
+    is_upper_or_has_no_position,
     nonote,
     sort_token_chords,
 )
@@ -61,7 +63,7 @@ def check_token_lines(lines: list[EncodedSymbol]) -> None:
 
 
 def _symbol_to_sortable(symbol: EncodedSymbol) -> int:
-    position = 10000000 if symbol.position == "lower" else 0
+    position = 10000000 if is_lower_position(symbol.position) else 0
     if "note" in symbol.rhythm:
         return (
             vocab.pitch[symbol.pitch] * len(vocab.rhythm) + vocab.rhythm[symbol.rhythm] + position
@@ -73,25 +75,29 @@ def _symbol_to_sortable(symbol: EncodedSymbol) -> int:
 
 def _chord_to_str(chord: list[EncodedSymbol]) -> str:
     sorted_chord = sorted(chord, key=_symbol_to_sortable)
-    upper_slurs = set()
-    lower_slurs = set()
+    slurs_by_position: dict[str, set[str]] = defaultdict(set)
     upper_artics = set()
     lower_artics = set()
 
     annotation_resorted: list[EncodedSymbol] = []
     for symbol in sorted_chord:
+        # Dynamic modifiers live in the articulation branch of a dynamic symbol,
+        # but belong to that dynamic rather than to the notes at the same position.
+        # Keep them attached so they cannot be moved onto a control symbol such as
+        # voltaStart when annotations are consolidated below.
+        if symbol.rhythm.startswith("dynamic"):
+            annotation_resorted.append(symbol)
+            continue
+
         artic_stripped, symbol_stripped = symbol.strip_articulations([], remove_all=True)
         slur_stripped, symbol_stripped = symbol_stripped.strip_slurs([], remove_all=True)
         for articulation in artic_stripped:
-            if symbol.position == "lower":
+            if is_lower_position(symbol.position):
                 lower_artics.add(articulation)
             else:
                 upper_artics.add(articulation)
         for slur in slur_stripped:
-            if symbol.position == "lower":
-                lower_slurs.add(slur)
-            else:
-                upper_slurs.add(slur)
+            slurs_by_position[symbol.position].add(slur)
 
         annotation_resorted.append(symbol_stripped)
 
@@ -102,29 +108,23 @@ def _chord_to_str(chord: list[EncodedSymbol]) -> str:
 
     upper_artics = _remove_item_helper(upper_artics, ".")
     lower_artics = _remove_item_helper(lower_artics, ".")
-    upper_slurs = _remove_item_helper(upper_slurs, ".")
-    lower_slurs = _remove_item_helper(lower_slurs, ".")
-
-    if len(upper_slurs) > 0:
-        first_upper = next(
-            (idx for idx, s in enumerate(annotation_resorted) if s.position != "lower"), None
+    for position, slurs in slurs_by_position.items():
+        voice_slurs = _remove_item_helper(slurs, ".")
+        first_in_voice = next(
+            idx for idx, s in enumerate(annotation_resorted) if s.position == position
         )
-        if first_upper is not None:
-            annotation_resorted[first_upper] = annotation_resorted[first_upper].add_slurs(
-                list(upper_slurs)
-            )
-    if len(lower_slurs) > 0:
-        first_lower = next(
-            (idx for idx, s in enumerate(annotation_resorted) if s.position == "lower"), None
+        annotation_resorted[first_in_voice] = annotation_resorted[first_in_voice].add_slurs(
+            list(voice_slurs)
         )
-        if first_lower is not None:
-            annotation_resorted[first_lower] = annotation_resorted[first_lower].add_slurs(
-                list(lower_slurs)
-            )
 
     if len(upper_artics) > 0:
         first_upper = next(
-            (idx for idx, s in enumerate(annotation_resorted) if s.position != "lower"), None
+            (
+                idx
+                for idx, s in enumerate(annotation_resorted)
+                if s.rhythm.startswith(("note", "rest")) and is_upper_or_has_no_position(s.position)
+            ),
+            None,
         )
         if first_upper is not None:
             annotation_resorted[first_upper] = annotation_resorted[first_upper].add_articulations(
@@ -132,7 +132,12 @@ def _chord_to_str(chord: list[EncodedSymbol]) -> str:
             )
     if len(lower_artics) > 0:
         first_lower = next(
-            (idx for idx, s in enumerate(annotation_resorted) if s.position == "lower"), None
+            (
+                idx
+                for idx, s in enumerate(annotation_resorted)
+                if s.rhythm.startswith(("note", "rest")) and is_lower_position(s.position)
+            ),
+            None,
         )
         if first_lower is not None:
             annotation_resorted[first_lower] = annotation_resorted[first_lower].add_articulations(
@@ -173,12 +178,15 @@ def max_ledger_lines(tokens: list[EncodedSymbol]) -> int:
     }
     max_ledger_lines = 0
     for symbol in tokens:
+        position_type = symbol.position.removesuffix(
+            "2"
+        )  # ignore the difference between upper/upper2 or lower/lower2
         if symbol.rhythm.startswith("clef"):
             anchor = _clef_anchor(symbol.rhythm)
             if anchor is None:
                 continue
-            if symbol.position in anchors:
-                anchors[symbol.position] = anchor
+            if position_type in anchors:
+                anchors[position_type] = anchor
             else:
                 anchors["upper"] = anchor
                 anchors["lower"] = anchor
@@ -194,7 +202,7 @@ def max_ledger_lines(tokens: list[EncodedSymbol]) -> int:
         if absolute_val is None:
             continue
 
-        anchor = anchors.get(symbol.position, anchors["upper"])
+        anchor = anchors.get(position_type, anchors["upper"])
         if anchor is None:
             raise ValueError("Failed to get anchor")
         offset = absolute_val - anchor
@@ -401,5 +409,3 @@ if __name__ == "__main__":
             errors.add(file)
 
     eprint("Stats", stats)
-    if len(errors) > 0:
-        eprint("errors", errors)

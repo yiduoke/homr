@@ -12,7 +12,7 @@ import numpy as np
 import onnxruntime as ort
 
 from homr import color_adjust, download_utils
-from homr.autocrop import autocrop
+from homr.autocrop import autocrop_with_offset
 from homr.bar_line_detection import (
     detect_bar_lines,
     prepare_bar_line_image,
@@ -34,16 +34,23 @@ from homr.noise_filtering import filter_predictions
 from homr.note_detection import add_notes_to_staffs, combine_noteheads_with_stems
 from homr.onnx_providers import coreml_available, cuda_available, rocm_available
 from homr.pdf_utils import render_pdf_to_image
+from homr.point_mapping import PointMapping, chain, undo_crop, undo_resize
 from homr.relieur import process_concat
 from homr.resize import resize_image
 from homr.segmentation.config import segnet_path_onnx, segnet_path_onnx_fp16
 from homr.segmentation.inference_segnet import extract
 from homr.simple_logging import eprint
-from homr.staff_detection import break_wide_fragments, detect_staff, make_lines_stronger
+from homr.staff_detection import (
+    break_wide_fragments,
+    detect_staff,
+    estimate_unit_size_from_clefs,
+    make_lines_stronger,
+)
 from homr.staff_parsing import parse_staffs
 from homr.staff_position_save_load import load_staff_positions, save_staff_positions
+from homr.system_repair import repair_systems
 from homr.title_detection import TitleAndTempo, detect_title, download_ocr_weights
-from homr.transformer.configs import Config, default_config, root_dir
+from homr.transformer.configs import Config, default_config
 from homr.type_definitions import NDArray
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -108,16 +115,23 @@ def replace_extension(path: str, new_extension: str) -> str:
 
 def load_and_preprocess_predictions(
     image_path: str, enable_debug: bool, enable_cache: bool, segnet_use_gpu: bool
-) -> tuple[InputPredictions, Debug]:
+) -> tuple[InputPredictions, Debug, PointMapping]:
+    """
+    The returned mapping takes coordinates of the predictions back to the input image.
+    """
     image = cv2.imread(image_path)
     if image is None:
         raise InvalidProgramArgumentException(
             "The file format is not supported, please provide a JPG or PNG image file:" + image_path
         )
-    image = autocrop(image)
+    image, crop_top_left = autocrop_with_offset(image)
+    cropped_shape = image.shape
     image = resize_image(image)
     preprocessed = color_adjust.apply_clahe(image)
     predictions = get_predictions(image, preprocessed, image_path, enable_cache, segnet_use_gpu)
+    to_input_image = chain(
+        undo_resize(cropped_shape, predictions.preprocessed.shape), undo_crop(*crop_top_left)
+    )
     debug = Debug(predictions.original, image_path, enable_debug)
     debug.write_image("color_adjust", preprocessed)
 
@@ -129,7 +143,7 @@ def load_and_preprocess_predictions(
     debug.write_threshold_image("stems_rest", predictions.stems_rest)
     debug.write_threshold_image("notehead", predictions.notehead)
     debug.write_threshold_image("clefs_keys", predictions.clefs_keys)
-    return predictions, debug
+    return predictions, debug, to_input_image
 
 
 def predict_symbols(debug: Debug, predictions: InputPredictions) -> PredictedSymbols:
@@ -185,7 +199,9 @@ def process_image(
             image = cv2.imread(image_path)
             if image is None:
                 raise ValueError("Failed to read " + image_path)
+            original_shape = image.shape
             image = resize_image(image)
+            to_input_image = undo_resize(original_shape, image.shape)
             debug = Debug(image, image_path, config.enable_debug)
             staff_position_files = replace_extension(image_path, ".txt")
             multi_staffs = load_staff_positions(
@@ -199,8 +215,11 @@ def process_image(
             # two code paths feed the symbol-recognition encoder consistent input.
             image = color_adjust.apply_clahe(image)
         else:
-            multi_staffs, image, debug, title_future, _ = detect_staffs_in_image(image_path, config)
+            multi_staffs, image, debug, title_future, _, to_input_image = detect_staffs_in_image(
+                image_path, config
+            )
         debug_cleanup = debug
+        multi_staffs = repair_systems(debug, multi_staffs)
 
         transformer_config = Config()
         transformer_config.use_gpu_inference = config.transformer_use_gpu
@@ -212,6 +231,7 @@ def process_image(
             image,
             selected_staff=config.selected_staff,
             config=transformer_config,
+            page_to_input_image=to_input_image,
         )
 
         if not config.read_staff_positions:
@@ -247,8 +267,8 @@ def process_image(
 
 def detect_staffs_in_image(
     image_path: str, config: ProcessingConfig
-) -> tuple[list[MultiStaff], NDArray, Debug, Future[TitleAndTempo], int]:
-    predictions, debug = load_and_preprocess_predictions(
+) -> tuple[list[MultiStaff], NDArray, Debug, Future[TitleAndTempo], int, PointMapping]:
+    predictions, debug, to_input_image = load_and_preprocess_predictions(
         image_path, config.enable_debug, config.enable_cache, config.segnet_use_gpu
     )
     symbols = predict_symbols(debug, predictions)
@@ -260,12 +280,15 @@ def detect_staffs_in_image(
     noteheads_with_stems = combine_noteheads_with_stems(symbols.noteheads, symbols.stems_rest)
     debug.write_bounding_boxes_alternating_colors("notehead_with_stems", noteheads_with_stems)
     eprint("Found " + str(len(noteheads_with_stems)) + " noteheads")
-    if len(noteheads_with_stems) == 0:
-        raise Exception("No noteheads found")
-
-    average_note_head_height = float(
-        np.median([notehead.notehead.size[1] for notehead in noteheads_with_stems])
-    )
+    if len(noteheads_with_stems) > 0:
+        average_note_head_height = float(
+            np.median([notehead.notehead.size[1] for notehead in noteheads_with_stems])
+        )
+    else:
+        unit_size = estimate_unit_size_from_clefs(symbols.staff_fragments, symbols.clefs_keys)
+        if unit_size is None:
+            raise Exception("No noteheads or clefs found")
+        average_note_head_height = unit_size
     eprint("Average note head height: " + str(average_note_head_height))
 
     all_noteheads = [notehead.notehead for notehead in noteheads_with_stems]
@@ -314,13 +337,15 @@ def detect_staffs_in_image(
 
     debug.write_all_bounding_boxes_alternating_colors("notes", multi_staffs, notes)
 
-    return multi_staffs, predictions.preprocessed, debug, title_future, len(staffs)
+    return multi_staffs, predictions.preprocessed, debug, title_future, len(staffs), to_input_image
 
 
 def get_all_image_files_in_folder(folder: str) -> list[str]:
     image_files = []
     for ext in ["png", "jpg", "jpeg", "pdf", "PNG", "JPG", "JPEG", "PDF"]:
         image_files.extend(glob.glob(os.path.join(folder, "**", f"*.{ext}"), recursive=True))
+    # On case-insensitive file systems the upper and lower case patterns match the same files
+    image_files = list(dict.fromkeys(image_files))
     without_teasers = [
         img
         for img in image_files
@@ -379,7 +404,6 @@ def run_homr(
     """
     eprint("Merging", len(images), "files:", images)
     xml_paths = []
-    filename = os.path.splitext(os.path.basename(images[0]))[0]
     for image_file in images:
         eprint("=========================================")
         try:
@@ -387,16 +411,16 @@ def run_homr(
             eprint("Finished", image_file)
         except Exception as e:
             eprint(f"An error occurred while processing {image_file}: {e}")
-            return  # Don't need to continue (save time)
+            raise
 
     if len(xml_paths) == len(images) and len(xml_paths) > 1:
-        output_path = os.path.join(root_dir, f"{filename}_merged.musicxml")
         m, _, _ = process_concat(xml_paths)
-        ET.ElementTree(m).write(output_path, encoding="UTF-8", xml_declaration=True)
-
         for path in xml_paths:
             if os.path.exists(path):
                 os.remove(path)
+        filename = os.path.splitext(images[0])[0]
+        output_path = f"{filename}.musicxml"
+        ET.ElementTree(m).write(output_path, encoding="UTF-8", xml_declaration=True)
 
         eprint(f"Saved the generated musicxml at {output_path}")
 
@@ -474,8 +498,11 @@ def main() -> None:
     coreml_encoder = args.coreml_encoder and not transformer_use_gpu and coreml_available()
 
     download_weights(segnet_use_gpu, transformer_use_gpu, coreml_encoder)
-    if args.init:
+
+    if not args.no_title:
         download_ocr_weights()
+
+    if args.init:
         eprint("Init finished")
         return
 
@@ -546,6 +573,8 @@ def main() -> None:
         except InvalidProgramArgumentException as e:
             eprint(str(e))
             sys.exit(2)
+        except Exception:
+            sys.exit(1)
 
 
 if __name__ == "__main__":

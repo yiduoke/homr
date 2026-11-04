@@ -14,6 +14,7 @@ from homr.transformer.vocabulary import (
     EncodedSymbol,
     SymbolDuration,
     empty,
+    is_lower_position,
     nonote,
     sort_token_chords,
 )
@@ -73,22 +74,15 @@ class SymbolChord:
         return min(notes_rests)
 
     def into_positions(self) -> list["SymbolChord"]:
-        upper = []
-        lower = []
-        lower_is_only_rest = True
+        buckets: dict[str, list[EncodedSymbol]] = defaultdict(list)
         for symbol in self.symbols:
-            if symbol.position == "upper":
-                upper.append(symbol)
-            else:
-                lower.append(symbol)
-                lower_is_only_rest = lower_is_only_rest and symbol.rhythm.startswith("rest")
-        chords = (
-            SymbolChord(upper, self.tuplet_mark),
-            SymbolChord(lower, self.tuplet_mark),
+            buckets[symbol.position].append(symbol)
+        chords = [SymbolChord(symbols, self.tuplet_mark) for symbols in buckets.values()]
+        # Voices of only rests go first, the last chord is the one which advances time.
+        chords.sort(
+            key=lambda chord: all(s.rhythm.startswith("rest") for s in chord.symbols), reverse=True
         )
-        if lower_is_only_rest:
-            chords = (chords[1], chords[0])
-        return [chord for chord in chords if len(chord.symbols) > 0]
+        return chords
 
 
 class XmlGeneratorArguments:
@@ -132,7 +126,7 @@ def xml_to_string(element: ET.Element) -> str:
 
 def _voice_has_two_staves(voice: list[EncodedSymbol]) -> bool:
     """True if any symbol uses the lower staff (e.g. piano left hand / bass clef)."""
-    return any(s.position == "lower" for s in voice)
+    return any(is_lower_position(s.position) for s in voice)
 
 
 def build_part(
@@ -152,14 +146,23 @@ def build_measures(
     is_first_part: bool,
     has_two_staves: bool = False,
 ) -> list[ET.Element]:
+    # Tokens say which notes start together, not when each group starts. A group starts
+    # when the earliest still-sounding note ends (that is how training data is grouped),
+    # so track the end times of sounding notes instead of only the last group's shortest note.
+    clock = Fraction(0)
+    sounding: list[Fraction] = []
+
     def close_current_measure() -> None:
+        nonlocal clock, sounding
         rebalance_measure_voices(current_measure)
         measures.append(current_measure)
+        clock, sounding = Fraction(0), []
 
     measure_number = 1
-    groups = add_tuplet_start_stop(group_into_chords(voice))
-    division, nominator = find_division_and_time_signature_nominator(groups)
-    state = ConversionState(division, nominator)
+    groups = split_mixed_chords(add_tuplet_start_stop(group_into_chords(voice)))
+    division, nominators = find_division_and_time_signature_nominators(groups)
+    state = ConversionState(division, nominators[0])
+    time_signature_no = 0
     measures: list[ET.Element] = []
     current_measure = ET.Element("measure", number=str(measure_number))
     first_attributes = build_or_get_attributes(current_measure, None)
@@ -186,14 +189,20 @@ def build_measures(
                 build_multi_measure_rest(symbol, attributes)
             else:
                 staff_positions = group.into_positions()
+                advance = _advance_to_next_group(group, clock, sounding)
+                clock += advance
+                sounding = [end for end in sounding if end > clock]
                 for pos_no, staff_pos in enumerate(staff_positions):
-                    chord_duration = (
-                        group.get_duration() if pos_no == len(staff_positions) - 1 else Fraction(0)
-                    )
+                    chord_duration = advance if pos_no == len(staff_positions) - 1 else Fraction(0)
                     for note_xml in build_note_chord(staff_pos, state, chord_duration):
                         current_measure.append(note_xml)
             continue
-        if rhythm == "newline":
+        if rhythm == "measureRest":
+            for staff_no, rest in enumerate(sorted(group.symbols, key=get_staff)):
+                if staff_no > 0:
+                    current_measure.append(build_backup(state.nominator, state))
+                current_measure.append(build_measure_rest(rest, state))
+        elif rhythm == "newline":
             is_last_measure = group_no == len(groups) - 1
             if not is_last_measure:
                 ET.SubElement(current_measure, "print", attrib={"new-system": "yes"})
@@ -207,6 +216,8 @@ def build_measures(
             build_key(symbol, attributes)
         elif rhythm.startswith("timeSignature"):
             attributes = build_or_get_attributes(current_measure, last_attributes)
+            state.nominator = nominators[min(time_signature_no, len(nominators) - 1)]
+            time_signature_no += 1
             build_time_signature(symbol, attributes, state)
         elif "barline" in rhythm:
             if rhythm != "barline":
@@ -247,17 +258,36 @@ def build_measures(
             volta_number = state.stop_volta(measure_number)
             barline = build_or_get_barline(current_measure, "right")
             build_barline_ending(symbol, barline, volta_number)
+
+        elif rhythm.startswith("dynamic") or symbol.articulation.startswith("dynamic"):
+            for dynamic in group.symbols:
+                build_dynamic(dynamic, current_measure)
         else:
             eprint("Symbol isn't supported yet ", symbol)
 
     if len(list(current_measure)) > 0:
         close_current_measure()
-    if first_attributes.find("time") is None:
+    # A clef opens a second attributes element, so look at the whole first measure
+    if measures[0].find("attributes/time") is None:
         time_el = ET.SubElement(first_attributes, "time")
         beats = max(int(state.nominator * 4), 1)
         ET.SubElement(time_el, "beats").text = str(beats)
         ET.SubElement(time_el, "beat-type").text = "4"
     return measures
+
+
+def _advance_to_next_group(
+    group: SymbolChord, clock: Fraction, sounding: list[Fraction]
+) -> Fraction:
+    """How far the next group starts after this one, updating the sounding notes in place."""
+    durations = [
+        s.get_duration().fraction for s in group.symbols if s.rhythm.startswith(("note", "rest"))
+    ]
+    timed = [d for d in durations if d > 0]  # grace notes have no duration and take no time
+    if not timed:
+        return Fraction(0)
+    sounding.extend(clock + d for d in timed)
+    return min(end for end in sounding if end > clock) - clock
 
 
 def build_work(title_text: str) -> ET.Element:
@@ -327,13 +357,37 @@ def build_or_get_barline(measure: ET.Element, location: str) -> ET.Element:
     return ET.SubElement(measure, "barline", location=location)
 
 
+def build_dynamic(model_dynamic: EncodedSymbol, measure: ET.Element) -> None:
+    marks: list[ET.Element] = []
+    if model_dynamic.rhythm.startswith("dynamic"):
+        dynamic_name = model_dynamic.rhythm.split("_", 1)[1]
+        # `dynamic_empty` is the internal placeholder used for a modifier-only
+        # marking (for example, "più"). It is not a MusicXML dynamics element.
+        if dynamic_name != "empty":
+            marks.append(ET.Element(dynamic_name))
+    if model_dynamic.articulation.startswith("dynamic"):
+        text = ET.Element("other-dynamics")
+        text.text = model_dynamic.articulation.split("_", 1)[1].replace("piu", "più")
+        marks.append(text)
+
+    if not marks:
+        return
+
+    direction = ET.SubElement(measure, "direction", placement="below")
+    direction_type = ET.SubElement(direction, "direction-type")
+    dynamics = ET.SubElement(direction_type, "dynamics")
+    dynamics.extend(marks)
+
+    ET.SubElement(direction, "staff").text = str(get_staff(model_dynamic))
+
+
 def build_key(model_key: EncodedSymbol, attributes: ET.Element) -> None:
     key = ET.SubElement(attributes, "key")
     ET.SubElement(key, "fifths").text = model_key.rhythm.split("_")[1]
 
 
 def get_staff(symbol: EncodedSymbol) -> int:
-    return 2 if symbol.position == "lower" else 1
+    return 2 if is_lower_position(symbol.position) else 1
 
 
 def get_xml_voice(staff_num: int, rhythmic_layer: int) -> int:
@@ -596,48 +650,52 @@ def build_articulations(
 
     xml_articulations: list[ET.Element] = []
     xml_ornaments: list[ET.Element] = []
-
-    for articulation in articualations.split("_"):
-        if articulation == "":
-            continue
-        elif articulation == nonote:
-            eprint("WARNING note without valid articulation", articualations)
-        elif articulation == "fermata":
-            ET.SubElement(notation, "fermata")
-        elif articulation == "arpeggiate":
-            ET.SubElement(notation, "arpeggiate")
-        elif articulation == "accent":
-            xml_articulations.append(ET.Element("accent"))
-        elif articulation == "staccato":
-            xml_articulations.append(ET.Element("staccato"))
-        elif articulation == "staccatissimo":
-            xml_articulations.append(ET.Element("staccatissimo"))
-        elif articulation == "tenuto":
-            xml_articulations.append(ET.Element("tenuto"))
-        elif articulation == "tremolo":
-            el = ET.Element("tremolo", type=state.toggle_tremolo_state())
-            el.text = "3"
-            xml_ornaments.append(el)
-        elif articulation == "trill":
-            xml_ornaments.append(ET.Element("trill-mark"))
-        elif articulation == "breathMark":
-            xml_articulations.append(ET.Element("breath-mark"))
-        elif articulation == "turn":
-            xml_ornaments.append(ET.Element("inverted-turn"))
-        elif articulation == "caesura":
-            xml_articulations.append(ET.Element("caesura"))
-        elif articulation == "doit":
-            xml_articulations.append(ET.Element("doit"))
-        elif articulation == "slurStart":
-            ET.SubElement(notation, "slur", type="start")
-        elif articulation == "slurStop":
-            ET.SubElement(notation, "slur", type="stop")
-        elif articulation == "tieStart":
-            ET.SubElement(notation, "tied", type="start")
-        elif articulation == "tieStop":
-            ET.SubElement(notation, "tied", type="stop")
-        else:
-            raise ValueError("Unsupported articulation " + articulation)
+    if not articualations.startswith("dynamic"):
+        for articulation in articualations.split("_"):
+            if articulation == "":
+                continue
+            elif articulation == nonote:
+                eprint("WARNING note without valid articulation", articualations)
+            elif articulation == "fermata":
+                ET.SubElement(notation, "fermata")
+            elif articulation == "arpeggiate":
+                ET.SubElement(notation, "arpeggiate")
+            elif articulation == "accent":
+                xml_articulations.append(ET.Element("accent"))
+            elif articulation == "accentStrong":
+                xml_articulations.append(ET.Element("strong-accent"))
+            elif articulation == "mordent":
+                xml_articulations.append(ET.Element("mordent"))
+            elif articulation == "staccato":
+                xml_articulations.append(ET.Element("staccato"))
+            elif articulation == "staccatissimo":
+                xml_articulations.append(ET.Element("staccatissimo"))
+            elif articulation == "tenuto":
+                xml_articulations.append(ET.Element("tenuto"))
+            elif articulation == "tremolo":
+                el = ET.Element("tremolo", type=state.toggle_tremolo_state())
+                el.text = "3"
+                xml_ornaments.append(el)
+            elif articulation == "trill":
+                xml_ornaments.append(ET.Element("trill-mark"))
+            elif articulation == "breathMark":
+                xml_articulations.append(ET.Element("breath-mark"))
+            elif articulation == "turn":
+                xml_ornaments.append(ET.Element("inverted-turn"))
+            elif articulation == "caesura":
+                xml_articulations.append(ET.Element("caesura"))
+            elif articulation == "doit":
+                xml_articulations.append(ET.Element("doit"))
+            elif articulation == "slurStart":
+                ET.SubElement(notation, "slur", type="start")
+            elif articulation == "slurStop":
+                ET.SubElement(notation, "slur", type="stop")
+            elif articulation == "tieStart":
+                ET.SubElement(notation, "tied", type="start")
+            elif articulation == "tieStop":
+                ET.SubElement(notation, "tied", type="stop")
+            else:
+                raise ValueError("Unsupported articulation " + articulation)
 
     if tuplet_mark != "":
         ET.SubElement(notation, "tuplet", type=tuplet_mark)
@@ -711,7 +769,9 @@ def build_note_or_rest(
         ET.SubElement(note, "type").text = DURATION_NAMES[base_duration]
     elif model_duration.fraction.numerator > 0:
         base_duration = 1 if model_duration.kern == 0 else model_duration.kern
-        ET.SubElement(note, "duration").text = str(int(model_duration.fraction * state.division))
+        ET.SubElement(note, "duration").text = str(
+            max(1, int(model_duration.fraction * state.division))
+        )
         ET.SubElement(note, "type").text = DURATION_NAMES[base_duration]
     else:
         ET.SubElement(note, "duration").text = str(state.beats)
@@ -732,8 +792,20 @@ def build_note_or_rest(
 
     build_articulations(note, model_note.articulation, tuplet_mark, state)
     build_slurs(note, model_note.slur, slur_number)
+    build_image_position(note, model_note)
 
     return note
+
+
+def build_image_position(xml: ET.Element, symbol: EncodedSymbol) -> None:
+    """
+    Adds the position of the symbol on the input image as comment. The position is estimated
+    from the attention of the transformer, it points roughly at the symbol but isn't precise.
+    """
+    if symbol.image_coordinates is None:
+        return
+    x, y = symbol.image_coordinates
+    xml.append(ET.Comment(f" imgpos: {round(x)}, {round(y)} "))
 
 
 def build_multi_measure_rest(symbol: EncodedSymbol, attributes: ET.Element) -> None:
@@ -745,10 +817,21 @@ def build_multi_measure_rest(symbol: EncodedSymbol, attributes: ET.Element) -> N
     ET.SubElement(style, "multiple-rest").text = str(duration)
 
 
+def build_measure_rest(symbol: EncodedSymbol, state: ConversionState) -> ET.Element:
+    """A rest which fills the measure, e.g. in a staff which is hidden in a system."""
+    note = ET.Element("note")
+    ET.SubElement(note, "rest", measure="yes")
+    duration = max(1, int(state.nominator * state.division))
+    ET.SubElement(note, "duration").text = str(duration)
+    ET.SubElement(note, "voice").text = "1"
+    ET.SubElement(note, "staff").text = str(get_staff(symbol))
+    return note
+
+
 def build_backup(duration: Fraction, state: ConversionState) -> ET.Element:
     assert duration > Fraction(0), "Backup duration must be positive"
     backup = ET.Element("backup")
-    ET.SubElement(backup, "duration").text = str(int(duration * state.division))
+    ET.SubElement(backup, "duration").text = str(max(1, int(duration * state.division)))
     return backup
 
 
@@ -766,14 +849,8 @@ def build_note_chord(
             result.append(build_note_or_rest(note, i, not is_first, state, note_chord.tuplet_mark))
             is_first = False
 
-        if rests:
-            if group_duration <= Fraction(0):
-                # A zero-length rest group can't be written down and there is nothing
-                # to back up over, but it also isn't worth losing the page for: the
-                # transformer occasionally emits one on dense scores. Skip it and
-                # keep whatever else the measure had.
-                eprint("WARNING skipping rest group with non-positive duration")
-                continue
+        # A grace note without pitch would be a rest which takes no time
+        if rests and group_duration > Fraction(0):
             if notes:
                 # There are other notes, so to avoid rest being merged into chord, we emit a backup
                 result.append(build_backup(group_duration, state))
@@ -854,29 +931,105 @@ def find_common_division(durations: list[Fraction]) -> int:
     return common
 
 
-def find_division_and_time_signature_nominator(voice: list[SymbolChord]) -> tuple[int, Fraction]:
+def find_division_and_time_signature_nominators(
+    voice: list[SymbolChord],
+) -> tuple[int, list[Fraction]]:
+    """
+    Returns the division and one measure length per time signature, estimated from the
+    measures up to the next time signature. Measures before the first one count towards it.
+    """
     durations = [Fraction(1, 4)]
     duration_in_measure = Fraction(0)
-    measure_duration = []
+    segments: list[list[Fraction]] = [[]]
+    has_time_signature = False
     for chord in voice:
-        if chord.is_barline() and duration_in_measure > Fraction(0):
-            measure_duration.append(duration_in_measure)
+        if chord.symbols and chord.symbols[0].rhythm.startswith("timeSignature"):
+            if duration_in_measure > Fraction(0):
+                segments[-1].append(duration_in_measure)
+                duration_in_measure = Fraction(0)
+            if has_time_signature:
+                segments.append([])
+            has_time_signature = True
+        elif chord.is_barline() and duration_in_measure > Fraction(0):
+            segments[-1].append(duration_in_measure)
             duration_in_measure = Fraction(0)
         else:
+            for symbol in chord.symbols:
+                if symbol.rhythm.startswith(("note", "rest")):
+                    frac = symbol.get_duration().fraction
+                    if frac > Fraction(0):
+                        durations.append(frac)
             duration = chord.get_duration()
             if duration > Fraction(0):
-                durations.append(duration)
                 duration_in_measure += duration
 
     if duration_in_measure > Fraction(0):
-        measure_duration.append(duration_in_measure)
+        segments[-1].append(duration_in_measure)
 
-    if len(measure_duration) == 0:
-        return find_common_division(durations), Fraction(1)
+    all_measures = [d for segment in segments for d in segment]
+    if len(all_measures) == 0:
+        return find_common_division(durations), [Fraction(1)] * len(segments)
 
-    nominator: Fraction = np.median(measure_duration)  # type: ignore
+    # A time signature without measures after it, e.g. a courtesy one at the end of a
+    # system, belongs to the measures of the next one
+    nominators: list[Fraction] = []
+    following: Fraction = np.median(all_measures)  # type: ignore
+    for segment in reversed(segments):
+        if segment:
+            following = np.median(segment)  # type: ignore
+        nominators.append(following)
+    nominators.reverse()
 
-    return find_common_division(durations), nominator
+    return find_common_division(durations), nominators
+
+
+_BEFORE_NOTES_ORDER = ["clef", "keySignature", "timeSignature"]
+
+
+def _split_mixed_chord(symbols: list[EncodedSymbol]) -> list[list[EncodedSymbol]]:
+    """
+    The transformer sometimes joins a clef, key, time signature or barline to a chord
+    of notes, e.g. a clef change in one staff on the beat where the other staff plays.
+    build_measures handles a group by its first symbol: if that is a note the extra
+    symbol becomes a zero-length rest (and fails an assertion), otherwise the notes
+    are dropped. Split it: clefs, keys and time signatures go before the notes (in
+    the order they have at the start of a line), barlines and repeats after them.
+    """
+    notes = [s for s in symbols if s.rhythm.startswith(("note", "rest"))]
+    if not notes or len(notes) == len(symbols):
+        return [symbols]
+    others = [s for s in symbols if not s.rhythm.startswith(("note", "rest"))]
+    after = [s for s in others if "barline" in s.rhythm or "repeat" in s.rhythm]
+    before: dict[str, list[EncodedSymbol]] = defaultdict(list)
+    for s in others:
+        if s not in after:
+            before[s.rhythm.split("_")[0].split("/")[0]].append(s)
+    rank = {kind: i for i, kind in enumerate(_BEFORE_NOTES_ORDER)}
+    ordered = sorted(before, key=lambda kind: rank.get(kind, len(rank)))
+    return [*(before[kind] for kind in ordered), notes, *([s] for s in after)]
+
+
+def split_mixed_chords(groups: list[SymbolChord]) -> list[SymbolChord]:
+    """
+    Applies _split_mixed_chord to every group. Runs after the tuplet marks are set, so
+    the notes keep their mark and a split-off clef doesn't interrupt a tuplet.
+    """
+    result: list[SymbolChord] = []
+    split_barline = False
+    for group in groups:
+        parts = _split_mixed_chord(group.symbols)
+        if split_barline and group.is_barline() and len(parts) == 1:
+            # The barline split off the previous chord and this one are the same barline:
+            # keep one, preferring a repeat or double barline over a plain barline.
+            if group.symbols[0].rhythm == "barline" and result[-1].symbols[0].rhythm != "barline":
+                split_barline = False
+                continue
+            result.pop()
+        for part in parts:
+            is_notes = part[0].rhythm.startswith(("note", "rest"))
+            result.append(SymbolChord(part, group.tuplet_mark if is_notes else ""))
+        split_barline = len(parts) > 1 and result[-1].is_barline()
+    return result
 
 
 def group_into_chords(voice: list[EncodedSymbol]) -> list[SymbolChord]:
