@@ -1,7 +1,12 @@
 import unittest
 
 from homr.model import MultiStaff, Staff, StaffPoint
-from homr.staff_parsing import _assign_parts, _clean_up_voice, _measure_rests_like
+from homr.staff_parsing import (
+    _assign_parts,
+    _clean_up_voice,
+    _measure_rests_like,
+    _parts_of_systems,
+)
 from homr.system_repair import (
     _common_layout,
     _ensure_same_number_of_staffs,
@@ -276,6 +281,24 @@ class TestStaffParsing(unittest.TestCase):
         two_voices = MultiStaff([make_staff(0), make_staff(1)], [])
 
         self.assertIsNone(_assign_parts([two_voices, make_row(3)]))
+
+    def test_parts_of_systems_keeps_systems_whose_layout_changes(self) -> None:
+        # Piano on a grand staff, then on four staffs for two systems
+        grand = make_row(0, is_grandstaff=True)
+        four = [MultiStaff([make_staff(4 * i + j) for j in range(4)], []) for i in (1, 2)]
+
+        staffs, parts = _parts_of_systems([grand, *four])
+
+        self.assertEqual([grand, *four], staffs)
+        self.assertEqual([(0,), (0, 1, 2, 3), (0, 1, 2, 3)], parts)
+
+    def test_parts_of_systems_reads_single_staffs_on_their_own(self) -> None:
+        rows = [make_row(0, is_grandstaff=True), make_row(1)]
+
+        staffs, parts = _parts_of_systems(rows)
+
+        self.assertEqual(2, len(staffs))
+        self.assertEqual([(0,), (0,)], parts)
 
     def test_measure_rests_like(self) -> None:
         symbols = [

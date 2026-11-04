@@ -292,6 +292,34 @@ def _assign_parts(staffs: list[MultiStaff]) -> list[tuple[int, ...]] | None:
     return result
 
 
+def _parts_of_systems(
+    staffs: list[MultiStaff],
+) -> tuple[list[MultiStaff], list[tuple[int, ...]]]:
+    """
+    The systems to read and, for each, the parts (staffs of the widest system) which
+    its staffs belong to.
+    """
+    parts = [tuple(range(len(row.staffs))) for row in staffs]
+    if len({len(staff.staffs) for staff in staffs}) <= 1:
+        return staffs, parts
+    # The voices are read across systems, a system with fewer staffs hides some
+    assigned = _assign_parts(staffs)
+    if assigned is not None:
+        eprint("Staffs are hidden in some systems, parts of the systems:", assigned)
+        return staffs, assigned
+    if any(len(staff.staffs) > 1 for staff in staffs):
+        # Braces or bar lines join the staffs of a system, so they sound together.
+        # Reading them one after another would play the hands of a 4-staff system
+        # in sequence; piano writing that grows from 2 to 4 staffs for a few systems
+        # (Rachmaninoff's Op. 3 No. 2) has no unambiguous slot mapping, so the
+        # staffs are taken top to bottom and the missing ones are filled with rests.
+        eprint("The layout changes on the page, mapping the staffs top to bottom")
+        return staffs, parts
+    eprint("The layout changes on the page, reading every staff on its own")
+    single = [one for staff in staffs for one in staff.break_apart()]
+    return single, [(0,)] * len(single)
+
+
 def _measure_rests_like(symbols: list[EncodedSymbol], is_grandstaff: bool) -> list[EncodedSymbol]:
     """
     Rests for a staff which is hidden in a system: one per measure of the symbols
@@ -332,17 +360,7 @@ def parse_staffs(
     page_to_input_image maps the coordinates of image back to the image the user provided,
     it's used to fill EncodedSymbol.image_coordinates.
     """
-    parts = [tuple(range(len(row.staffs))) for row in staffs]
-    if len({len(staff.staffs) for staff in staffs}) > 1:
-        # The voices are read across systems, a system with fewer staffs hides some
-        assigned = _assign_parts(staffs)
-        if assigned is None:
-            eprint("The layout changes on the page, reading every staff on its own")
-            staffs = [single for staff in staffs for single in staff.break_apart()]
-            parts = [(0,)] * len(staffs)
-        else:
-            eprint("Staffs are hidden in some systems, parts of the systems:", assigned)
-            parts = assigned
+    staffs, parts = _parts_of_systems(staffs)
     # For simplicity we call every staff in a multi staff a voice,
     # even if it's part of a grand staff.
     number_of_voices = max(len(staff.staffs) for staff in staffs)
