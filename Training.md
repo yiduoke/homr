@@ -144,7 +144,7 @@ Scans, per piece (round three epoch 1, bracket-aware cutting):
 | Ravel Scarbo (Gaspard de la nuit) | 4 | 8 / 15 | 0 | [IMSLP](https://imslp.org/files/imglnks/usimg/9/99/IMSLP246876-PMLP02576-Ravel,_Maurice-Gaspard_de_la_nuit_Durand_7207_filter.pdf) |
 | Scriabin Etude Op.8 No.12 | 1 | 1 / 2 | 0 | [IMSLP](https://imslp.org/files/imglnks/usimg/f/f3/IMSLP273680-PMLP02576-Scriabin_Op.8_No_12.pdf) |
 | Scriabin Piano Sonata No.4 Op.30 | 2 | 6 / 6 | 0 | [archive.org](https://archive.org/details/imslp-sonata-no4-op30-scriabin-aleksandr) |
-| Bach, Beethoven, Brahms (other scans) | 15 | in the 39 pages above | — | [archive.org](https://archive.org/details/TheWellTemperedClavierBook1), [archive.org](https://archive.org/details/beethovensonatas0000vari_t9w7), [archive.org](https://archive.org/details/imslp-fantasien-op116-brahms-johannes) |
+| Control pages without octave marks (Bach, Beethoven, Brahms): 24 of the 34 controls | 24 | — | 1 false mark in all 34 controls |  [archive.org](https://archive.org/details/TheWellTemperedClavierBook1), [archive.org](https://archive.org/details/beethovensonatas0000vari_t9w7), [archive.org](https://archive.org/details/imslp-fantasien-op116-brahms-johannes) |
 
 Held-out staffs (`training/transformer/octave_eval.py`), epoch 1:
 
