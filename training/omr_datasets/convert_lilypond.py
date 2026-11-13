@@ -8,9 +8,11 @@ changes, so no answer key has to be invented.
 
 How a page becomes staff crops:
   1. musicxml2ly converts the MusicXML, LilyPond chooses its own line and page breaks.
-  2. LilyPond runs twice on the same .ly: once with the SVG backend, where the grobs we
-     care about carry a class via `output-attributes` (geometry only), once to PNG (the
-     picture; the SVG backend leaves text to whatever "serif" the rasteriser has).
+  2. LilyPond engraves the page once, with the SVG backend, where the grobs we care about
+     carry a class via `output-attributes`. That one SVG gives the geometry and, through
+     rsvg-convert, the picture. Engraving a second time for the picture does not work:
+     LilyPond's backends measure text differently, and with lyrics the second run broke
+     the lines elsewhere in a third of the scores, so pictures and tokens disagreed.
   3. Staff lines and bar lines from the SVG give each staff its box and its number of
      measures; MeasureCutter hands out that many measures per staff, top to bottom.
   4. A sample is kept only if the picture agrees with its tokens: same number of note
@@ -137,9 +139,13 @@ _OTHER_DYNAMICS_ALONE = re.compile(
     r"<dynamics\b[^>]*>\s*<other-dynamics\b[^>]*>(.*?)</other-dynamics>\s*</dynamics>", re.S
 )
 _OTHER_DYNAMICS = re.compile(r"<other-dynamics\b[^>]*>.*?</other-dynamics>", re.S)
+_LYRICS = re.compile(r"<lyric(?:\s[^>]*)?>.*?</lyric>", re.S)
+# Lyrics aren't in the tokens. Half of the songs are engraved without them, which gives
+# their piano parts the look of plain piano music.
+_P_DROP_LYRICS = 0.5
 
 
-def _without_other_dynamics(musicxml_file: str, work_file: str) -> str:
+def _without_other_dynamics(musicxml_file: str, work_file: str, name: str) -> str:
     """
     musicxml2ly turns <other-dynamics>dolce</other-dynamics> into a LilyPond variable
     named after the text ("dolce.", "più", "ad libitum"), which rarely is a valid name
@@ -148,10 +154,13 @@ def _without_other_dynamics(musicxml_file: str, work_file: str) -> str:
     """
     with open(musicxml_file, encoding="utf-8", errors="ignore") as f:
         xml = f.read()
-    if "<other-dynamics" not in xml:
+    drop_lyrics = "<lyric" in xml and _random_for("lyrics" + name).random() < _P_DROP_LYRICS
+    if "<other-dynamics" not in xml and not drop_lyrics:
         return musicxml_file
     xml = _OTHER_DYNAMICS_ALONE.sub(r'<words font-style="italic">\1</words>', xml)
     xml = _OTHER_DYNAMICS.sub("", xml)
+    if drop_lyrics:
+        xml = _LYRICS.sub("", xml)
     with open(work_file, "w", encoding="utf-8") as f:
         f.write(xml)
     return work_file
@@ -159,7 +168,7 @@ def _without_other_dynamics(musicxml_file: str, work_file: str) -> str:
 
 def write_ly(musicxml_file: str, ly_file: str, name: str) -> None:
     """musicxml2ly, then our layout block: grob classes for the SVG and a style per file."""
-    musicxml_file = _without_other_dynamics(musicxml_file, ly_file + ".musicxml")
+    musicxml_file = _without_other_dynamics(musicxml_file, ly_file + ".musicxml", name)
     subprocess.run(  # noqa: S603
         [  # noqa: S607
             "musicxml2ly",
@@ -217,6 +226,39 @@ def _run_lilypond(args: list[str], ly_file: str, out_base: str) -> None:
         capture_output=True,
         timeout=900,
     )
+
+
+def _rasterize(svg_file: str, png_file: str) -> None:
+    subprocess.run(  # noqa: S603
+        [  # noqa: S607
+            "rsvg-convert",
+            "-w",
+            str(RASTER_WIDTH),
+            "-b",
+            "white",
+            "-o",
+            png_file,
+            svg_file,
+        ],
+        check=True,
+        capture_output=True,
+        timeout=300,
+    )
+
+
+def _lines_are_where_expected(
+    image: "cv2.typing.MatLike", staffs: list["LilyStaff"], scale: float
+) -> bool:
+    """A last check that the picture is the page the geometry describes."""
+    for staff in staffs:
+        x0 = int(staff.x * scale) + 5
+        x1 = int((staff.x + staff.width) * scale) - 5
+        for line in range(5):
+            y = round((staff.line_top + line * (staff.line_bottom - staff.line_top) / 4) * scale)
+            band = image[max(0, y - 2) : y + 3, x0:x1]
+            if band.size == 0 or float((band.min(axis=0) < 128).mean()) < 0.6:  # noqa: PLR2004
+                return False
+    return True
 
 
 def _pages(out_base: str, extension: str) -> list[str]:
@@ -450,17 +492,21 @@ def convert_file(file: Path) -> tuple[list[str], dict[str, int]]:  # noqa: PLR09
             ly_file = os.path.join(work, "score.ly")
             write_ly(str(file), ly_file, name)
             _run_lilypond(["-dbackend=svg", "-dno-point-and-click"], ly_file, f"{work}/geo")
-            resolution = str(RASTER_WIDTH / (210 / 25.4))
-            _run_lilypond(["--png", f"-dresolution={resolution}"], ly_file, f"{work}/img")
-            svgs, pngs = _pages(f"{work}/geo", "svg"), _pages(f"{work}/img", "png")
-            if not svgs or len(svgs) != len(pngs):
+            svgs = _pages(f"{work}/geo", "svg")
+            if not svgs:
                 return [], {"failed_pages": 1}
+            pngs = [svg[: -len("svg")] + "png" for svg in svgs]
+            for svg, png in zip(svgs, pngs, strict=True):
+                _rasterize(svg, png)
 
             pages: list[tuple[float, list[LilyStaff], str]] = []
             for svg, png in zip(svgs, pngs, strict=True):
                 width, staffs = parse_page(svg)
                 if not staffs:
                     continue
+                picture = cv2.imread(png, cv2.IMREAD_GRAYSCALE)
+                if not _lines_are_where_expected(picture, staffs, picture.shape[1] / width):
+                    return [], {"failed_picture": 1}
                 grouped = _group_systems(staffs, voices)
                 if grouped is None:
                     return [], {"failed_staff_count": 1}

@@ -1,5 +1,6 @@
 import itertools
 import math
+import os
 
 import cv2
 import numpy as np
@@ -8,6 +9,7 @@ from homr import constants
 from homr.debug import Debug
 from homr.image_utils import crop_image_and_return_new_top
 from homr.model import MultiStaff, Staff
+from homr.octave_bracket_rows import find_dashed_line_rows, find_top_of_content
 from homr.point_mapping import PointMapping, chain, identity, undo_crop, undo_resize
 from homr.simple_logging import eprint
 from homr.staff_dewarping import StaffDewarping, dewarp_staff_image
@@ -108,18 +110,73 @@ def remove_black_contours_at_edges_of_image(gray: NDArray, unit_size: float) -> 
     return gray
 
 
-def _calculate_region(staff: Staff, regions: StaffRegions) -> NDArray:
-    x_min = staff.min_x - 2 * staff.average_unit_size
-    x_max = staff.max_x + 2 * staff.average_unit_size
-    y_min = max(
-        staff.min_y - 4 * staff.average_unit_size,
-        regions.get_start_of_closest_staff_above(staff.min_y),
-    )
-    y_max = min(
-        staff.max_y + 4 * staff.average_unit_size,
-        regions.get_start_of_closest_staff_below(staff.max_y),
-    )
+# How far above or below the staff lines an octave bracket is looked for
+_MAX_BRACKET_DISTANCE_IN_UNITS = 12
+# Room kept around the line of a bracket for its "8" label and its hook
+_BRACKET_PADDING_IN_UNITS = 2.0
+
+
+def _calculate_region(staff: Staff, regions: StaffRegions, image: NDArray | None = None) -> NDArray:
+    unit = staff.average_unit_size
+    x_min = staff.min_x - 2 * unit
+    x_max = staff.max_x + 2 * unit
+    staff_above = regions.get_start_of_closest_staff_above(staff.min_y)
+    staff_below = regions.get_start_of_closest_staff_below(staff.max_y)
+    y_min = max(staff.min_y - 4 * unit, staff_above)
+    y_max = min(staff.max_y + 4 * unit, staff_below)
+    if image is not None and not os.environ.get("HOMR_FIXED_MARGIN"):
+        y_min, y_max = _include_octave_brackets(
+            staff, image, (x_min, x_max), (y_min, y_max), (staff_above, staff_below)
+        )
     return np.array([int(x_min), int(y_min), int(x_max), int(y_max)])
+
+
+def _owner_is_below(line_y: float, bottom_of_upper: float, top_of_lower: float) -> bool:
+    """
+    A dashed line between two staffs is the octave bracket of the lower one, unless it is
+    clearly closer to the upper one. Octave-higher brackets are far more common than
+    octave-lower ones and float high above their staff over ledger lines.
+    """
+    return (top_of_lower - line_y) <= 2 * (line_y - bottom_of_upper)
+
+
+def _include_octave_brackets(
+    staff: Staff,
+    image: NDArray,
+    x_range: tuple[float, float],
+    y_range: tuple[float, float],
+    neighbors: tuple[float, float],
+) -> tuple[float, float]:
+    unit = staff.average_unit_size
+    y_min, y_max = y_range
+    staff_above, staff_below = neighbors
+    reach = _MAX_BRACKET_DISTANCE_IN_UNITS * unit
+    padding = _BRACKET_PADDING_IN_UNITS * unit
+
+    # Above the staff: brackets which belong to it must be inside the region
+    top = max(staff_above + 0.5 * unit, staff.min_y - reach, 0)
+    for line_y in find_dashed_line_rows(image, *x_range, top, staff.min_y - 0.5 * unit, unit):
+        if _owner_is_below(line_y, staff_above, staff.min_y):
+            y_min = min(y_min, line_y - padding)
+    # High notes take what is attached to them (beams, short brackets) above the fixed
+    # margin. The training crops always hold the whole content plus a margin.
+    if staff_above > 0:
+        content_top = find_top_of_content(
+            image, *x_range, y_min, max(staff_above + unit, staff.min_y - reach), unit
+        )
+        if content_top < y_min:
+            y_min = content_top - 1.5 * unit
+    y_min = max(y_min, staff_above, 0)
+
+    # Below the staff: brackets of the next staff must stay outside the region
+    bottom = min(staff_below - 0.5 * unit, staff.max_y + reach, image.shape[0])
+    for line_y in find_dashed_line_rows(image, *x_range, staff.max_y + 0.5 * unit, bottom, unit):
+        if staff_below < image.shape[0] and _owner_is_below(line_y, staff.max_y, staff_below):
+            y_max = min(y_max, line_y - 0.5 * unit)
+        else:
+            y_max = max(y_max, line_y + padding)
+    y_max = min(max(y_max, staff.max_y + unit), staff_below)
+    return y_min, y_max
 
 
 def prepare_staff_image(
@@ -129,7 +186,7 @@ def prepare_staff_image(
     Returns the staff image for the transformer, the staff in the coordinates of that image
     and a mapping from the coordinates of that image back to the coordinates of the page.
     """
-    region = _calculate_region(staff, regions)
+    region = _calculate_region(staff, regions, staff_image)
     image_dimensions = get_tr_omr_canvas_size(
         (int(region[3] - region[1]), int(region[2] - region[0]))
     )

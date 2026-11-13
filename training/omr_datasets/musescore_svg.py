@@ -354,6 +354,79 @@ def _extend_staffs_with_dynamics(staffs: list[SvgStaff], dynamics: list[SvgRecta
         staff.extend_y_range(dynamic.y + dynamic.height)
 
 
+def _extend_staffs_with_ottavas(
+    staffs: list[SvgStaff],
+    segments: list[list[tuple[float, float]]],
+    labels: list[SvgRectangle],
+) -> None:
+    """
+    Extends each staff to its octave brackets. They are part of the labels, and a staff
+    image which sometimes shows the bracket and sometimes cuts it off teaches the model
+    to guess. The hook at the end of the dashed line points at the staff the bracket
+    belongs to, which matters for a bracket between two systems.
+    """
+    max_distance_in_staff_spaces = 12
+    straight = 2.0
+    lines = []
+    hooks = []
+    for points in segments:
+        xs = [point[0] for point in points]
+        ys = [point[1] for point in points]
+        if max(ys) - min(ys) <= straight:
+            lines.append((min(xs), max(xs), ys[0]))
+        elif max(xs) - min(xs) <= straight:
+            hooks.append((xs[0], min(ys), max(ys)))
+
+    def distance_to_lines(staff: SvgStaff, y: float) -> float:
+        return max(staff.line_top - y, y - staff.line_bottom, 0)
+
+    def extend(staff: SvgStaff, top: float, bottom: float) -> None:
+        staff.extend_y_range(math.floor(top - 0.5 * staff.staff_space))
+        staff.extend_y_range(math.ceil(bottom + 0.5 * staff.staff_space))
+
+    used_labels: set[int] = set()
+    for x_start, x_end, y in lines:
+        candidates = [s for s in staffs if s.contains_x_position(int((x_start + x_end) / 2))]
+        if not candidates:
+            continue
+        top = bottom = y
+        staff_is_below: bool | None = None
+        for hook_x, hook_top, hook_bottom in hooks:
+            if abs(hook_x - x_end) < 6 and hook_top - 3 <= y <= hook_bottom + 3:  # noqa: PLR2004
+                staff_is_below = (hook_bottom - y) > (y - hook_top)
+                top, bottom = min(top, hook_top), max(bottom, hook_bottom)
+        if staff_is_below is True:
+            candidates = [s for s in candidates if s.line_top > y] or candidates
+        elif staff_is_below is False:
+            candidates = [s for s in candidates if s.line_bottom < y] or candidates
+        staff = min(candidates, key=lambda s: distance_to_lines(s, y))
+        if distance_to_lines(staff, y) > max_distance_in_staff_spaces * staff.staff_space:
+            continue
+        for index, label in enumerate(labels):
+            near_start = abs((label.x + label.width) - x_start) < 4 * staff.staff_space
+            same_height = (
+                label.y - 2 * staff.staff_space
+                <= y
+                <= label.y + label.height + 2 * staff.staff_space
+            )
+            if near_start and same_height:
+                used_labels.add(index)
+                top, bottom = min(top, label.y), max(bottom, label.y + label.height)
+        extend(staff, top, bottom)
+
+    # A bracket over a single note can be a label without a line
+    for index, label in enumerate(labels):
+        if index in used_labels:
+            continue
+        center_y = label.y + label.height / 2
+        candidates = [s for s in staffs if s.contains_x_position(label.x + label.width // 2)]
+        if not candidates:
+            continue
+        staff = min(candidates, key=lambda s: distance_to_lines(s, center_y))
+        if distance_to_lines(staff, center_y) <= max_distance_in_staff_spaces * staff.staff_space:
+            extend(staff, label.y, label.y + label.height)
+
+
 def _staff_has_content_between(
     staff: SvgStaff, notes: list[tuple[float, float]], start: float, end: float
 ) -> bool:
@@ -406,6 +479,8 @@ def get_position_information_from_svg(svg_file: str) -> SvgMusicFile:
         staff_lines: list[SvgRectangle] = []
         bar_lines: list[BarLine] = []
         stems: list[SvgRectangle] = []
+        ottava_segments: list[list[tuple[float, float]]] = []
+        ottava_labels: list[SvgRectangle] = []
         for line in lines:
             class_name = line.getAttribute("class")
             if class_name == "StaffLines":
@@ -419,6 +494,13 @@ def get_position_information_from_svg(svg_file: str) -> SvgMusicFile:
                 )
             if class_name == "Stem":
                 stems.append(_parse_paths(line.getAttribute("points")))
+            if class_name == "OttavaSegment":
+                ottava_segments.append(
+                    [
+                        (float(x), float(y))
+                        for x, y in (p.split(",") for p in line.getAttribute("points").split())
+                    ]
+                )
 
         notes: list[tuple[float, float]] = []
         dynamics: list[SvgRectangle] = []
@@ -428,6 +510,8 @@ def get_position_information_from_svg(svg_file: str) -> SvgMusicFile:
                 notes.append(_parse_note_position(path))
             if class_name == "Dynamic" and not path.getAttribute("transform"):
                 dynamics.append(_parse_path_box(path.getAttribute("d")))
+            if class_name == "OttavaSegment" and not path.getAttribute("transform"):
+                ottava_labels.append(_parse_path_box(path.getAttribute("d")))
 
         combined = _combine_staff_lines_and_bar_lines(staff_lines, bar_lines)
 
@@ -436,6 +520,7 @@ def get_position_information_from_svg(svg_file: str) -> SvgMusicFile:
 
         _remove_empty_measures(svg_file, combined, notes)
         _extend_staffs_with_dynamics(combined, dynamics)
+        _extend_staffs_with_ottavas(combined, ottava_segments, ottava_labels)
 
         return SvgMusicFile(svg_file, width, height, combined)
     finally:
