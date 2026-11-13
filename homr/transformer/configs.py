@@ -9,7 +9,9 @@ root_dir = os.getcwd()
 
 class FilePaths:
     def __init__(self) -> None:
-        model_name = "pytorch_model_509-2293bba14bfea47d9d28411339362af15fce4c31"
+        # Octave shifts fine-tuned in two rounds from checkpoint 465, see Training.md.
+        # Published on https://github.com/yiduoke/homr/releases/tag/octave_checkpoints
+        model_name = "pytorch_model_octave-r2e2-6431d41"
         self.encoder_path = os.path.join(
             workspace,
             f"encoder_{model_name}.onnx",

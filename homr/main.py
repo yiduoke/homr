@@ -391,6 +391,8 @@ def get_all_image_files_in_folder(folder: str) -> list[str]:
 
 def download_weights(segnet_use_gpu: bool, transformer_use_gpu: bool, coreml_encoder: bool) -> None:
     base_url = "https://github.com/liebharc/homr/releases/download/onnx_checkpoints/"
+    # The transformer of this branch isn't an upstream model, it lives on the fork
+    transformer_url = "https://github.com/yiduoke/homr/releases/download/octave_checkpoints/"
     models = [segnet_path_onnx_fp16 if segnet_use_gpu else segnet_path_onnx]
     if transformer_use_gpu:
         # CUDA runs the whole transformer on the fp16 models.
@@ -421,7 +423,8 @@ def download_weights(segnet_use_gpu: bool, transformer_use_gpu: bool, coreml_enc
             eprint(f"Downloading {base_name}")
             try:
                 zip_name = base_name + ".zip"
-                download_url = base_url + zip_name
+                is_transformer = base_name.startswith(("encoder_", "decoder_"))
+                download_url = (transformer_url if is_transformer else base_url) + zip_name
                 os.makedirs(os.path.dirname(model), exist_ok=True)
                 downloaded_zip = os.path.join(os.path.dirname(model), zip_name)
                 download_utils.download_file(download_url, downloaded_zip)

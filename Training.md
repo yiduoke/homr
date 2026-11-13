@@ -97,6 +97,43 @@ This validation provides a **more representative indication of overall system pe
 
 Implementation: `rate_validation_result.py`
 
+# Octave shifts, fine-tuned on this fork (octave-r2e2)
+
+Commit: 6431d4105b7bd6c8d0fdb8c21f27eb821598792b plus the scripts named below
+Day: 12 November 2026
+Weights: https://github.com/yiduoke/homr/releases/tag/octave_checkpoints
+System Level, Polish scores, SMB scores: not run
+
+Not a full training run. Two fine-tuning rounds on one RTX 3090, starting from the
+published checkpoint 465 (`training/transformer/finetune_octave.py`):
+
+1. Round one, 2 epochs on the regular datasets with the octave vocabulary. The rows of
+   the grown rhythm and articulation layers are copied from 465 by token name.
+2. Round two, 2 epochs on 70,000 round-one samples plus 15,700 staffs which LilyPond
+   engraved from the same MusicXML (`training/omr_datasets/convert_lilypond.py`), the
+   2,000 with an octave bracket four times each.
+
+Why round two: after round one the model read MuseScore's bracket and no other. On one
+page rendered twice it found the bracket labelled with a bold "8" and missed it labelled
+with an italic "8va". The LilyPond staffs vary the wording, font, dashes and hook per file
+and keep the "8" and the dashed line.
+
+Octave starts found on real pages which were never trained on, counted per page
+(hits / printed, extras in brackets):
+
+| Pages | Round one | Round two |
+| --- | --- | --- |
+| Chopin Ballade 4, LilyPond with an italic "8va", 5 pages | 0 / 11 | 9 / 11 |
+| La Campanella, MuseScore, 6 pages | 27 / 40 (2) | 29 / 40 (2) |
+| Scans of printed editions, 39 pages, printed count approximate | 71 / 178 (2) | 122 / 178 (4) |
+| Other typeset PDFs, 3 pages | 0 / 7 | 1 / 7 |
+| Pages without octave marks, 34 pages | 2 pages with a false mark | 1 page |
+
+On staffs held out from training (`training/transformer/octave_eval.py`): LilyPond styles
+94% of 8va starts and 84% of shift stops found; MuseScore staffs in the same range as round
+one. Octave-lower marks are barely covered: 4 held-out LilyPond staffs and 3 real pages.
+The validation accuracy on the regular datasets is 99.84%, round one had 99.81%.
+
 # Run 520 - Epoch 14 - discarded
 Commit: c0a84a090eb2afb7282d1272df0e661aad42a7fc
 Day: 7 November
