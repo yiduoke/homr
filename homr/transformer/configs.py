@@ -11,7 +11,7 @@ class FilePaths:
     def __init__(self) -> None:
         # Octave shifts fine-tuned in two rounds from checkpoint 465, see Training.md.
         # Published on https://github.com/yiduoke/homr/releases/tag/octave_checkpoints
-        model_name = "pytorch_model_octave-r2e2-6431d41"
+        model_name = "pytorch_model_octave-r3e1-7ef6ff3"
         self.encoder_path = os.path.join(
             workspace,
             f"encoder_{model_name}.onnx",
