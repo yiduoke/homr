@@ -97,6 +97,77 @@ This validation provides a **more representative indication of overall system pe
 
 Implementation: `rate_validation_result.py`
 
+# Octave shifts, round three, epoch 1 (octave-r3e1-7ef6ff3)
+
+Commit: 7ef6ff3 (bracket-aware cutting and data), 9af4975 (model name)
+Day: 13 November 2026
+Weights: https://github.com/yiduoke/homr/releases/tag/octave_checkpoints (file names with `r3e1-7ef6ff3`)
+System Level, Polish scores, SMB scores: not run
+
+Starts from round two epoch 2 (`octave-r2e2`) and trains two epochs on one RTX 3090; this
+release is epoch 1 (epoch 2 was no better on real pages, see below).
+
+Training data (`training/transformer/build_round3_index.py`): 70,000 round-one samples
+without octave marks, 9,784 MuseScore staffs cut again so brackets are inside the picture
+(2,446 of them with a bracket), 26,559 LilyPond staffs engraved once per page, of which
+4,453 have a bracket (2,407 with a bracket inserted into the MusicXML by
+`training/omr_datasets/augment_octave_shifts.py`).
+
+Page cutting: the strip above a staff now reaches up to a dashed bracket in the gap and
+stops short of the one above (`homr/octave_bracket_rows.py`). `HOMR_FIXED_MARGIN=1` gives
+the old fixed margin, used for the "released cutting" column.
+
+Octave starts found on real pages which were never trained on, counted per page
+(hits / printed, extras in brackets; printed counts approximate for the scans):
+
+| Pages | Round two, bracket-aware | Round three epoch 1, released cutting | Round three epoch 1, bracket-aware |
+| --- | --- | --- | --- |
+| Chopin Ballade 4, LilyPond, 5 pages | 9 / 11 | 9 / 11 (0) | 11 / 11 (1) |
+| La Campanella, MuseScore, 6 pages | 36 / 40 (3) | 28 / 40 (2) | 35 / 40 (3) |
+| Scans of printed editions, 39 pages | 126 / 178 (5) | 124 / 178 (5) | 132 / 178 (4) |
+| Other typeset PDFs, 3 pages | 1 / 7 | 1 / 7 | 1 / 7 |
+| Pages without octave marks, 34 pages | 2 pages with a false mark | 1 page | 1 page |
+
+Scans, per piece (round three epoch 1, bracket-aware cutting):
+
+| Piece | Pages | Hits / printed | Extras | Source |
+| --- | --- | --- | --- | --- |
+| Chopin Scherzo No.1 Op.20 | 4 | 11 / 11 | 0 | [IMSLP](https://imslp.org/files/imglnks/usimg/f/fc/IMSLP74350-PMLP02354-Chopin_Scherzi_and_Fantasy_Schirmer_Mikuli_Op_20_filter.pdf) |
+| Liszt Hungarian Rhapsody No.2 S.244 | 4 | 12 / 15 | 0 | [IMSLP](https://imslp.org/files/imglnks/usimg/a/a7/IMSLP67715-PMLP136737-s244.02.pdf) |
+| Liszt La Campanella (Paganini Etude III) | 4 | 19 / 23 | 3 | [archive.org](https://archive.org/details/b10271399) |
+| Liszt Liebestraum No.3 S.541 | 3 | 8 / 10 | 0 | [IMSLP](https://imslp.org/files/imglnks/usimg/c/c3/IMSLP707483-PMLP2598-Liszt_-_Liebestraum_No._3.pdf) |
+| Liszt Mephisto Waltz No.1 S.514 | 4 | 20 / 21 | 1 | [IMSLP](https://imslp.org/files/imglnks/usimg/7/7e/IMSLP13711-Liszt_-_S514_Mephisto_Waltz_No1_(schubert).pdf) |
+| Liszt Totentanz S.525 | 3 | 16 / 17 | 0 | [IMSLP](https://archive.org/details/imslp-s126-liszt-franz) |
+| Liszt Transcendental Etude No.4 Mazeppa S.139 | 4 | 15 / 28 | 0 | no public link yet |
+| Mussorgsky Pictures at an Exhibition | 2 | 3 / 14 | 0 | [archive.org](https://archive.org/details/imslp-at-an-exhibition-mussorgsky-modest) |
+| Ravel Jeux d'eau | 4 | 13 / 16 | 0 | [archive.org](https://archive.org/details/jeuxdeaupourpian00rave) |
+| Ravel Scarbo (Gaspard de la nuit) | 4 | 8 / 15 | 0 | [IMSLP](https://imslp.org/files/imglnks/usimg/9/99/IMSLP246876-PMLP02576-Ravel,_Maurice-Gaspard_de_la_nuit_Durand_7207_filter.pdf) |
+| Scriabin Etude Op.8 No.12 | 1 | 1 / 2 | 0 | [IMSLP](https://imslp.org/files/imglnks/usimg/f/f3/IMSLP273680-PMLP02576-Scriabin_Op.8_No_12.pdf) |
+| Scriabin Piano Sonata No.4 Op.30 | 2 | 6 / 6 | 0 | [archive.org](https://archive.org/details/imslp-sonata-no4-op30-scriabin-aleksandr) |
+| Bach, Beethoven, Brahms (other scans) | 15 | in the 39 pages above | — | [archive.org](https://archive.org/details/TheWellTemperedClavierBook1), [archive.org](https://archive.org/details/beethovensonatas0000vari_t9w7), [archive.org](https://archive.org/details/imslp-fantasien-op116-brahms-johannes) |
+
+Held-out staffs (`training/transformer/octave_eval.py`), epoch 1:
+
+| Test | 8va start (recall / precision) | 8vb start | Shift stop | Octave clef |
+| --- | --- | --- | --- | --- |
+| Inserted brackets, 150 staffs | 98.4% / 99.2% | 93.9% / 92.5% | 97.0% / 97.9% | 95.2% / 100% |
+| LilyPond staffs, 130 staffs | 97.8% / 91.1% | 100% / 80% (4 in truth) | 89.9% / 91.2% | — |
+| MuseScore staffs, 150 staffs | 89.3% / 94.3% | 92.9% / 86.7% | 84.6% / 95.7% | 95.5% / 100% |
+
+Clean samples with an invented bracket: 0 of 60 (inserted-bracket test), 0 of 50 (MuseScore).
+Validation accuracy on the regular datasets: 99.81% (round two 99.84%).
+
+Epoch 2 (not published): real pages were no better (scans 127/178 with 7 extras, La Campanella
+36/40 with 2 extras, Chopin 11/11 with 1), and held-out inserted brackets were about the same.
+
+Limits:
+- Mazeppa, Ravel Scarbo, Pictures at an Exhibition and Jeux d'eau are where the misses are,
+  mostly short brackets in dense passages and brackets printed between the staves.
+- Octave-lower marks are barely covered: 4 held-out LilyPond staffs and 3 real pages.
+- Printed counts on the scans come mostly from a helper's count by eye; only some are checked.
+- The test pages are not in the repository. Only the links above.
+- The upstream benchmarks (Polish scores, SMB) were not run.
+
 # Octave shifts, fine-tuned on this fork (octave-r2e2)
 
 Commit: 6431d4105b7bd6c8d0fdb8c21f27eb821598792b plus the scripts named below
