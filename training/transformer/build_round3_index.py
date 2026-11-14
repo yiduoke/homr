@@ -21,7 +21,9 @@ score for octave_eval.py, separately for real and for inserted brackets.
 
     PYTHONPATH=. python training/transformer/build_round3_index.py
 Environment: R3_ORIGINAL (70000), R3_VAL (4000), R3_BRACKET_REPEAT (2), R3_HOLDOUT (0.1),
-R3_RECUT_OTHERS (2, staffs without a bracket per staff with one from the scores cut again).
+R3_RECUT_OTHERS (2, staffs without a bracket per staff with one from the scores cut again),
+R3_8VB_REPEAT (1, extra repeats of LilyPond staffs with an octave-lower bracket),
+R3_NAME (round3, prefix of the lists written).
 """
 
 import hashlib
@@ -41,13 +43,14 @@ from training.transformer.training_vocabulary import check_token_lines, read_tok
 
 
 def _score_of(line: str) -> str:
-    """lc5104275-2-8.png, lc5104275v2-1-3.png and lc5104275oct-1-3.png -> lc5104275"""
+    """lc5104275-2-8.png, lc5104275v2-1-3.png, lc5104275oct-1-3.png and
+    lc5104275oct4-1-3.png -> lc5104275"""
     name = Path(line.split(",", maxsplit=1)[0]).name.rsplit("-", 2)[0]
-    return re.sub(r"(oct)?(v\d)?$", "", name)
+    return re.sub(r"(oct\d?)?(v\d)?$", "", name)
 
 
 def _is_augmented(line: str) -> bool:
-    return bool(re.search(r"oct(v\d)?-\d+-\d+\.png", line.split(",", maxsplit=1)[0]))
+    return bool(re.search(r"oct\d?(v\d)?-\d+-\d+\.png", line.split(",", maxsplit=1)[0]))
 
 
 def _held_out(score: str, share: float) -> bool:
@@ -119,7 +122,9 @@ def main() -> None:
     kept = [line for line in lily if not _held_out(_score_of(line), holdout_share)]
     with_bracket = [line for line in kept if _has_bracket(line)]
 
-    train = original_train + recut + kept + with_bracket * (repeat - 1)
+    with_8vb = [line for line in with_bracket if "octaveShift_8vb" in _tokens(line)]
+    vb_repeat = int(os.environ.get("R3_8VB_REPEAT", "1"))
+    train = original_train + recut + kept + with_bracket * (repeat - 1) + with_8vb * (vb_repeat - 1)
     rng.shuffle(train)
 
     def write(name: str, lines: list[str]) -> None:
@@ -128,8 +133,9 @@ def main() -> None:
 
     held_real = [line for line in held if not _is_augmented(line)]
     held_inserted = [line for line in held if _is_augmented(line)]
-    write("round3_train.txt", train)
-    write("round3_val.txt", original_val)
+    name = os.environ.get("R3_NAME", "round3")
+    write(f"{name}_train.txt", train)
+    write(f"{name}_val.txt", original_val)
     write("holdout_real.txt", held_real)
     write("holdout_inserted.txt", held_inserted)
     summary = {
@@ -144,6 +150,7 @@ def main() -> None:
             "octaveShift_8vb" in _tokens(line) for line in with_bracket
         ),
         "bracket_repeat": repeat,
+        "octave_lower_repeat": vb_repeat,
         "val_from_round_one": len(original_val),
         "holdout_real_staffs": len(held_real),
         "holdout_real_with_bracket": sum(_has_bracket(line) for line in held_real),
@@ -151,7 +158,7 @@ def main() -> None:
         "holdout_inserted_with_bracket": sum(_has_bracket(line) for line in held_inserted),
     }
     eprint(json.dumps(summary, indent=1))
-    write("round3_summary.json", [json.dumps(summary)])
+    write(f"{name}_summary.json", [json.dumps(summary)])
 
 
 if __name__ == "__main__":

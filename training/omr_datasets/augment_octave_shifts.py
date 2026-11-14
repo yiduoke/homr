@@ -32,8 +32,17 @@ _STEP_TO_SEMITONE = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
 _MIN_MIDI_FOR_8VA = {"G": 72, "F": 55}
 # Highest note of an octave-lower bracket under the bass clef
 _MAX_MIDI_FOR_8VB = 50
-# Chance that a bracket starts at a measure where one is possible, per staff
-_P_START = {"8va": 0.16, "8vb": 0.2}
+# Chance that a bracket starts at a measure where one is possible, per staff.
+# AUG_P_8VA and AUG_P_8VB change them; round four raised the octave-lower one, the
+# kind real editions use under the bass and the model reads worst.
+_P_START = {
+    "8va": float(os.environ.get("AUG_P_8VA", "0.16")),
+    "8vb": float(os.environ.get("AUG_P_8VB", "0.2")),
+}
+# Chance that a short bracket covers a single note (AUG_P_SINGLE), and the lengths of a
+# run of short brackets bar after bar to choose from (AUG_RUNS, 0 is no run)
+_P_SINGLE = float(os.environ.get("AUG_P_SINGLE", "0.2"))
+_RUNS = [int(n) for n in os.environ.get("AUG_RUNS", "0,0,2,3,5").split(",")]
 _MAX_MEASURES = 4
 
 
@@ -171,7 +180,7 @@ def augment(root: ET.Element, rng: random.Random) -> dict[str, int]:  # noqa: C9
                     )
                     if style == "short" and single_voice and len(pitched) >= 2:  # noqa: PLR2004
                         # Mostly a few notes, now and then a single one
-                        shortest = 1 if rng.random() < 0.2 else 2  # noqa: PLR2004
+                        shortest = 1 if rng.random() < _P_SINGLE else 2
                         length = rng.randint(
                             min(shortest, len(pitched) - 1), min(6, len(pitched) - 1)
                         )
@@ -184,7 +193,7 @@ def augment(root: ET.Element, rng: random.Random) -> dict[str, int]:  # noqa: C9
                             added["short"] += 1
                             added["lower_staff"] += staff > 1
                             if run_left == 0:
-                                run_left = rng.choice([0, 0, 2, 3, 5])
+                                run_left = rng.choice(_RUNS)
                             else:
                                 run_left -= 1
                         else:
@@ -232,9 +241,9 @@ def augment(root: ET.Element, rng: random.Random) -> dict[str, int]:  # noqa: C9
     return added
 
 
-def augment_file(source: Path, destination: Path) -> dict[str, int]:
+def augment_file(source: Path, destination: Path, salt: str = "") -> dict[str, int]:
     tree = ET.parse(source)  # noqa: S314
-    added = augment(tree.getroot(), _random_for(source.stem))
+    added = augment(tree.getroot(), _random_for(source.stem + salt))
     if added["8va"] + added["8vb"] > 0:
         tree.write(destination, encoding="UTF-8", xml_declaration=True)
     return added
@@ -247,9 +256,12 @@ def main() -> None:
     for arg in sys.argv[2:]:
         path = Path(arg)
         files.extend(sorted(path.rglob("*.musicxml")) if path.is_dir() else [path])
-    # AUG_SHARE picks a fixed part of the files, the same ones on every run
+    # AUG_SHARE picks a fixed part of the files, the same ones on every run with the same
+    # AUG_SUFFIX; another suffix picks other files and names the copies apart
     share = float(os.environ.get("AUG_SHARE", "1"))
-    files = [f for f in files if _random_for("pick" + f.stem).random() < share]
+    suffix = os.environ.get("AUG_SUFFIX", "oct")
+    salt = "pick" if suffix == "oct" else "pick" + suffix
+    files = [f for f in files if _random_for(salt + f.stem).random() < share]
     totals = {
         "files_in": len(files),
         "files_out": 0,
@@ -261,7 +273,11 @@ def main() -> None:
     for file in files:
         try:
             # The name tells the copies apart from the originals, which keep their tokens
-            added = augment_file(file, out_dir / f"{file.stem}oct.musicxml")
+            added = augment_file(
+                file,
+                out_dir / f"{file.stem}{suffix}.musicxml",
+                "" if suffix == "oct" else suffix,
+            )
         except (ET.ParseError, ValueError, KeyError) as error:
             sys.stderr.write(f"skipping {file}: {error!r}\n")
             continue
