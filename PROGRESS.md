@@ -38,6 +38,9 @@ in. The main goal is now general note accuracy on 566 (see "Next"); octave round
   as `.txt` next to each page PNG in `/workspace/kern_check/pages/`). Next: a cheap
   helper looks by eye at pieces where homr's count still disagrees with the .krn; then
   cut matching pieces into system/token pairs and have Sonnet check a sample bar by bar.
+- Outside benchmarks (checked 2026-11-15 by a Sonnet helper, see "Benchmarks" under
+  Next). Goal: ISMIR 2027 paper (abstract 9 Mar, paper 16 Mar 2027, London) or its
+  late-breaking/demo session (about Aug 2027).
 - Fixed: `homr --init` on this branch fetched 566 from the fork's release (404); upstream
   models now come from upstream's release (commit 5ecda33).
 - No training is running. Nothing new is published; round 3 epoch 1 is still the
@@ -592,6 +595,20 @@ octave-only round is deferred. Keep experiments separate (one change each).
    complexity 2, 30% complexity 3 and the most virtuoso pieces from the sources above;
    fresh scores first, repeats at most about 2x. Judge on the references plus one simple
    piece (a reference for e.g. Mozart K. 331's theme would show forgetting).
+   **Benchmarks for a paper (2026-11-15; never train on any of them):**
+   - IMSLP-Piano-Scores (Hugging Face, gated, real pages, MusicXML ground truth), leaderboard
+     by OMR-NED (lower is better): copista-28m 0.164, homr fine-tunes by another user about
+     0.25, clefscan 0.35, LEGATO (ICLR 2026, 0.9B) 0.442, stock homr 0.905 (submitted by
+     someone else; likely a setup problem), GPT-5 0.944. Active through mid-October 2026.
+   - OLiMPiC (Prague, CC BY-SA): scanned dev 1,438 / test 1,493 systems from OpenScore
+     Lieder; their best SER 17.7 on scanned test. **Lieder is in our training data**:
+     remove OLiMPiC's test pieces from Lieder before training if we report on it.
+   - SMT++ (Alicante, full page, **kern, MIT code, weights on HF): CER 10.5 Mozarteum and
+     19.6 Polish Scores after fine-tuning on fewer than 100 pages each (5-fold), 27.7 / 53.2
+     zero-shot; Audiveris 86.8 / 93.7.
+   - Plan: report on IMSLP-Piano-Scores, OLiMPiC scanned test, Polish Scores and our own
+     references; check each for overlap with PDMX, Lieder and KernScores training data.
+
 5. **Octave work: one round on 566 at most,** later, with matched bracket/no-bracket
    pairs and 8vb exposure back to round 3's level.
 
