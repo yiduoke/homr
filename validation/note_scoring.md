@@ -51,13 +51,21 @@ then a diagonal match. This is a heuristic alignment, not a verified mapping. Re
 the JSON pairs around repeated passages, cadenzas and split/merged bars. The scorer
 does not support many-to-many bar alignment.
 
+If the parts of a file have different bar counts (for example one part per staff, with
+one staff missing a bar), each staff is instead aligned to the reference separately with
+the same dynamic programming, on that staff's own inventories. Notes are then matched
+within each aligned bar pair as above, and unaligned bars still count as misses or
+extras. Output and JSON show `alignment_mode: "per_staff"` with `staff_alignment`;
+`reference_measures`, `predicted_measures` and `matched_measures` become per-staff lists.
+Equal bar counts keep the joint alignment (`"joint"`).
+
 Onsets restart at each aligned bar. This measures notation timing, not uninterrupted
 playback timing or tempo. Meter, beam groups, voice labels, spelling, ties, pedal and
 dynamics are not scored directly. Grace notes at the same onset are unordered; ties
 are not collapsed into sustained events. Staff assignment must agree, including for
 cross-staff notation. Parts and staves are flattened in document order, allowing one
-grand-staff part to match two single-staff parts. Unequal measure counts between parts,
-transposing instruments and unpitched percussion are rejected.
+grand-staff part to match two single-staff parts. Transposing instruments and
+unpitched percussion are rejected.
 
 Pitch inventory is a lenient diagnostic: scrambled notes can still match it. The
 timing metrics are stricter, but cannot by themselves distinguish recognition errors,

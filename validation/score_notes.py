@@ -41,6 +41,9 @@ class Measure:
 class Score:
     measures: tuple[Measure, ...]
     staves: int
+    # Set only when parts have different bar counts: one bar list per staff.
+    # `measures` is then empty because there is no shared bar index.
+    staff_measures: tuple[tuple[Measure, ...], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -137,7 +140,8 @@ def parse_musicxml(xml: str) -> Score:
     """Read score-partwise XML; flatten parts/staves in document order.
 
     One two-staff piano part and two single-staff parts become the same staff layout.
-    Different measure counts between parts are rejected rather than silently aligned.
+    Parts with different measure counts keep one bar list per staff (`staff_measures`);
+    score_notes then aligns each staff to the reference separately.
     """
     root = ET.fromstring(xml)  # noqa: S314 - caller-provided local score, never fetched here
     for element in root.iter():
@@ -145,15 +149,27 @@ def parse_musicxml(xml: str) -> Score:
     if root.tag != "score-partwise":
         raise ValueError("Expected uncompressed score-partwise MusicXML")
     parts = []
+    part_staves = []
     staff_offset = 0
     for part in root.findall("part"):
         measures, staves = _read_part(part, staff_offset)
         parts.append(measures)
+        part_staves.append((staff_offset, staves))
         staff_offset += staves
     if not parts or not parts[0]:
         raise ValueError("Score has no measures")
     if any(len(part) != len(parts[0]) for part in parts):
-        raise ValueError("Parts have different measure counts; establish their alignment first")
+        if any(not part for part in parts):
+            raise ValueError("Score has no measures")
+        per_staff = tuple(
+            tuple(
+                Measure(m.number, tuple(n for n in m.notes if n.staff == staff))
+                for m in part
+            )
+            for part, (offset, count) in zip(parts, part_staves, strict=True)
+            for staff in range(offset + 1, offset + count + 1)
+        )
+        return Score((), staff_offset, per_staff)
     combined = tuple(
         Measure(parts[0][i].number, tuple(note for part in parts for note in part[i].notes))
         for i in range(len(parts[0]))
@@ -163,6 +179,18 @@ def parse_musicxml(xml: str) -> Score:
 
 def _inventory(notes: tuple[Note, ...]) -> Counter[tuple[int, float]]:
     return Counter((note.staff, note.pitch) for note in notes)
+
+
+def _staff_bars(score: Score) -> list[tuple[Measure, ...]]:
+    """Bars of each staff, in staff order (a staff's notes only)."""
+    if score.staff_measures:
+        return list(score.staff_measures)
+    return [
+        tuple(
+            Measure(m.number, tuple(n for n in m.notes if n.staff == staff)) for m in score.measures
+        )
+        for staff in range(1, score.staves + 1)
+    ]
 
 
 def align_measures(reference: Score, prediction: Score) -> list[tuple[int, int]]:
@@ -246,6 +274,8 @@ def count_matches(
 def score_notes(reference: Score, prediction: Score, tolerance: float = DEFAULT_TOLERANCE) -> dict:
     if not math.isfinite(tolerance) or tolerance < 0:
         raise ValueError("Timing tolerance must be finite and nonnegative")
+    if reference.staff_measures or prediction.staff_measures:
+        return _score_per_staff(reference, prediction, tolerance)
     pairs = align_measures(reference, prediction)
     ref_matched, pred_matched = {i for i, _ in pairs}, {j for _, j in pairs}
     metrics = {}
@@ -273,6 +303,7 @@ def score_notes(reference: Score, prediction: Score, tolerance: float = DEFAULT_
         }
     return {
         "tolerance_quarters": tolerance,
+        "alignment_mode": "joint",
         "reference_measures": len(reference.measures),
         "predicted_measures": len(prediction.measures),
         "matched_measures": len(pairs),
@@ -298,6 +329,78 @@ def score_notes(reference: Score, prediction: Score, tolerance: float = DEFAULT_
         ],
         "unmatched_prediction_measures": [
             j + 1 for j in range(len(prediction.measures)) if j not in pred_matched
+        ],
+        "metrics": metrics,
+    }
+
+
+def _score_per_staff(reference: Score, prediction: Score, tolerance: float) -> dict:
+    """Align each staff to the reference on its own (same DP as align_measures)."""
+    if reference.staves != prediction.staves:
+        raise ValueError("Reference and prediction must have the same staff layout")
+    ref_bars, pred_bars = _staff_bars(reference), _staff_bars(prediction)
+    staff_pairs = [
+        align_measures(
+            Score(ref_bars[k], reference.staves), Score(pred_bars[k], reference.staves)
+        )
+        for k in range(reference.staves)
+    ]
+    metrics = {}
+    for metric in METRICS:
+        staff_counts = [
+            Counts(
+                sum(
+                    count_matches(ref_bars[k][i].notes, pred_bars[k][j].notes, metric, tolerance)
+                    for i, j in staff_pairs[k]
+                ),
+                sum(len(m.notes) for m in ref_bars[k]),
+                sum(len(m.notes) for m in pred_bars[k]),
+            )
+            for k in range(reference.staves)
+        ]
+        total = Counts(
+            sum(c.matched for c in staff_counts),
+            sum(c.reference for c in staff_counts),
+            sum(c.predicted for c in staff_counts),
+        )
+        metrics[metric] = {
+            "combined": total.report(),
+            "staves": [c.report() for c in staff_counts],
+        }
+    return {
+        "tolerance_quarters": tolerance,
+        "alignment_mode": "per_staff",
+        "reference_measures": [len(b) for b in ref_bars],
+        "predicted_measures": [len(b) for b in pred_bars],
+        "matched_measures": [len(p) for p in staff_pairs],
+        "staff_alignment": [
+            {
+                "staff": k + 1,
+                "pairs": [
+                    {
+                        "reference_index": i + 1,
+                        "reference_number": ref_bars[k][i].number,
+                        "prediction_index": j + 1,
+                        "prediction_number": pred_bars[k][j].number,
+                        "reference_notes": len(ref_bars[k][i].notes),
+                        "predicted_notes": len(pred_bars[k][j].notes),
+                        "matches": {
+                            metric: count_matches(
+                                ref_bars[k][i].notes, pred_bars[k][j].notes, metric, tolerance
+                            )
+                            for metric in METRICS
+                        },
+                    }
+                    for i, j in staff_pairs[k]
+                ],
+                "unmatched_reference_measures": sorted(
+                    set(range(1, len(ref_bars[k]) + 1)) - {i + 1 for i, _ in staff_pairs[k]}
+                ),
+                "unmatched_prediction_measures": sorted(
+                    set(range(1, len(pred_bars[k]) + 1)) - {j + 1 for _, j in staff_pairs[k]}
+                ),
+            }
+            for k in range(reference.staves)
         ],
         "metrics": metrics,
     }
@@ -352,7 +455,8 @@ def main() -> None:
     sys.stdout.write("model\tpitch inventory\tpitch+onset\tpitch+onset+duration\n")
     for result in results:
         values = [f"{100 * result['metrics'][metric]['combined']['f1']:.2f}" for metric in METRICS]
-        sys.stdout.write(result["name"] + "\t" + "\t".join(values) + "\n")
+        mode = " [per-staff bar alignment]" if result.get("alignment_mode") == "per_staff" else ""
+        sys.stdout.write(result["name"] + "\t" + "\t".join(values) + mode + "\n")
         strict = result["metrics"]["pitch_onset_duration"]["combined"]
         sys.stdout.write(
             f"  Full match: {strict['matched']}/{strict['reference']} reference notes; "

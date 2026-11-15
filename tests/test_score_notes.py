@@ -165,6 +165,53 @@ class TestIndividualNoteScoring(unittest.TestCase):
         self.assertEqual(len(align_measures(ref, hyp)), 2)
         self.assertEqual(result["metrics"]["pitch_inventory"]["combined"]["matched"], 1)
 
+    def test_staves_with_different_bar_counts_align_per_staff(self) -> None:
+        def part(pid: str, staff_notes: list[str]) -> str:
+            bars = "".join(
+                f'<measure number="{i + 1}">'
+                + ("<attributes><divisions>2</divisions></attributes>" if i == 0 else "")
+                + _note(n)
+                + "</measure>"
+                for i, n in enumerate(staff_notes)
+            )
+            return f'<part id="{pid}">{bars}</part>'
+
+        grand = (
+            '<score-partwise><part id="P1">'
+            '<measure number="1"><attributes><divisions>2</divisions></attributes>'
+            + _note("C")
+            + "<backup><duration>2</duration></backup>"
+            + _note("C", staff=2)
+            + '</measure><measure number="2">'
+            + _note("D")
+            + "<backup><duration>2</duration></backup>"
+            + _note("D", staff=2)
+            + '</measure><measure number="3">'
+            + _note("E")
+            + "<backup><duration>2</duration></backup>"
+            + _note("E", staff=2)
+            + "</measure></part></score-partwise>"
+        )
+        # Staff 1 keeps all three bars; staff 2 lost its middle bar.
+        split = (
+            "<score-partwise>"
+            + part("a", ["C", "D", "E"])
+            + part("b", ["C", "E"])
+            + "</score-partwise>"
+        )
+        ref, hyp = parse_musicxml(grand), parse_musicxml(split)
+        self.assertEqual(len(hyp.staff_measures), 2)
+        result = score_notes(ref, hyp)
+        self.assertEqual(result["alignment_mode"], "per_staff")
+        self.assertEqual(result["matched_measures"], [3, 2])
+        self.assertEqual(result["staff_alignment"][1]["unmatched_reference_measures"], [2])
+        strict = result["metrics"]["pitch_onset_duration"]
+        self.assertEqual(strict["staves"][0], Counts(3, 3, 3).report())
+        self.assertEqual(strict["staves"][1], Counts(2, 3, 2).report())
+        self.assertEqual(strict["combined"], Counts(5, 6, 5).report())
+        # Equal bar counts keep the joint alignment.
+        self.assertEqual(score_notes(ref, ref)["alignment_mode"], "joint")
+
     def test_staff_and_grace_status_must_match(self) -> None:
         ref = (Note(1, 60, 0, 0, True),)
         self.assertEqual(count_matches(ref, (Note(2, 60, 0, 0, True),), "pitch_onset", 0), 0)
