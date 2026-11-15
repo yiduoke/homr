@@ -2,9 +2,12 @@ campanella
 paganini & no. 3
 paganini & no.3
 mazeppa
-liebestraum & 3
-liebesträume & 3
-mephisto & 1
+liebestraum & no. 3
+liebestraum & no.3
+liebesträume & no. 3
+liebestraume & no. 3
+mephisto & no. 1
+mephisto & no.1
 hungarian rhapsody & no. 2
 hungarian rhapsody & no.2
 rhapsodie hongroise & 2
@@ -44,10 +47,13 @@ k331
 kv 331
 kv331
 alla turca
-rachmaninoff & op. 3
-rachmaninov & op. 3
-rachmaninoff & c# minor
-rachmaninoff & c sharp minor
+rachmaninoff & op. 3 no. 2
+rachmaninoff & op.3 no.2
+rachmaninoff & op. 3, no. 2
+rachmaninov & op. 3 no. 2
+rachmaninoff & prelude & c# minor
+rachmaninoff & prelude & c-sharp minor
+rachmaninoff & prelude & c sharp minor
 brahms & op. 116
 brahms & op.116
 fantasien & 116
