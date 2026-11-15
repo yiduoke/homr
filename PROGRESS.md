@@ -31,8 +31,8 @@ in. The main goal is now general note accuracy on 566 (see "Next"); octave round
   pieces; deduplicate before mixing. Also converted: ASAP (5,832 staffs, about 150 pieces)
   and KernScores Scriabin (1,847 staffs, 149 pieces), test pieces excluded; 62 ASAP and 54
   Scriabin pieces were dropped because their tuplets or 128th/256th notes don't fit the
-  vocabulary (another reason for the tuplet token). Disk is at 90%; the `rendered_scores` folders
-  SVGs were deleted on 2026-11-15; disk is at 55%. Box details and how to check
+  vocabulary (another reason for the tuplet token). Disk cleaned on 2026-11-15 (PDMX SVG
+  renders and superseded 509-era data deleted): 55% used. Box details and how to check
   progress: `run/HANDOFF_LOCAL.md` (laptop only).
 - KernScores scan check done: usable after filtering (see "Real scans paired with
   transcriptions" under Next). Running since 20:40 UTC: recount of systems on every scan
