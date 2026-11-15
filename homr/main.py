@@ -25,7 +25,7 @@ from homr.bounding_boxes import (
 )
 from homr.debug import Debug
 from homr.model import InputPredictions, MultiStaff, Note, Staff
-from homr.music_xml_generator import XmlGeneratorArguments, generate_xml
+from homr.music_xml_generator import TimeSignatureMemory, XmlGeneratorArguments, generate_xml
 from homr.noise_filtering import filter_predictions
 from homr.note_detection import add_notes_to_staffs, combine_noteheads_with_stems
 from homr.onnx_providers import coreml_available, cuda_available, rocm_available
@@ -186,7 +186,12 @@ def process_image(
     image_path: str,
     config: ProcessingConfig,
     xml_generator_args: XmlGeneratorArguments,
+    time_signatures: TimeSignatureMemory | None = None,
 ) -> str:
+    """
+    time_signatures: Pass the same object for all pages of a score, so that a page
+    without a time signature continues with the one of the previous page.
+    """
     eprint("Processing " + image_path)
     xml_file = replace_extension(image_path, ".musicxml")
     debug_cleanup: Debug | None = None
@@ -234,7 +239,7 @@ def process_image(
         eprint("Found title:", title)
 
         eprint("Writing XML", result_staffs)
-        xml = generate_xml(xml_generator_args, result_staffs, title)
+        xml = generate_xml(xml_generator_args, result_staffs, title, time_signatures)
         ET.ElementTree(xml).write(xml_file, encoding="unicode", xml_declaration=True)
 
         eprint("Finished parsing " + str(len(result_staffs)) + " staves")
@@ -448,10 +453,11 @@ def run_homr(
     """
     eprint("Merging", len(images), "files:", images)
     xml_paths = []
+    time_signatures = TimeSignatureMemory()
     for image_file in images:
         eprint("=========================================")
         try:
-            xml_paths.append(process_image(image_file, config, xml_generator_args))
+            xml_paths.append(process_image(image_file, config, xml_generator_args, time_signatures))
             eprint("Finished", image_file)
         except Exception as e:
             eprint(f"An error occurred while processing {image_file}: {e}")

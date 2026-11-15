@@ -14,7 +14,7 @@ from training.transformer.training_vocabulary import (
 )
 
 HEADER = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
-timeSignature/4 . . . . .
+timeSignature_2/4 . . . . .
 """
 
 

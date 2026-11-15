@@ -20,23 +20,54 @@ from homr.transformer.vocabulary import (
     nonote,
     octaves_of_clef,
     octaves_of_shift,
+    parse_time_signature_token,
     sort_token_chords,
     split_slur_and_beam,
     transpose_octaves,
 )
 
 
+class PartTimeSignature:
+    """
+    The last time signature which was recognised in a part, as its token. It is the
+    one in force until the staff shows another one, also on the next page.
+    """
+
+    def __init__(self, token: str | None = None) -> None:
+        self.token = token
+
+
+class TimeSignatureMemory:
+    """Carries the time signature of every part from one page to the next."""
+
+    def __init__(self) -> None:
+        self._parts: dict[int, PartTimeSignature] = {}
+
+    def part(self, index: int) -> PartTimeSignature:
+        return self._parts.setdefault(index, PartTimeSignature())
+
+
 class ConversionState:
     def __init__(self, division: int, nominator: Fraction):
         self.beats = 4 * constants.duration_of_quarter
         self.division = division
+        # Length of a measure in whole notes
         self.nominator = nominator
+        # Token of the last time signature which was recognised
+        self.time_token: str | None = None
         self.tremolo_state = "stop"
         self.volta_number = 1
         self.last_volta_measure = -10
         # Octaves between written and sounding pitch per staff, from octave clefs and shifts
         self.clef_octaves: dict[int, int] = {}
         self.shift_octaves: dict[int, int] = {}
+
+    def set_time_signature(self, token: str) -> None:
+        """Makes the measures as long as the recognised time signature says."""
+        beats, beat_type, _symbol = parse_time_signature_token(token)
+        self.time_token = token
+        self.nominator = Fraction(beats, beat_type)
+        self.beats = beats
 
     def sounding_pitch(self, written_pitch: str, staff: int) -> str:
         octaves = self.clef_octaves.get(staff, 0) + self.shift_octaves.get(staff, 0)
@@ -121,8 +152,16 @@ def build_identification() -> ET.Element:
 
 
 def generate_xml(
-    args: XmlGeneratorArguments, staffs: list[list[EncodedSymbol]], title: str
+    args: XmlGeneratorArguments,
+    staffs: list[list[EncodedSymbol]],
+    title: str,
+    time_signatures: TimeSignatureMemory | None = None,
 ) -> ET.Element:
+    """
+    time_signatures: Pass the same object for the pages of a score. A page continues
+    with the time signature the previous one ended with, until it shows another one.
+    """
+    time_signatures = time_signatures or TimeSignatureMemory()
     root = ET.Element("score-partwise", version="4.0")
     root.append(build_work(title))
     root.append(build_identification())
@@ -130,7 +169,15 @@ def generate_xml(
     has_two_staves_by_part = [_voice_has_two_staves(staff) for staff in staffs]
     root.append(build_part_list(has_two_staves_by_part))
     for index, staff in enumerate(staffs):
-        root.append(build_part(args, staff, index, has_two_staves_by_part[index]))
+        root.append(
+            build_part(
+                args,
+                staff,
+                index,
+                has_two_staves_by_part[index],
+                time_signatures.part(index),
+            )
+        )
     return root
 
 
@@ -140,11 +187,15 @@ def _voice_has_two_staves(voice: list[EncodedSymbol]) -> bool:
 
 
 def build_part(
-    args: XmlGeneratorArguments, voice: list[EncodedSymbol], index: int, has_two_staves: bool
+    args: XmlGeneratorArguments,
+    voice: list[EncodedSymbol],
+    index: int,
+    has_two_staves: bool,
+    time_signature: PartTimeSignature | None = None,
 ) -> ET.Element:
     part = ET.Element("part", id=get_part_id(index))
     is_first_part = index == 0
-    for measure in build_measures(args, voice, is_first_part, has_two_staves):
+    for measure in build_measures(args, voice, is_first_part, has_two_staves, time_signature):
         part.append(measure)
     convert_ties(part)
     add_stems(part)
@@ -158,7 +209,14 @@ def build_measures(
     voice: list[EncodedSymbol],
     is_first_part: bool,
     has_two_staves: bool = False,
+    time_signature: PartTimeSignature | None = None,
 ) -> list[ET.Element]:
+    """
+    time_signature: The time signature in force at the start, it is updated to the one in
+    force at the end. The measure lengths come from the recognised time signatures. Only
+    where none was recognised so far they are estimated from the notes.
+    """
+    time_signature = time_signature or PartTimeSignature()
     clock = GroupClock()
     measure_number = 1
     # Measures a multi-measure rest still covers after the current one
@@ -192,7 +250,9 @@ def build_measures(
     groups = split_mixed_chords(add_tuplet_start_stop(group_into_chords(voice)))
     division, nominators = find_division_and_time_signature_nominators(groups)
     state = ConversionState(division, nominators[0])
-    time_signature_no = 0
+    carried_time_token = time_signature.token
+    if carried_time_token is not None:
+        state.set_time_signature(carried_time_token)
     measures: list[ET.Element] = []
     current_measure = ET.Element("measure", number=str(measure_number))
     first_attributes = build_or_get_attributes(current_measure, None)
@@ -252,8 +312,6 @@ def build_measures(
             build_key(symbol, attributes)
         elif rhythm.startswith("timeSignature"):
             attributes = build_or_get_attributes(current_measure, last_attributes)
-            state.nominator = nominators[min(time_signature_no, len(nominators) - 1)]
-            time_signature_no += 1
             build_time_signature(symbol, attributes, state)
         elif "barline" in rhythm:
             # A barline right after another one (e.g. at the start of a line, or after a
@@ -331,10 +389,17 @@ def build_measures(
         stop_octave_shifts(measures[-1], state)
     # A clef opens a second attributes element, so look at the whole first measure
     if measures[0].find("attributes/time") is None:
-        time_el = ET.SubElement(first_attributes, "time")
-        beats = max(int(state.nominator * 4), 1)
-        ET.SubElement(time_el, "beats").text = str(beats)
-        ET.SubElement(time_el, "beat-type").text = "4"
+        if carried_time_token is not None:
+            # The page continues with the time signature of the previous one
+            time_el = _time_element(carried_time_token)
+        else:
+            time_el = ET.Element("time")
+            beats = max(int(state.nominator * 4), 1)
+            ET.SubElement(time_el, "beats").text = str(beats)
+            ET.SubElement(time_el, "beat-type").text = "4"
+        _insert_time_element(first_attributes, time_el)
+    if state.time_token is not None:
+        time_signature.token = state.time_token
     return measures
 
 
@@ -944,15 +1009,35 @@ def build_clef(model_clef: EncodedSymbol, attributes: ET.Element) -> None:
         ET.SubElement(clef, "clef-octave-change").text = str(octaves)
 
 
+def _time_element(token: str) -> ET.Element:
+    """C and cut C are written with the symbol attribute and the numbers of 4/4 and 2/2."""
+    beats, beat_type, symbol = parse_time_signature_token(token)
+    time = ET.Element("time")
+    if symbol is not None:
+        time.set("symbol", symbol)
+    ET.SubElement(time, "beats").text = str(beats)
+    ET.SubElement(time, "beat-type").text = str(beat_type)
+    return time
+
+
+def _insert_time_element(attributes: ET.Element, time: ET.Element) -> None:
+    """MusicXML wants divisions and key before the time signature."""
+    index = 0
+    for i, child in enumerate(attributes):
+        if child.tag in ("divisions", "key"):
+            index = i + 1
+    attributes.insert(index, time)
+
+
 def build_time_signature(
     model_time_signature: EncodedSymbol, attributes: ET.Element, state: ConversionState
 ) -> None:
-    time = ET.SubElement(attributes, "time")
-    denominator = model_time_signature.rhythm.split("/")[1]
-    beats = max(int(state.nominator * int(denominator)), 1)
-    ET.SubElement(time, "beats").text = str(beats)
-    ET.SubElement(time, "beat-type").text = denominator
-    state.beats = beats
+    try:
+        state.set_time_signature(model_time_signature.rhythm)
+    except ValueError:
+        eprint("Time signature isn't supported", model_time_signature)
+        return
+    attributes.append(_time_element(model_time_signature.rhythm))
 
 
 def build_barline_style(barline: EncodedSymbol, xml: ET.Element) -> None:
@@ -1300,6 +1385,8 @@ def find_division_and_time_signature_nominators(
     """
     Returns the division and one measure length per time signature, estimated from the
     measures up to the next time signature. Measures before the first one count towards it.
+    The writer only uses it where no time signature was recognised, before that it takes
+    the measure lengths from the recognised ones.
     """
     durations = [Fraction(1, 4)]
     duration_in_measure = Fraction(0)

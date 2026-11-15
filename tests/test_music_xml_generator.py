@@ -112,7 +112,7 @@ class TestMusicXmlGenerator(unittest.TestCase):
     def test_repeat_start_at_the_start_of_a_line_adds_no_empty_measure(self) -> None:
         # The repeat sign follows the barline that ended the previous line
         measures = self._measures("""clef_G2 . . . . upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_1 C4 _ _ _ upper
 barline . . . . .
 newline . . . . .
@@ -131,7 +131,7 @@ repeatEnd . . . . .""")
     def test_barline_after_volta_stop_adds_no_empty_measure(self) -> None:
         # First ending, repeat, then the second ending
         measures = self._measures("""clef_G2 . . . . upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 voltaStart_1 . . . . .
 note_1 C4 _ _ _ upper
 repeatEnd . . . . .
@@ -156,7 +156,7 @@ barline . . . . .""")
     def test_empty_pickup_measure_is_kept(self) -> None:
         # A part with nothing in the pickup measure still has the measure
         measures = self._measures("""clef_G2 . . . . upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 barline . . . . .
 rest_1 _ _ _ _ upper
 barline . . . . .""")
@@ -165,7 +165,7 @@ barline . . . . .""")
     def test_chord_with_different_duratons(self) -> None:
         tabi_measure_18_upper = """clef_G2 . . . . upper
 keySignature_4 . . . . .
-timeSignature/8 . . . . .
+timeSignature_6/8 . . . . .
 note_4. G3 # _ _ upper &note_4. C4 # _ _ upper&note_16 E4 # _ _ upper
 note_16 F4 # _ _ upper
 note_4 E4 # _ _ upper
@@ -201,7 +201,7 @@ barline . . . . ."""
         """
         six_eight = """clef_G2 . . . . upper
 keySignature_0 . . . . .
-timeSignature/8 . . . . .
+timeSignature_6/8 . . . . .
 note_4. C4 _ _ _ upper
 note_4. D4 _ _ _ upper
 barline . . . . .
@@ -216,7 +216,7 @@ barline . . . . ."""
     def test_multi_measure_rest_is_written_as_that_many_measures(self) -> None:
         rest_then_note = """clef_G2 . . . . upper
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 rest_3m _ _ _ _ upper
 barline . . . . .
 note_1 C4 _ _ _ upper
@@ -253,7 +253,7 @@ barline . . . . ."""
     def test_grand_staff_generation(self) -> None:
         grandstaff = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_1 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_1 G4 _ _ _ upper&note_1 A3 # _ _ upper&rest_2 _ _ _ _ upper&note_4 G3 _ _ _ lower
 rest_4 _ _ _ _ lower
 note_2 E4 _ _ _ upper&note_2 C2 _ _ _ lower
@@ -288,7 +288,7 @@ barline . . . . ."""
     def test_two_voices_on_the_same_staff(self) -> None:
         two_voices = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_2 G4 _ _ _ upper&note_4 E4 _ _ _ upper2&note_1 C3 _ _ _ lower
 note_4 D4 _ _ _ upper2
 barline . . . . ."""
@@ -386,7 +386,7 @@ barline . . . . ."""
     def test_slur_between_same_pitches_becomes_a_tie(self) -> None:
         """A slur joining two identical pitches is a tie, and needs both elements."""
         tied = """clef_G2 . . . . upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 C4 _ _ slurStart upper
 note_4 C4 _ _ slurStop upper
 note_2 D4 _ _ _ upper
@@ -404,7 +404,7 @@ barline . . . . ."""
     def test_tie_between_two_chords(self) -> None:
         """Every notehead of a chord ties to its own pitch in the next one."""
         chords = """clef_G2 . . . . upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 C4 _ _ slurStart upper&note_4 E4 _ _ slurStart upper
 note_4 C4 _ _ slurStop upper&note_4 E4 _ _ slurStop upper
 barline . . . . ."""
@@ -422,7 +422,7 @@ barline . . . . ."""
         leave the rest of the chord as it is.
         """
         chords = """clef_G2 . . . . upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 C4 _ _ _ upper&note_4 E4 _ _ slurStart upper
 note_4 C4 _ _ _ upper&note_4 E4 _ _ slurStop upper
 barline . . . . ."""
@@ -436,7 +436,7 @@ barline . . . . ."""
 
     def test_slur_from_a_chord_to_a_different_pitch_stays_a_slur(self) -> None:
         chords = """clef_G2 . . . . upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 C4 _ _ _ upper&note_4 E4 _ _ slurStart upper
 note_4 C4 _ _ _ upper&note_4 G4 _ _ slurStop upper
 barline . . . . ."""
@@ -454,7 +454,7 @@ barline . . . . ."""
         event may close a tie.
         """
         phrase = """clef_G2 . . . . upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 C4 _ _ _ upper&note_4 G4 _ _ slurStart upper
 note_4 A4 _ _ _ upper
 note_4 C4 _ _ _ upper&note_4 G4 _ _ slurStop upper
@@ -472,7 +472,7 @@ barline . . . . ."""
         ties: G4 has no stop to reach, and C4 has no start behind it.
         """
         crossing = """clef_G2 . . . . upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 C4 _ _ _ upper&note_4 G4 _ _ slurStart upper
 note_4 C4 _ _ slurStop upper&note_4 A4 _ _ _ upper
 barline . . . . ."""
@@ -484,7 +484,7 @@ barline . . . . ."""
 
     def test_slur_between_different_pitches_stays_a_slur(self) -> None:
         phrase = """clef_G2 . . . . upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 C4 _ _ slurStart upper
 note_4 E4 _ _ slurStop upper
 note_2 D4 _ _ _ upper
@@ -498,7 +498,7 @@ barline . . . . ."""
     def test_tie_is_recognised_across_a_barline(self) -> None:
         """Ties cross barlines constantly, which is why the pass runs per part."""
         across = """clef_G2 . . . . upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_1 C4 _ _ slurStart upper
 barline . . . . .
 note_1 C4 _ _ slurStop upper
@@ -512,7 +512,7 @@ barline . . . . ."""
     def test_same_pitch_but_not_adjacent_stays_a_slur(self) -> None:
         """Same pitch is not enough: a tie joins a note to its immediate successor."""
         apart = """clef_G2 . . . . upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 C4 _ _ slurStart upper
 note_4 E4 _ _ _ upper
 note_4 C4 _ _ slurStop upper
@@ -546,7 +546,7 @@ barline . . . . ."""
         and its successor rather than by pairing starts with stops.
         """
         nested = """clef_G2 . . . . upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 E4 _ _ slurStart upper
 note_4 C4 _ _ slurStart upper
 note_4 C4 _ _ slurStop upper
@@ -570,7 +570,7 @@ barline . . . . ."""
         """
         hands_moving_independently = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 C5 _ _ _ upper&note_8 C3 _ _ _ lower
 note_4 E3 _ _ _ lower
 note_4 D5 _ _ _ upper
@@ -603,7 +603,7 @@ barline . . . . ."""
         """
         elijah_measure_6 = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_-4 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 A4 b _ _ upper&note_4 E4 b _ _ upper&note_4 C4 _ _ _ upper&note_2 A2 b _ _ lower2&note_8 A2 b _ _ lower
 note_4 A3 b _ _ lower
 note_8. A4 b _ _ upper&note_8. E4 b _ _ upper&note_8. C4 _ _ _ upper
@@ -628,7 +628,7 @@ barline . . . . ."""
         """A group of only grace notes must not move later notes (the next note stays on beat 1)."""
         with_grace_note = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 C5 _ _ _ upper&note_2 C3 _ _ _ lower
 note_8G D5 _ _ _ upper
 note_4 E5 _ _ _ upper
@@ -643,7 +643,7 @@ barline . . . . ."""
 
     def test_grace_note_without_pitch_is_skipped(self) -> None:
         tokens = read_token_lines("""clef_G2 _ _ _ _ upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_8G . _ _ _ upper
 note_2 C5 _ _ _ upper
 barline . . . . .""".splitlines())
@@ -652,8 +652,8 @@ barline . . . . .""".splitlines())
 
     def test_measure_rest_of_a_hidden_grand_staff(self) -> None:
         tokens = read_token_lines("""clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
-timeSignature/4 . . . . .
-note_2 C5 _ _ _ upper&note_2 C3 _ _ _ lower
+timeSignature_4/4 . . . . .
+note_1 C5 _ _ _ upper&note_1 C3 _ _ _ lower
 barline . . . . .""".splitlines())
         tokens += [
             EncodedSymbol("newline"),
@@ -695,7 +695,7 @@ barline . . . . .""".splitlines())
 
     def test_dynamics_take_no_time(self) -> None:
         tokens = read_token_lines("""clef_G2 . . . . upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 E4 _ _ _ upper
 dynamic_ff _ _ dynamic_sempre _ upper
 note_4 C4 _ _ _ upper
@@ -719,7 +719,7 @@ barline . . . . .""".splitlines())
     def test_dynamics_in_grand_staff(self) -> None:
         tokens = read_token_lines("""clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_2 E4 _ _ _ upper&note_2 C3 _ _ _ lower
 dynamic_pp _ _ _ _ upper&dynamic_ff _ _ _ _ lower
 note_2 G4 _ _ _ upper&note_2 G2 _ _ _ lower
@@ -733,7 +733,7 @@ barline . . . . .""".splitlines())
 
     def test_other_dynamics(self) -> None:
         tokens = read_token_lines("""clef_G2 . . . . upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 E4 _ _ _ upper
 dynamic_ff _ _ dynamic_sempre _ upper
 note_4 C4 _ _ _ upper
@@ -758,7 +758,7 @@ barline . . . . .""".splitlines())
         """
         clef_in_chord = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 C5 _ _ _ upper&note_4 C3 _ _ _ lower
 note_4 A4 _ _ _ upper&clef_G2 _ _ _ _ lower
 note_4 F4 _ _ _ lower
@@ -787,7 +787,7 @@ barline . . . . ."""
         """A barline the transformer joined to the last chord of a measure still ends the measure."""
         barline_in_chord = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 C5 _ _ _ upper&note_4 C3 _ _ _ lower
 note_4 D5 _ _ _ upper&note_4 D3 _ _ _ lower&barline _ _ _ _ .
 note_2 E5 _ _ _ upper&note_2 E3 _ _ _ lower
@@ -803,7 +803,7 @@ barline . . . . ."""
         """A clef token that came with a pitch, joined to a note, must not become an extra note."""
         clef_with_pitch = """clef_G2 _ _ _ _ upper&clef_G2 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_2 F4 _ _ _ upper&clef_F4 F5 _ _ _ lower
 note_2 G4 _ _ _ upper&note_2 C3 _ _ _ lower
 barline . . . . ."""
@@ -816,7 +816,7 @@ barline . . . . ."""
         """A barline joined to a chord and then written again on its own ends only one measure."""
         barline_twice = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 C5 _ _ _ upper&note_4 C3 _ _ _ lower
 note_4 D5 _ _ _ upper&note_4 D3 _ _ _ lower&barline F5 _ _ _ upper
 barline . . . . .
@@ -835,7 +835,7 @@ barline . . . . ."""
         """
         chord = [
             EncodedSymbol("barline"),
-            EncodedSymbol("timeSignature/4"),
+            EncodedSymbol("timeSignature_4/4"),
             EncodedSymbol("note_4", "C4", position="upper"),
             EncodedSymbol("keySignature_1"),
             EncodedSymbol("clef_G2", position="lower"),
@@ -848,7 +848,7 @@ barline . . . . ."""
             [
                 ["clef_G2"],
                 ["keySignature_1"],
-                ["timeSignature/4"],
+                ["timeSignature_4/4"],
                 ["note_4", "rest_4"],
                 ["barline"],
             ],
@@ -869,7 +869,7 @@ barline . . . . ."""
     def test_key_signature_joined_to_a_chord_of_notes(self) -> None:
         key_in_chord = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_2 C5 _ _ _ upper&note_2 C3 _ _ _ lower
 barline . . . . .
 note_2 D5 _ _ _ upper&note_2 D3 _ _ _ lower&keySignature_2 . . . . .
@@ -884,7 +884,7 @@ barline . . . . ."""
     def test_time_signature_joined_to_a_chord_of_notes(self) -> None:
         time_in_chord = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-note_4 C5 _ _ _ upper&note_4 C3 _ _ _ lower&timeSignature/4 . . . . .
+note_4 C5 _ _ _ upper&note_4 C3 _ _ _ lower&timeSignature_4/4 . . . . .
 note_4 D5 _ _ _ upper&note_4 D3 _ _ _ lower
 barline . . . . ."""
         tokens = read_token_lines(time_in_chord.splitlines())
@@ -895,7 +895,7 @@ barline . . . . ."""
     def test_clef_joined_to_a_chord_of_rests(self) -> None:
         clef_with_rests = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 rest_4 _ _ _ _ upper&rest_4 _ _ _ _ lower&clef_G2 _ _ _ _ lower
 note_4 C5 _ _ _ upper&note_4 E4 _ _ _ lower
 barline . . . . ."""
@@ -914,7 +914,7 @@ barline . . . . ."""
         """
         repeat_in_chord = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_2 C5 _ _ _ upper&note_2 C3 _ _ _ lower&repeatEnd . . . . .
 note_2 D5 _ _ _ upper&note_2 D3 _ _ _ lower
 barline . . . . ."""
@@ -930,7 +930,7 @@ barline . . . . ."""
     def test_repeat_split_off_a_chord_wins_over_a_following_plain_barline(self) -> None:
         repeat_then_barline = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_2 C5 _ _ _ upper&note_2 C3 _ _ _ lower&repeatEnd . . . . .
 barline . . . . .
 note_2 D5 _ _ _ upper&note_2 D3 _ _ _ lower
@@ -947,7 +947,7 @@ barline . . . . ."""
         """Splitting the chord must not break the triplet around it."""
         clef_in_triplet = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_12 C5 _ _ _ upper&note_4 C3 _ _ _ lower
 note_12 D5 _ _ _ upper&clef_G2 _ _ _ _ lower
 note_12 E5 _ _ _ upper
@@ -1019,7 +1019,7 @@ barline . . . . ."""
         """Only a plain barline after a split-off barline is a duplicate, not a chord with a repeat."""
         both = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_2 C5 _ _ _ upper&note_2 C3 _ _ _ lower&barline _ _ _ _ .
 note_2 D5 _ _ _ upper&note_2 D3 _ _ _ lower&repeatEnd . . . . .
 note_2 E5 _ _ _ upper&note_2 E3 _ _ _ lower
@@ -1036,12 +1036,12 @@ barline . . . . ."""
     def test_symbols_split_off_a_chord_are_written_as_if_they_came_separately(self) -> None:
         """A key and time signature joined to a chord give the same MusicXML as on their own lines."""
         joined = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
-note_4 C5 _ _ _ upper&note_4 C3 _ _ _ lower&keySignature_2 . . . . .&timeSignature/4 . . . . .
+note_4 C5 _ _ _ upper&note_4 C3 _ _ _ lower&keySignature_2 . . . . .&timeSignature_4/4 . . . . .
 note_4 D5 _ _ _ upper&note_4 D3 _ _ _ lower
 barline . . . . ."""
         separate = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_2 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 C5 _ _ _ upper&note_4 C3 _ _ _ lower
 note_4 D5 _ _ _ upper&note_4 D3 _ _ _ lower
 barline . . . . ."""
@@ -1055,26 +1055,24 @@ barline . . . . ."""
         self.assertEqual(written[0], written[1])
 
     def test_time_signature_change_gets_its_own_numerator(self) -> None:
-        """Each time signature is estimated from its own measures, not from the whole staff."""
+        """Each time signature is written as the token says, also if only the numerator changes."""
         tokens = """clef_G2 _ _ _ _ upper
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_4 C4 _ _ _ upper
 note_4 C4 _ _ _ upper
 note_4 C4 _ _ _ upper
 note_4 C4 _ _ _ upper
 barline . . . . .
-timeSignature/4 . . . . .
+timeSignature_2/4 . . . . .
 note_4 C4 _ _ _ upper
 note_4 C4 _ _ _ upper
 barline . . . . .
-timeSignature/4 . . . . .
+timeSignature_3/4 . . . . .
 newline . . . . .
-timeSignature/4 . . . . .
-note_4 C4 _ _ _ upper
-note_4 C4 _ _ _ upper
-note_4 C4 _ _ _ upper
-note_4 C4 _ _ _ upper
+timeSignature_3/8 . . . . .
+note_8 C4 _ _ _ upper
+note_8 C4 _ _ _ upper
+note_8 C4 _ _ _ upper
 barline . . . . ."""
         xml = generate_xml(XmlGeneratorArguments(), [read_token_lines(tokens.splitlines())], "")
-        beats = [t.findtext("beats") for t in xml.iter("time")]
-        self.assertEqual(beats, ["4", "2", "4", "4"])
+        self.assertEqual(_times(xml), [("4", "4"), ("2", "4"), ("3", "4"), ("3", "8")])

@@ -51,7 +51,7 @@ def test_music_xml_beam_is_on_the_chord() -> None:
         _xml_note("E", "quarter", 2),
     )
     assert _tokens(xml) == """clef_G2 _ _ _ _ upper
-timeSignature/4 . . . . .
+timeSignature_2/4 . . . . .
 note_8 E5 _ _ beamStart upper&note_8 C5 _ _ _ upper
 note_8 D5 _ _ beamStop upper
 note_4 E5 _ _ _ upper
@@ -77,7 +77,7 @@ def test_kern_beams_count_all_levels() -> None:
 
 def test_generator_adds_secondary_beams_and_hooks() -> None:
     xml = _generate("""clef_G2 _ _ _ _ upper
-timeSignature/4 . . . . .
+timeSignature_2/4 . . . . .
 note_8. C5 _ _ beamStart upper
 note_16 D5 _ _ beamStop upper
 note_16 E5 _ _ beamStart upper
@@ -97,7 +97,7 @@ def test_generator_repairs_beams() -> None:
     # A beam which starts but never continues, a quarter in a beam and a group
     # without a start
     xml = _generate("""clef_G2 _ _ _ _ upper
-timeSignature/4 . . . . .
+timeSignature_2/4 . . . . .
 note_8 C5 _ _ beamStart upper
 note_4 D5 _ _ beamContinue upper
 note_8 E5 _ _ beamContinue upper
@@ -109,7 +109,7 @@ barline . . . . .""")
 
 def test_generator_beams_chords_on_the_first_note() -> None:
     xml = _generate("""clef_G2 _ _ _ _ upper
-timeSignature/4 . . . . .
+timeSignature_2/4 . . . . .
 note_8 C5 _ _ beamStart upper&note_8 E5 _ _ _ upper
 note_8 D5 _ _ beamStop upper&note_8 F5 _ _ _ upper
 barline . . . . .""")
@@ -118,7 +118,7 @@ barline . . . . .""")
 
 def test_round_trip() -> None:
     tokens = """clef_G2 _ _ _ _ upper
-timeSignature/4 . . . . .
+timeSignature_2/4 . . . . .
 note_8 C5 _ _ beamStart_slurStart upper
 note_16 D5 _ _ beamContinue upper
 note_16 E5 _ _ beamStop_slurStop upper
@@ -130,7 +130,7 @@ barline . . . . ."""
 
 def test_generator_joins_cross_staff_beams() -> None:
     xml = _generate("""clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
-timeSignature/4 . . . . .
+timeSignature_2/4 . . . . .
 note_8 C5 _ _ beamStart upper
 note_8 C3 _ _ beamContinue lower
 note_8 D5 _ _ beamStop upper

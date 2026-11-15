@@ -53,7 +53,7 @@ def test_octave_shift_has_written_pitches_until_it_stops() -> None:
         _measure(_note("E", 6) + _shift("stop") + _note("F", 5)),
     )
     assert _tokens(xml) == """clef_G2 _ _ _ _ upper
-timeSignature/4 . . . . .
+timeSignature_2/4 . . . . .
 octaveShift_8va _ _ _ _ upper
 note_4 C5 _ _ _ upper
 note_4 D5 _ _ _ upper
@@ -67,7 +67,7 @@ barline . . . . ."""
 def test_benchmarks_keep_sounding_pitches() -> None:
     xml = _score(_measure(_shift("down") + _note("C", 6) + _shift("stop") + _note("D", 5), TREBLE))
     assert _tokens(xml, sounding_pitch=True) == """clef_G2 _ _ _ _ upper
-timeSignature/4 . . . . .
+timeSignature_2/4 . . . . .
 note_4 C6 _ _ _ upper
 note_4 D5 _ _ _ upper
 barline . . . . ."""
@@ -143,7 +143,7 @@ barline . . . . ."""
 
 def test_generator_writes_sounding_pitches() -> None:
     tokens = """clef_G2_8vb _ _ _ _ upper&clef_F4 _ _ _ _ lower
-timeSignature/4 . . . . .
+timeSignature_2/4 . . . . .
 note_2 C4 _ _ _ upper&note_2 C3 _ _ _ lower
 octaveShift_8va _ _ _ _ upper&octaveShift_8vb _ _ _ _ lower
 note_2 C5 _ _ _ upper&note_2 C3 _ _ _ lower
@@ -163,7 +163,7 @@ barline . . . . ."""
 
 def test_generator_ends_shift_with_its_staff() -> None:
     tokens = """clef_G2 _ _ _ _ upper
-timeSignature/4 . . . . .
+timeSignature_2/4 . . . . .
 octaveShift_8va _ _ _ _ upper
 note_1 C5 _ _ _ upper
 barline . . . . .
@@ -179,7 +179,7 @@ barline . . . . ."""
 
 def test_round_trip() -> None:
     tokens = """clef_G2_8vb _ _ _ _ upper
-timeSignature/4 . . . . .
+timeSignature_2/4 . . . . .
 note_4 C5 _ _ _ upper
 octaveShift_8va _ _ _ _ upper
 note_4 C5 _ _ _ upper

@@ -31,6 +31,9 @@ def clef_attributes(clef) -> dict[str]:  # type ignore
 def time_attributes(time) -> dict[str]:  # type ignore
     # take an ElementTree <time> element
     attributes = {}
+    if time.get("symbol") is not None:
+        # C and cut C are a different signature than the numbers of 4/4 and 2/2
+        attributes["Symbol"] = time.get("symbol")
     for a in get_children_of_type(time, "beats"):
         attributes["Beats"] = a.text
     for a in get_children_of_type(time, "beat-type"):
