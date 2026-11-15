@@ -606,6 +606,12 @@ octave-only round is deferred. Keep experiments separate (one change each).
    - SMT++ (Alicante, full page, **kern, MIT code, weights on HF): CER 10.5 Mozarteum and
      19.6 Polish Scores after fine-tuning on fewer than 100 pages each (5-fold), 27.7 / 53.2
      zero-shot; Audiveris 86.8 / 93.7.
+   - Copista 28M (KobiMusic, leaderboard best 0.164; symbol detector + rules + 2M
+     transformer, Apache-2.0, `github.com/kobimusic/copisteria`) run locally on our pieces
+     (2026-11-15, outputs `run/out/compare/<piece>/*-copista.*`). Per-note F1 full / pitch
+     alone: Mazeppa 27.6 / 68.8 (566: 34.8 / 76.7), La Campanella 39.4 / 65.6 (566: 68.0 /
+     75.2). Rachmaninoff's four-staff pages come out as four parts (not scorable);
+     Petrushka 539 of about 878 bars. On hard real piano music 566 is clearly ahead.
    - Plan: report on IMSLP-Piano-Scores, OLiMPiC scanned test, Polish Scores and our own
      references; check each for overlap with PDMX, Lieder and KernScores training data.
 
