@@ -400,12 +400,17 @@ octave-only round is deferred. Keep experiments separate (one change each).
    and check a few reference passages against the scan too.
 2. **Regenerate the training data with upstream 566's converters** on the GPU box (beam
    tokens; the box's datasets are 509-era). Needed before any training on 566.
-3. **Time signatures, code first.** Before any new tokens, make the guess smarter:
-   `homr/music_xml_generator.py` (`find_division_and_time_signature_nominators`) picks one
-   numerator per page from the median bar length, which misses mid-page changes (Mazeppa's
-   6/8) and is thrown off by cadenza bars. Guess per passage instead (switch where bar
-   lengths change), and use the printed denominator plus beam grouping to tell 6/8 from
-   3/4. No training; measure on the references. Only if that is not enough, add tokens:
+3. **Time signatures: recognize them, and carry them across pages.** Decided
+   2026-11-15: recognition is the fix, and it is the first training round on 566.
+   - Tokens for the whole signature plus C and ¢ (below). Upstream's converters can
+     rebuild only the token files (`only_recreate_token_files=True`), so the data being
+     regenerated now does not have to be rendered again.
+   - A signature is printed only at the start and where it changes; most pages have
+     none, and homr reads each page alone. So carry the last recognized meter across
+     systems and pages and switch where a new one appears (today
+     `find_division_and_time_signature_nominators` in `homr/music_xml_generator.py`
+     guesses one numerator per page from the median bar length, which is why Mazeppa
+     stays in 4/4). Keep the guess only as a fallback when no signature was read.
    **Time-signature tokens (one controlled round on 566).** Today the parser keeps only the
    beat type (`timeSignature/4`); C and ¢ arrive as `/4` and `/2` with their `symbol`
    attribute dropped, and `homr/music_xml_generator.py` guesses the count from the
