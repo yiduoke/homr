@@ -29,6 +29,7 @@ still adds.
 | Fine-tuning script | `training/transformer/finetune_octave.py` (warm start, new vocabulary rows copied by token name) |
 | Octave training data code | `training/omr_datasets/augment_octave_shifts.py` (inserts brackets into MusicXML), `convert_lilypond.py` (LilyPond renders, one per page), `recrop_musescore_octave.py`, `training/transformer/build_round3_index.py` (training lists) |
 | Held-out staff test | `training/transformer/octave_eval.py` |
+| Individual-note scorer | `validation/score_notes.py`; definitions and usage in `validation/note_scoring.md` |
 | Bracket-aware staff cutting | `homr/octave_bracket_rows.py`, used in `homr/staff_parsing.py`; `HOMR_FIXED_MARGIN=1` switches back to upstream's cutting |
 | Local only (git-excluded `run/`) | Test pages, scorers, results, reference transcriptions; on the owner's laptop, not on GitHub |
 
@@ -43,7 +44,7 @@ still adds.
 | `run/scores/*.pdf` | Whole pieces used for listening: Bach BWV 848 prelude and fugue, Beethoven Pathétique mvt 1, Chopin Ballade 4, Liszt La Campanella, Mozart K. 309 mvt 1 and K. 331 theme, Rachmaninoff Op. 3 No. 2, Stravinsky Petrushka |
 | `run/real_eval.py` | Bracket counts per page: `python run/real_eval.py <dir with encoder_*.onnx and decoder_*.onnx> <label>`. Copies the ONNX into the worktree's model slot, so run one at a time |
 | `run/system_eval.py` | Same, per system and direction: a misplaced bracket counts as a miss and a false mark |
-| `run/score_vs_ref.py` | Pitches right per bar against a reference MusicXML: `python run/score_vs_ref.py REF.musicxml name=OUT.musicxml ...` |
+| `run/score_vs_ref.py` | Legacy mean per-bar pitch-inventory F1; not individual-note accuracy |
 | `run/merge_pages.py` | Joins per-page MusicXML into one score (drops ossia-like parts, splits odd note lengths) |
 | `run/render_wav.py` | Plain-synth WAV of a MusicXML at a steady 108 bpm |
 | `run/models/octave/real_eval/<label>/` | Cached MusicXML per model and test page; `<label>.json` has per-page numbers |
@@ -92,7 +93,7 @@ pitch guide lines overlaid. Things spanning staves (folded three-staff systems, 
 beams, 8va brackets, ties and slurs across barlines) were settled on the full page. The
 result was rendered with Verovio and compared with the scan.
 
-Use: test-only references for note accuracy (`run/score_vs_ref.py`). Their pitches are
+Use: test-only references for note evaluation (`validation/score_notes.py`). Their pitches are
 trustworthy; their octave-bracket extents are the least checked part. Both pieces are in
 the bracket test set, so they must never be used for training.
 
@@ -146,14 +147,80 @@ read, upper and lower staff):
 | Mazeppa | 202 | 93 / 107 | 18 / 16 |
 | La Campanella | 147 | 72 / 67 | 18 / 11 |
 
-So about one pitch in five is wrong and only about half the bars are nearly right. These
-are dense virtuoso pieces (Mazeppa also a dirty scan); upstream's own Polish-scores
+These are mean per-bar pitch-inventory F1 scores, not the fraction of individual notes
+correct; see the note-weighted rescore below. Only about half the bars reach 90% by the
+legacy metric. These are dense virtuoso pieces (Mazeppa also a dirty scan); upstream's
+own Polish-scores
 benchmark puts 566 at a 14.6% error rate on cleaner scans. There is no reference yet for a
 simpler piece, so it is unknown whether this rate holds outside such music.
 
 Ignoring octave, La Campanella is about 87% for every version, so its differences are
 octave brackets. On Mazeppa, ignoring octave, round 3 with upstream's cutting matches 509
 on the upper staff (89%) and is a little behind on the lower (85% vs 88%).
+
+### Individual-note rescoring (2026-11-15)
+
+The new scorer counts every pitched notehead, including chord members, grace notes and
+tied segments. It uses one bar alignment shared by both staves and includes notes in
+missing/extra bars in the denominators. The old scorer averaged bars equally, aligned
+each staff separately and did not penalize unmatched predicted bars. Its numbers are
+not directly comparable. See [the scoring definitions](validation/note_scoring.md).
+
+All figures below are **micro F1 percentages**, both staves combined, against the
+existing references (Mazeppa: 7,213 noteheads; La Campanella: 4,250). They evaluate the
+existing merged MusicXML, including `run/merge_pages.py` repairs, not the transformer
+alone. No inference or training was run, and no input score was changed.
+
+| Piece | Output | Pitch inventory | Pitch + onset | Pitch + onset + duration |
+|---|---|---:|---:|---:|
+| Mazeppa | Round 3, fixed cutting | 76.73 | 37.57 | 33.49 |
+| Mazeppa | Round 3, published cutting | 70.66 | 34.41 | 29.54 |
+| Mazeppa | Upstream 566 | 76.74 | 39.31 | 34.84 |
+| La Campanella | Round 3, fixed cutting | 74.00 | 67.09 | 66.18 |
+| La Campanella | Round 3, published cutting | 82.59 | 73.69 | 73.08 |
+| La Campanella | Upstream 566 | 75.22 | 68.99 | 67.96 |
+
+For upstream 566, full matches are 2,410/7,213 reference notes on Mazeppa and 2,903/4,250
+on La Campanella. Those are recalls of 33.41% and 68.31%; precision is 36.40% and 67.62%.
+The low Mazeppa timing score does **not** mean two-thirds of its pitches are wrong:
+rhythm errors can displace many subsequent notes within a bar. Pitch inventory ignores
+order and remains a lenient diagnostic, not a complete note-recognition score.
+
+One example: reference Mazeppa bar 28 aligns to upstream output bar 31, with 108 versus
+100 noteheads. There are 91 pitch matches, five pitch-and-onset matches and no full
+matches. Its opening E5/E6 chord lasts 2/9 quarter notes in the reference and 1/2 in
+the output; later onsets consequently diverge. Alignment is heuristic, especially near
+cadenzas and split/merged bars, and the report exposes every pair for inspection.
+
+Validation: the parser agrees with music21 on pitch, onset, duration and grace status
+in every staff-measure of both references and both upstream566 outputs. Tolerance
+0, 1/96 and 1/48 quarter notes gives the same Mazeppa score; La Campanella's full-match
+F1 ranges only from 67.92% to 67.99%. The gap is not a floating-point rounding effect.
+
+The scorer's 17 tests (plus 11 subtests), formatting, lint and type checks pass.
+`make ci` was attempted; full CI remains blocked by unchanged training import-format
+and type errors, and test collection requires the missing `augraphy` dependency.
+
+Local reports: `run/out/compare/{mazeppa,la-campanella}/note-scores.json`, including
+input hashes, per-staff counts and aligned/skipped bars. Reproduce from a checkout
+containing the scorer, with `comparison_dir` pointing to the local comparison directory:
+
+```sh
+piece=mazeppa  # or la-campanella
+python -m validation.score_notes "$comparison_dir/$piece-reference.musicxml" \
+  "r3-fixed=$comparison_dir/$piece-ours-fixedcut.musicxml" \
+  "r3-published=$comparison_dir/$piece-ours-published.musicxml" \
+  "upstream566=$comparison_dir/$piece-upstream566.musicxml" \
+  --json "$comparison_dir/note-scores.json"
+```
+
+Implication for training: general note reading remains a priority, but first distinguish
+pitch/omission errors from onset, duration and merge errors. These results do not
+isolate their causes. Develop on separate, aligned real scans with dense chords,
+ledger lines, tuplets and multiple voices, retaining clean synthetic examples for
+coverage. Check each staff crop against its labels before training. Keep these pieces
+held out and report all three metrics; fixing meter alone cannot explain or guarantee
+closing the note-level gap.
 
 ### Upstream 566 on our test set (2026-11-15)
 
@@ -166,8 +233,8 @@ on the upper staff (89%) and is a little behind on the lower (85% vs 88%).
 Per system on the four marked pieces (correct / missed / false of 217): ours 152 / 65 /
 13, 566 with upstream's cutting 114 / 103 / 5, with bracket-aware cutting 97 / 120 / 9.
 
-Notes with 566 and bracket-aware cutting: Mazeppa drops to 67% / 73% (from 78% / 79%),
-La Campanella stays at 77% / 80%.
+Notes with 566 and bracket-aware cutting (legacy per-bar measure): Mazeppa drops to
+67% / 73% (from 78% / 79%), La Campanella stays at 77% / 80%.
 
 Reading: our data adds about 64 real brackets over 566, and 566 barely reads an italic
 "8va" label (1 of 11), the same blind spot our round 1 had before the LilyPond styles.
@@ -226,13 +293,14 @@ Overall accuracy matters more than new features:
 
 | Problem | Cost on Mazeppa / La Campanella | Heard in playback |
 |---|---|---|
-| Wrong notes, octave aside | About 11-15% of pitches per bar | Everywhere |
+| Wrong notes, octave aside | Legacy octave-free per-bar F1 about 85-89%; not an individual-note error rate | Everywhere |
 | Wrong meter (6/8, 3/2, changes) | Every bar after the error is misplaced | Very |
 | Missed octave brackets | About 5-8 points | In some passages |
 | Missing features (glissando, pedal) | Rare, or not played at all | Hardly |
 
 Post-training on 566 is suited to adding or sharpening specific things (brackets, meter);
-it is not expected to lift general note accuracy on such pieces from about 78% to 95%.
+it is not expected to make note reading on such pieces nearly right (566 gets about 35%
+of Mazeppa's notes and 68% of La Campanella's fully right by the individual-note measure).
 That would need much more varied real training data, or constrained decoding and a
 render-and-compare check.
 
