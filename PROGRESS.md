@@ -504,8 +504,8 @@ octave-only round is deferred. Keep experiments separate (one change each).
    2/10/4, Ravel 169/29/6. So most virtuoso repertoire is excluded or rarely sampled.
    Candidate round: fine-tune 566 with all complexity 2-3 piano scores (octave shifts are
    supported now), plus virtuoso piano from Mutopia (a clone is in `run/mutopia`),
-   KernScores and possibly ASAP. Must exclude every test piece (PDMX likely has La
-   Campanella, Liebestraum, ...) and check copyright for 20th-century composers.
+   KernScores and possibly ASAP (PDMX and Mutopia are public domain or freely licensed).
+   Must exclude every test piece (PDMX likely has La Campanella, Liebestraum, ...).
 5. **Octave work: one round on 566 at most,** later, with matched bracket/no-bracket
    pairs and 8vb exposure back to round 3's level.
 
