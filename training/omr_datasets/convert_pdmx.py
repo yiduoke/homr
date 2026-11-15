@@ -20,19 +20,35 @@ dataset_root = os.path.join(git_root, "datasets")
 pdmx_root = os.path.join(dataset_root, "pdmx")
 pdmx_csv = os.path.join(pdmx_root, "PDMX.csv")
 pdmx_mxl_root = os.path.join(pdmx_root, "mxl")
-pdmx_train_index = os.path.join(pdmx_root, "index.txt")
-flat_pdmx = os.path.join(pdmx_root, "flat")
-rendered_scores = os.path.join(pdmx_root, "rendered_scores")
+# PDMX_SUBSET names a separate output folder (index, staffs, renders) inside pdmx, so a
+# second selection (e.g. only the hardest scores) does not mix with the default one.
+_subset_root = os.path.join(pdmx_root, os.environ.get("PDMX_SUBSET", ""))
+pdmx_train_index = os.path.join(_subset_root, "index.txt")
+flat_pdmx = os.path.join(_subset_root, "flat")
+rendered_scores = os.path.join(_subset_root, "rendered_scores")
 
-# Complexity 3 often has octave shifts (unsupported) and long sequences (see max_seq_len),
-# so we skip attempting those files rather than waste time converting ones we'd filter out later.
-_MAX_COMPLEXITY = 2
+# Complexity 3 often has octave shifts and long sequences (see max_seq_len), so by default
+# we skip those files. PDMX_MIN_COMPLEXITY / PDMX_MAX_COMPLEXITY / PDMX_TARGET_FILES change
+# the selection; PDMX_EXCLUDE names a file with one lowercase phrase per line, and scores
+# whose title, song name or composer contains one are left out (e.g. test pieces).
+_MIN_COMPLEXITY = int(os.environ.get("PDMX_MIN_COMPLEXITY", "0"))
+_MAX_COMPLEXITY = int(os.environ.get("PDMX_MAX_COMPLEXITY", "2"))
 _MAX_TRACKS = 2
-_TARGET_FILES = 20000  # ~100K images
+_TARGET_FILES = int(os.environ.get("PDMX_TARGET_FILES", "20000"))  # ~100K images
 
 
-def _load_filtered_paths() -> list[Path]:
+def _excluded_phrases() -> list[str]:
+    path = os.environ.get("PDMX_EXCLUDE")
+    if not path:
+        return []
+    with open(path, encoding="utf-8") as f:
+        return [line.strip().lower() for line in f if line.strip()]
+
+
+def _load_filtered_paths() -> list[Path]:  # noqa: C901
     buckets: dict[tuple[int, int], list[Path]] = {}
+    excluded = _excluded_phrases()
+    n_excluded = 0
     with open(pdmx_csv, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
@@ -48,13 +64,22 @@ def _load_filtered_paths() -> list[Path]:
                 continue
             try:
                 complexity = int(row["complexity"])
-                if complexity > _MAX_COMPLEXITY:
+                if complexity > _MAX_COMPLEXITY or complexity < _MIN_COMPLEXITY:
                     continue
             except (ValueError, KeyError):
                 continue
+            if excluded:
+                names = " ".join(
+                    (row.get(k) or "").lower() for k in ("title", "song_name", "composer_name")
+                )
+                if any(phrase in names for phrase in excluded):
+                    n_excluded += 1
+                    continue
             rel_mxl = row["mxl"].lstrip("./")
             buckets.setdefault((n_tracks, complexity), []).append(Path(pdmx_root) / rel_mxl)
 
+    if excluded:
+        eprint(f"  left out {n_excluded} files matching PDMX_EXCLUDE")
     rng = random.Random(42)
     for paths in buckets.values():
         rng.shuffle(paths)
@@ -105,7 +130,10 @@ def convert_pdmx(only_recreate_token_files: bool = False) -> None:
 
     eprint("Reading CSV and applying filters")
     mxl_paths = _load_filtered_paths()
-    eprint(f"{len(mxl_paths)} files pass pre-filters (c<={_MAX_COMPLEXITY}, tracks<={_MAX_TRACKS})")
+    eprint(
+        f"{len(mxl_paths)} files pass pre-filters"
+        f" ({_MIN_COMPLEXITY}<=c<={_MAX_COMPLEXITY}, tracks<={_MAX_TRACKS})"
+    )
 
     create_musicxml_and_svg_files_from_mxl(mxl_paths, rendered_scores)
     music_xml_files = list(Path(rendered_scores).rglob("*.musicxml"))
