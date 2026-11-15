@@ -478,8 +478,9 @@ Keep tuplet changes, harder-data reweighting, octave experiments and RL out of b
     `<time symbol="common|cut">`; check on rendered crops.
   - Verovio (GrandStaff kern): C only with `*met(c)` / `*met(c|)`; check on crops.
   - LilyPond (octave data): draws 4/4 as C and 2/2 as cut C unless
-    `\numericTimeSignature`; current labels say /4 and /2. Re-label from the .ly
-    settings, verified on crops; re-render only if they disagree.
+    `\numericTimeSignature`; current labels say /4 and /2. Decided with the owner
+    (2026-11-15): keep the existing octave images and fix only their labels (C / cut C
+    where drawn), verified on crops.
   - Reuse renders; regenerate tokens only where agreement is verified on a sample of
     images per dataset and per case; otherwise fix the rendering.
   - Systems without a printed signature carry no time-signature token (already so for
