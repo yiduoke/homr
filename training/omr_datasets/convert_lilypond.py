@@ -106,6 +106,16 @@ def _ottava_style(rng: random.Random) -> str:
     ]
     if rng.random() < 0.25:  # noqa: PLR2004
         lines.append("\\override OttavaBracket.edge-height = #'(0 . 0)")  # no hook at the end
+    # LilyPond keeps a bracket well clear of the notes, older engravings set it right on
+    # top of them. Drawn last, so the choices above stay what they were per file.
+    if rng.random() < float(os.environ.get("LILY_TIGHT_OTTAVA", "0")):
+        lines.extend(
+            [
+                "\\override OttavaBracket.padding = #0.1",
+                "\\override OttavaBracket.staff-padding = #0.2",
+                "\\override OttavaBracket.outside-staff-padding = #0.05",
+            ]
+        )
     return "\n      ".join(lines)
 
 
