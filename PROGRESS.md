@@ -29,7 +29,14 @@ in. The main goal is now general note accuracy on 566 (see "Next"); octave round
   "ALL DONE HARD2". Box details and how to check progress: `run/HANDOFF_LOCAL.md`
   (laptop only).
 - KernScores scan check done: usable after filtering (see "Real scans paired with
-  transcriptions" under Next).
+  transcriptions" under Next). Running since 20:40 UTC: recount of systems on every scan
+  page with homr's own staff detection on the GPU (tmux `kerncount`,
+  `/workspace/kern_check/homr_count.py`, results `homr_count.json`, staff positions saved
+  as `.txt` next to each page PNG in `/workspace/kern_check/pages/`). Next: a cheap
+  helper looks by eye at pieces where homr's count still disagrees with the .krn; then
+  cut matching pieces into system/token pairs and have Sonnet check a sample bar by bar.
+- Fixed: `homr --init` on this branch fetched 566 from the fork's release (404); upstream
+  models now come from upstream's release (commit 5ecda33).
 - No training is running. Nothing new is published; round 3 epoch 1 is still the
   fork's model.
 - First things to pick up: verify the regenerated indexes (sizes, beam tokens), then
