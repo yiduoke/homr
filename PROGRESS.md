@@ -530,6 +530,10 @@ octave-only round is deferred. Keep experiments separate (one change each).
    - Tuplet repair: a beamed group whose durations do not fill its beat is a tuplet
      (Mazeppa's biggest loss, see the audit). Check upstream's existing triplet
      restoration (`homr/triplet_restoration.py`) first and extend it to 5, 6, 7.
+     It does not use the meter today (it checks that voices meet); once run 1 recognises
+     full time signatures, use "every bar adds up to its meter" as an extra constraint.
+     Today the numerator is guessed from the median bar length, so a page full of misread
+     triplets can also get a wrong meter.
    - Page joining: switch to upstream's relieur, after fixing its part pairing (by name,
      not position) so pages whose small extra staff comes first keep their piano notes;
      drop ossia-like parts with `run/drop_minor_parts.py`; score again; retire
