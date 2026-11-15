@@ -248,6 +248,25 @@ bar alignment from `validation/score_notes.py`, one-to-one matching per bar and 
   unexplained and may be double counting at page edges. Check first.
 - Missing notes are mostly single notes, not chord members.
 
+### Page joining: ours vs upstream's (2026-11-15)
+
+Upstream joins pages itself since PR #149 (`homr.main` with several images or a PDF,
+`homr/relieur.py`). Same model 566, same pages, scored with `validation/score_notes.py`
+(full match = pitch, onset and duration):
+
+| Piece | Joining | Full match F1 | Recall | Precision |
+|---|---|---|---|---|
+| Mazeppa | `run/merge_pages.py` | **34.84%** | 33.41% | **36.40%** |
+| Mazeppa | upstream relieur | 24.01% | **34.41%** | 18.44% |
+| La Campanella | `run/merge_pages.py` | 67.96% | 68.31% | 67.62% |
+| La Campanella | upstream relieur | **69.53%** | **69.88%** | **69.18%** |
+
+Relieur keeps more correct notes on both pieces (72 more full matches on Mazeppa, 67 on
+La Campanella), so `merge_pages.py` does lose notes. Relieur's low Mazeppa precision
+comes from keeping the ossia and "Piano à 7 octaves" staves as extra parts (10,977
+unmatched predicted notes). Next step: use relieur and drop parts that cover only a few
+pages, then score again; `merge_pages.py` can then be retired.
+
 ### Upstream 566 on our test set (2026-11-15)
 
 | Version | Scan brackets found (of 322) | False marks | Chopin LilyPond italic "8va" (of 11) | La Campanella MuseScore (of 40) |
@@ -341,9 +360,9 @@ octave-only round is deferred. Keep experiments separate (one change each).
    - Tuplet repair: a beamed group whose durations do not fill its beat is a tuplet
      (Mazeppa's biggest loss, see the audit). Check upstream's existing triplet
      restoration (`homr/triplet_restoration.py`) first and extend it to 5, 6, 7.
-   - Page joining: find out whether `run/merge_pages.py` really drops about 250 Mazeppa
-     notes beyond the ossia parts (compare per-page outputs, kept in
-     `run/out/compare/<piece>/pages-upstream566/`, with the merged file), and fix it.
+   - Page joining: switch to upstream's relieur (it keeps notes `merge_pages.py` loses,
+     see "Page joining" above) and drop ossia-like parts that cover only a few pages;
+     score again on both references.
    - Accidentals: carry accidentals through the bar and respect the key signature where
      the model disagrees with itself; measure on La Campanella (216 accidental errors).
    Before blaming training, compare raw per-page predictions with the merged MusicXML,
