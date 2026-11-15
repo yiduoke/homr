@@ -394,8 +394,15 @@ octave-only round is deferred. Keep experiments separate (one change each).
      not position) so pages whose small extra staff comes first keep their piano notes;
      drop ossia-like parts with `run/drop_minor_parts.py`; score again; retire
      `run/merge_pages.py`. Candidate for an upstream issue if the owner wants one.
-   - Accidentals: carry accidentals through the bar and respect the key signature where
-     the model disagrees with itself; measure on La Campanella (216 accidental errors).
+   - Accidentals: no output-only rule. The model already carries accidentals itself:
+     training labels are each note's sounding alteration after the key signature and
+     earlier accidentals in the bar (`_lift_from_pitch_or_accidental` in
+     `training/omr_datasets/music_xml_parser.py`), and homr writes the model's value
+     straight to `<alter>`. The output does not say whether an accidental was printed,
+     so a rule cannot tell a printed natural from a forgotten sharp. Instead, first check
+     whether La Campanella's 216 accidental errors come from misread key signatures on
+     whole systems; if so, keep the key consistent across systems unless a change is
+     visible.
    Before blaming training, compare raw per-page predictions with the merged MusicXML,
    and check a few reference passages against the scan too.
 2. **Regenerate the training data with upstream 566's converters** on the GPU box (beam
