@@ -509,8 +509,12 @@ octave-only round is deferred. Keep experiments separate (one change each).
    Started 2026-11-15: `convert_pdmx.py` now takes `PDMX_MIN_COMPLEXITY`,
    `PDMX_MAX_COMPLEXITY`, `PDMX_TARGET_FILES`, `PDMX_SUBSET` and `PDMX_EXCLUDE`
    (`training/omr_datasets/pdmx_exclude_test_pieces.txt` lists phrases of our test
-   pieces). Complexity 2-3 with test pieces left out: 7,135 piano scores (80 excluded by
-   title), queued on the box into `datasets/pdmx/hard`.
+   pieces). Only pieces whose results we score are excluded: the bracket test pieces
+   (scan pages, Chopin Ballade 4, La Campanella) and the note references (Mazeppa, La
+   Campanella, Rachmaninoff Op. 3 No. 2). Pieces used only for listening or on the
+   bracket control pages (Bach WTC, Beethoven sonatas, Brahms Op. 116) stay in training.
+   Complexity 2-3: 21 scores excluded, about 7,190 kept, queued on the box into
+   `datasets/pdmx/hard`.
 5. **Octave work: one round on 566 at most,** later, with matched bracket/no-bracket
    pairs and 8vb exposure back to round 3's level.
 
