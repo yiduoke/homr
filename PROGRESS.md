@@ -484,6 +484,16 @@ octave-only round is deferred. Keep experiments separate (one change each).
 5. **Octave work: one round on 566 at most,** later, with matched bracket/no-bracket
    pairs and 8vb exposure back to round 3's level.
 
+**Idea for later: edit weights directly.** MIT CSAIL's "Sparks of Weight-Space
+Programming" (blog post, 2026-11-02, https://rikiyat.github.io/blog/weight-space-programming;
+logs at https://github.com/RikiyaT/lm_understand-logs) had GPT-6 Astra edit 0.016% of
+Qwen3.5-0.8B's weights with a Python kernel and 10-50 forward passes of practice
+problems: MATH-500 7.9% to 48.1%. No reasoning setting stated; little gain on a 270M
+model; the authors say it "is not a method". For homr (75M) start simpler: adjust output
+biases for narrow habits (false 8vb, plain sixteenths instead of tuplet lengths), tuned
+on development data and judged on the references, never tuned on test pages. A frontier
+model editing loop would come after that.
+
 More reference transcriptions (e.g. one simpler piece such as the Beethoven) would show
 whether the error rates hold outside dense virtuoso music; they are expensive to make,
 and any piece transcribed for testing must never be trained on.
