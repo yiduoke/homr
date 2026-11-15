@@ -380,7 +380,13 @@ octave-only round is deferred. Keep experiments separate (one change each).
    and check a few reference passages against the scan too.
 2. **Regenerate the training data with upstream 566's converters** on the GPU box (beam
    tokens; the box's datasets are 509-era). Needed before any training on 566.
-3. **Time signatures (one controlled round on 566).** Today the parser keeps only the
+3. **Time signatures, code first.** Before any new tokens, make the guess smarter:
+   `homr/music_xml_generator.py` (`find_division_and_time_signature_nominators`) picks one
+   numerator per page from the median bar length, which misses mid-page changes (Mazeppa's
+   6/8) and is thrown off by cadenza bars. Guess per passage instead (switch where bar
+   lengths change), and use the printed denominator plus beam grouping to tell 6/8 from
+   3/4. No training; measure on the references. Only if that is not enough, add tokens:
+   **Time-signature tokens (one controlled round on 566).** Today the parser keeps only the
    beat type (`timeSignature/4`); C and ¢ arrive as `/4` and `/2` with their `symbol`
    attribute dropped, and `homr/music_xml_generator.py` guesses the count from the
    median bar length. Plan: one token per whole signature (`timeSignature_3/4`,
