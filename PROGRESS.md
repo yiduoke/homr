@@ -435,6 +435,17 @@ octave-only round is deferred. Keep experiments separate (one change each).
    Suggested: add a tuplet group token (e.g. "6 in the time of 4") in the same data
    regeneration, since both changes write what is printed and need the same new data;
    test them as separate variants.
+   **"Transcribe what is printed, compute the meaning" (owner's proposal, 2026-11-15).**
+   Today a note's accidental label is its sounding alteration, so the decoder itself must
+   remember an accidental for the rest of the bar (a later B5 after a B#5 is output as
+   B#5 by the model). Proposed: label only the printed accidental (or none) and apply the
+   key signature and bar carry by rule after decoding (per pitch and staff, through ties
+   across the bar line), writing both `<alter>` and the printed `<accidental>` to
+   MusicXML. Same kind of change as the time-signature and tuplet-group tokens (label
+   semantics, re-tokenized data, one round), so the three can share one data
+   regeneration and be tested as separate variants. Measure first how many of La
+   Campanella's 216 accidental errors are forgotten carries (same pitch altered earlier
+   in the bar).
 4. **Note accuracy from real scans,** chosen by what step 1 leaves: if notes are missing
    from the crop, fix cropping; if recognition fails on dense chords and tuplets, build
    real-scan training examples for those cases (e.g. OpenScore scans, if bar alignment
