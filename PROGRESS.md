@@ -612,6 +612,26 @@ octave-only round is deferred. Keep experiments separate (one change each).
      alone: Mazeppa 27.6 / 68.8 (566: 34.8 / 76.7), La Campanella 39.4 / 65.6 (566: 68.0 /
      75.2). Rachmaninoff's four-staff pages come out as four parts (not scorable);
      Petrushka 539 of about 878 bars. On hard real piano music 566 is clearly ahead.
+   - More references (2026-11-15) from KernScores, converted with music21
+     (`run/kern_refs/scripts/build_refs.py`): Bach WTC I BWV 848 prelude (104 bars) and
+     fugue (55), Mozart K. 331 theme (18) and K. 309/1 (155), Beethoven Op. 13/1 (312).
+     **These five movements must stay out of all training data** (KernScores scan pairs,
+     ASAP, PDMX). The scorer now maps extra staves to the nearest reference staff
+     (commit 9d75cd0), so Rachmaninoff is scored. Per-note F1, all right (pitch alone):
+
+     | Piece | Ours r3 | Upstream 566 | Copista 28M | Audiveris |
+     |---|---|---|---|---|
+     | Bach prelude 848 | 90.6 (90.9) | 91.4 (93.6) | 93.4 (93.7) | 93.2 (93.8) |
+     | Bach fugue 848 | 80.4 (83.2) | 86.0 (86.5) | 83.4 (86.2) | 71.4 (85.4) |
+     | Mozart K. 331 theme | 99.6 | 99.6 | 99.4 | 99.2 |
+     | Mozart K. 309/1 | 96.7 (99.1) | 96.9 (99.2) | 97.2 (98.2) | 93.1 (98.0) |
+     | Beethoven Op. 13/1 | 96.3 (98.1) | 97.0 (98.3) | 91.3 (95.7) | 76.1 (85.4) |
+     | Rachmaninoff Op. 3/2 | 52.7 (68.4) | 57.8 (69.0) | 37.9 (58.1) | 57.7 (79.7) |
+     | Mazeppa | 33.5 (76.7) | 34.8 (76.7) | 27.6 (68.8) | - |
+     | La Campanella | 66.2 (74.0) | 68.0 (75.2) | 39.4 (65.6) | - |
+
+     Classical scans are nearly solved for 566; the gap is virtuoso music. Chopin Op. 52
+     exists as kern in pl-wnifc/humdrum-chopin-first-editions (not built yet).
    - Plan: report on IMSLP-Piano-Scores, OLiMPiC scanned test, Polish Scores and our own
      references; check each for overlap with PDMX, Lieder and KernScores training data.
 
