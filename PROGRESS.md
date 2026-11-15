@@ -248,6 +248,21 @@ bar alignment from `validation/score_notes.py`, one-to-one matching per bar and 
   unexplained and may be double counting at page edges. Check first.
 - Missing notes are mostly single notes, not chord members.
 
+### Rachmaninoff Prelude Op. 3 No. 2 (third reference, 2026-11-15)
+
+A third Claude-made reference (redone after a first attempt was discarded): 62 bars, one
+piano part, two staves (`run/out/compare/rachmaninoff-op3-2/rachmaninoff-op3-2-reference.musicxml`,
+test only). Pitches right per bar (legacy measure, `run/score_vs_ref.py`), upper / lower:
+
+| Version | All bars | Ignoring octave | Bars >= 90% / < 50% (upper; lower) |
+|---|---|---|---|
+| Round 3, upstream's cutting | 78% / 64% | 86% / 64% | 32 / 6; 23 / 17 |
+| Upstream 566 | 78% / 64% | 87% / 64% | 34 / 6; 22 / 17 |
+
+Ours and 566 are the same here (hardly any octave brackets). The lower staff is weak.
+`validation/score_notes.py` refuses these outputs ("Parts have different measure counts;
+establish their alignment first"): the two output staves disagree on bar count.
+
 ### Page joining: ours vs upstream's (2026-11-15)
 
 Upstream joins pages itself since PR #149 (`homr.main` with several images or a PDF,
