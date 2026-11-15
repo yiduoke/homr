@@ -465,8 +465,12 @@ Keep tuplet changes, harder-data reweighting, octave experiments and RL out of b
   joiner, one cutting mode. Quantify the joining loss on the references first (relieur
   pairs parts by position: Mazeppa page 11 loses 431 notes; our merge_pages drops minor
   parts) and fix or report it, so it is not mistaken for a training effect.
-- P5. Fixed elsewhere for both runs: staff cropping, dataset proportions, octave exposure
-  (same LilyPond/MuseScore octave share as round 3).
+- P5. Fixed elsewhere for both runs: staff cropping, dataset proportions, octave exposure.
+  Owner (2026-11-15): keep the amount and mix of our octave-bracket training data unchanged
+  (same LilyPond/MuseScore octave share as round 3). Those sets were made with the old
+  converters and have no beam tokens although the images show beams: regenerate their
+  tokens with the current parser (beams + full meter) from the same source MusicXML,
+  keeping the images, after checking beams against crops (LilyPond may auto-beam).
 
 **Run 1: complete time signatures**
 - Tokens: `timeSignature_<num>/<den>` for every printed numeric signature (vocabulary
