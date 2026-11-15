@@ -461,6 +461,15 @@ octave-only round is deferred. Keep experiments separate (one change each).
 
    The references' `<accidental>` elements can serve to measure printed-accidental
    accuracy once homr writes them.
+   History (upstream Training.md): the original TrOMR (run 0, weights from arXiv
+   2308.09370) wrote accidentals "depending on how they are placed", i.e. only visible
+   ones (in D major: semantic C#, Cb, Cb written as C, Cb, C). Upstream switched to the
+   semantic encoding in run 79 (April 2024); that run's entry shows 80.9 diffs against
+   22.3 for run 77, possibly not comparable. Find out why upstream switched (Training.md
+   around runs 76-90 and the commits from April 2024) before switching back. Upstream
+   trains its own runs for about 14-24 h each, so a from-scratch run is normal here
+   (about 1-3 days on one RTX 3090); fine-tuning 566 with re-labelled accidentals (and a
+   reset accidental head) is the cheaper first test.
 4. **Note accuracy from real scans,** chosen by what step 1 leaves: if notes are missing
    from the crop, fix cropping; if recognition fails on dense chords and tuplets, build
    real-scan training examples for those cases (e.g. OpenScore scans, if bar alignment
