@@ -10,7 +10,7 @@ class TestStaffMerging(unittest.TestCase):
         result = create_chord_over_two_staffs(
             [
                 EncodedSymbol("keySignature_0", empty, empty, empty, "upper"),
-                EncodedSymbol("timeSignature/4"),
+                EncodedSymbol("timeSignature_4/4"),
                 EncodedSymbol("clef_G2", empty, empty, empty, "upper"),
                 EncodedSymbol("note_16", "F4", empty, empty, "upper"),
                 EncodedSymbol("clef_F4", empty, empty, empty, "lower"),
@@ -27,7 +27,7 @@ class TestStaffMerging(unittest.TestCase):
                 "chord",
                 "clef_F4",
                 "keySignature_0",
-                "timeSignature/4",
+                "timeSignature_4/4",
                 "note_16",
                 "chord",
                 "rest_4",

@@ -334,7 +334,7 @@ note_8 E5 _ _ _ upper
 barline . . . . ."""
         header = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . ."""
+timeSignature_4/4 . . . . ."""
         symbols = read_token_lines([*header.splitlines(), *measure.splitlines() * 3])
 
         result = _clean_up_voice(symbols)

@@ -10,6 +10,7 @@ from homr.simple_logging import eprint
 from homr.type_definitions import NDArray
 from training.omr_datasets.humdrum_kern_parser import convert_kern_to_tokens
 from training.omr_datasets.musescore_svg import SvgValidationError
+from training.omr_datasets.time_signatures import UnsupportedTimeSignatureError
 from training.transformer.training_vocabulary import (
     calc_ratio_of_tuplets,
     token_lines_to_str,
@@ -105,6 +106,10 @@ def _convert_file(path: Path, ony_recreate_token_files: bool = False) -> str:  #
         )
 
     except SvgValidationError:
+        return ""
+    except UnsupportedTimeSignatureError as e:
+        # Counted as skipped, grep the log for the cause
+        eprint("Skipping, unsupported time signature:", path, e)
         return ""
     except Exception as e:
         eprint("Failed to convert ", path, e)

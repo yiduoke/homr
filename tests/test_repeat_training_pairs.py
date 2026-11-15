@@ -70,7 +70,7 @@ def test_parser_preserves_repeat_measure(boundary: str) -> None:
 def test_parser_completes_implicit_measure_boundaries() -> None:
     measures = _measures(ending="", prefix="")
     assert [_rhythms(measure) for measure in measures] == [
-        ["clef_G2", "keySignature_0", "timeSignature/4", "note_1", "barline"],
+        ["clef_G2", "keySignature_0", "timeSignature_4/4", "note_1", "barline"],
         ["note_1", "barline"],
     ]
 
@@ -99,7 +99,7 @@ def test_empty_measure_with_opening_repeat_still_gets_ending_barline(content: st
     expected = [
         "clef_G2",
         "keySignature_0",
-        "timeSignature/4",
+        "timeSignature_4/4",
         "repeatStart",
         "barline",
         "rest_1",
@@ -138,7 +138,7 @@ def test_opposite_ends_of_one_measure_keep_separate_repeat_signs() -> None:
     expected = [
         "clef_G2",
         "keySignature_0",
-        "timeSignature/4",
+        "timeSignature_4/4",
         "repeatStart",
         "repeatEnd",
     ]
@@ -166,7 +166,7 @@ def test_empty_measure_after_repeat_end_keeps_its_boundary(
     expected = [
         "clef_G2",
         "keySignature_0",
-        "timeSignature/4",
+        "timeSignature_4/4",
         "note_1",
         "repeatEnd",
         "repeatStart" if prefix else "barline",
@@ -208,7 +208,7 @@ def test_combined_repeat_at_start_of_empty_measure_preserves_its_repeat_end() ->
     expected = [
         "clef_G2",
         "keySignature_0",
-        "timeSignature/4",
+        "timeSignature_4/4",
         "note_1",
         "repeatEndStart",
         "repeatEnd",
@@ -242,7 +242,7 @@ def test_separate_images_keep_repeat_in_second_answer(boundary: str) -> None:
     assert _rhythms(previous) == [
         "clef_G2",
         "keySignature_0",
-        "timeSignature/4",
+        "timeSignature_4/4",
         "note_1",
         "doublebarline",
     ]
@@ -259,7 +259,7 @@ def test_repeat_inside_image_merges_adjacent_barline() -> None:
     assert _rhythms(symbols) == [
         "clef_G2",
         "keySignature_0",
-        "timeSignature/4",
+        "timeSignature_4/4",
         "note_1",
         "repeatStart",
         "note_1",
@@ -272,11 +272,10 @@ def test_window_start_keeps_repeat_without_printed_break() -> None:
     cutter = MeasureCutter(measures[1:])
     # Window converters supply the inherited context from preceding measures.
     cutter.clefs = [symbol for symbol in measures[0] if symbol.rhythm.startswith("clef")]
-    symbols = cutter.extract_measures(1, always_include_time=True)
+    symbols = cutter.extract_measures(1)
     assert _rhythms(symbols) == [
         "clef_G2",
         "keySignature_0",
-        "timeSignature/4",
         "repeatStart",
         "note_1",
         "barline",
@@ -298,7 +297,7 @@ def test_adjacent_end_and_start_merge_inside_image() -> None:
     assert _rhythms(symbols) == [
         "clef_G2",
         "keySignature_0",
-        "timeSignature/4",
+        "timeSignature_4/4",
         "note_1",
         "repeatEndStart",
         "note_1",
@@ -320,7 +319,7 @@ def test_boundary_without_repeat_preserves_barline(bar_style: str, expected: str
     assert _rhythms(symbols) == [
         "clef_G2",
         "keySignature_0",
-        "timeSignature/4",
+        "timeSignature_4/4",
         "note_1",
         expected,
         "note_1",
@@ -337,7 +336,7 @@ def test_opening_repeat_does_not_duplicate_clef_key_or_time() -> None:
     assert _rhythms(symbols) == [
         "clef_G2",
         "keySignature_0",
-        "timeSignature/4",
+        "timeSignature_4/4",
         "repeatStart",
         "rest_1",
         "barline",
@@ -354,7 +353,7 @@ def test_context_after_opening_repeat_replaces_inherited_context() -> None:
     assert _rhythms(symbols) == [
         "clef_F4",
         "keySignature_2",
-        "timeSignature/8",
+        "timeSignature_6/8",
         "repeatStart",
         "note_1",
         "barline",

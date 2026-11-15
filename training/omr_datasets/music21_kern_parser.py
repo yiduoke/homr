@@ -19,6 +19,11 @@ import music21.stream
 
 from homr.circle_of_fifths import strip_naturals
 from homr.transformer.vocabulary import EncodedSymbol, empty
+from training.omr_datasets.time_signatures import (
+    UnsupportedTimeSignatureError,
+    numeric_time_signature_token,
+    symbol_time_signature_token,
+)
 
 _DTYPE_TO_KERN: dict[str, int] = {
     "breve": 0,
@@ -148,6 +153,20 @@ def _clef_to_symbol(clef_el: object) -> EncodedSymbol:
     return EncodedSymbol(f"clef_{sign}{int(line)}", empty, empty, empty, empty)
 
 
+def _time_signature_symbols(time_sig: object) -> list[EncodedSymbol]:
+    """The token of a music21 time signature, nothing if it isn't in the vocabulary."""
+    symbol = getattr(time_sig, "symbol", "")
+    if symbol in ("common", "cut"):
+        return [EncodedSymbol(symbol_time_signature_token(symbol == "cut"))]
+    try:
+        token = numeric_time_signature_token(
+            getattr(time_sig, "numerator", 4), getattr(time_sig, "denominator", 4)
+        )
+    except UnsupportedTimeSignatureError:
+        return []
+    return [EncodedSymbol(token)]
+
+
 def _barline_tokens(
     right: object,
     next_left: object,
@@ -275,7 +294,7 @@ def _convert_m21_staff_group(
         if key_sig is not None:
             tokens.append(EncodedSymbol(f"keySignature_{getattr(key_sig, 'sharps', 0)}"))
         if time_sig is not None:
-            tokens.append(EncodedSymbol(f"timeSignature/{getattr(time_sig, 'denominator', 4)}"))
+            tokens.extend(_time_signature_symbols(time_sig))
 
         by_offset: dict[float, list[object]] = {}
         for staff_measures in all_measures:
@@ -323,7 +342,7 @@ def _convert_m21_part(part: object, ignore_tuplets: bool = False) -> list[Encode
             elif isinstance(el, m21.key.KeySignature):
                 tokens.append(EncodedSymbol(f"keySignature_{el.sharps}"))
             elif isinstance(el, m21.meter.TimeSignature):
-                tokens.append(EncodedSymbol(f"timeSignature/{el.denominator}"))
+                tokens.extend(_time_signature_symbols(el))
 
         # Collect notes/rests from all voices, grouped by time offset.
         by_offset: dict[float, list[object]] = {}

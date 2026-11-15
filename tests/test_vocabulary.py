@@ -56,10 +56,10 @@ class TestVocabulary(unittest.TestCase):
             EncodedSymbol("clef_G2", position="upper"),
             EncodedSymbol("clef_F4", position="lower"),
             EncodedSymbol("keySignature_0"),
-            EncodedSymbol("timeSignature_/4"),
+            EncodedSymbol("timeSignature_4/4"),
             EncodedSymbol("note_4"),
             EncodedSymbol("keySignature_0"),
-            EncodedSymbol("timeSignature_/4"),
+            EncodedSymbol("timeSignature_4/4"),
             EncodedSymbol("clef_G2", position="upper"),
             EncodedSymbol("clef_G2", position="lower"),
         ]
@@ -70,7 +70,7 @@ class TestVocabulary(unittest.TestCase):
                 EncodedSymbol("clef_G2", position="upper"),
                 EncodedSymbol("clef_F4", position="lower"),
                 EncodedSymbol("keySignature_0"),
-                EncodedSymbol("timeSignature_/4"),
+                EncodedSymbol("timeSignature_4/4"),
                 EncodedSymbol("note_4"),
                 EncodedSymbol("clef_G2", position="lower"),
             ],
@@ -79,7 +79,7 @@ class TestVocabulary(unittest.TestCase):
     def test_remove_duplicates_in_chord(self) -> None:
         tokens_str = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_1 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_12 B5 _ _ slurStop upper&note_12 G5 _ _ slurStart_slurStop upper&note_12 B5 _ _ slurStop upper
 note_12 G5 _ _ _ upper&note_12 D5 # staccato _ upper
 note_12 D5 # _ _ upper&note_12 B4 _ staccato _ upper&note_24 D5 # _ _ upper
@@ -90,7 +90,7 @@ barline . . . . ."""
         result = remove_duplicated_symbols(tokens)
         expected = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_1 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_12 B5 _ _ slurStart_slurStop upper&note_12 G5 _ _ _ upper
 note_12 G5 _ staccato _ upper&note_12 D5 # _ _ upper
 note_12 D5 # staccato _ upper&note_12 B4 _ _ _ upper

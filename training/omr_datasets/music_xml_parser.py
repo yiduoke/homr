@@ -28,7 +28,6 @@ from homr.transformer.vocabulary import (
     DYNAMICS_MODIFIER,
     OCTAVE_CLEFS,
     OCTAVE_SHIFT_STOP,
-    VALID_TIME_SIGNATURE_DENOMINATORS,
     EncodedSymbol,
     empty,
     has_rhythm_symbol_a_position,
@@ -40,6 +39,11 @@ from homr.transformer.vocabulary import (
 from training.omr_datasets.staff_merging import (
     EncodedSymbolWithPos,
     merge_upper_and_lower_staff,
+)
+from training.omr_datasets.time_signatures import (
+    UnsupportedTimeSignatureError,
+    numeric_time_signature_token,
+    symbol_time_signature_token,
 )
 from training.transformer.training_vocabulary import VocabularyStats, check_token_lines
 
@@ -621,16 +625,35 @@ def _process_attributes(part: TokensPart, attribute: ET.Element) -> int:
         fifths = _text(_child(keys[0], "fifths"), "0")
         part.append_symbol(EncodedSymbol(f"keySignature_{int(fifths)}"))
     if len(times) > 0:
-        beat_type = _text(_child(times[0], "beat-type"))
-        if not beat_type.isdigit() or int(beat_type) not in VALID_TIME_SIGNATURE_DENOMINATORS:
-            raise ValueError(f"Unsupported time signature denominator: {beat_type}")
-        part.append_symbol(EncodedSymbol(f"timeSignature/{beat_type}"))
+        time_token = _time_signature_token(times[0])
+        if time_token is not None:
+            part.append_symbol(EncodedSymbol(time_token))
 
     multiple_rest_duration = 0
     style = _children(attribute, "measure-style")
     if len(style) > 0:
         multiple_rest_duration = _process_multi_rests(part, style[0])
     return multiple_rest_duration
+
+
+def _time_signature_token(time: ET.Element) -> str | None:
+    """
+    The token for what the image shows: C and cut C for symbol="common" and "cut"
+    (whatever the numbers are), nothing for a hidden time signature, else the numbers.
+    """
+    if time.get("print-object") == "no":
+        return None
+    symbol = time.get("symbol")
+    if symbol in ("common", "cut"):
+        return symbol_time_signature_token(symbol == "cut")
+    if symbol not in (None, "normal"):
+        # single-number, note and dotted-note don't show both numbers
+        raise UnsupportedTimeSignatureError(f"Unsupported time signature symbol: {symbol}")
+    beats = _children(time, "beats")
+    beat_types = _children(time, "beat-type")
+    if len(beats) != 1 or len(beat_types) != 1:
+        raise UnsupportedTimeSignatureError("Unsupported time signature without a single meter")
+    return numeric_time_signature_token(_text(beats[0]).strip(), _text(beat_types[0]).strip())
 
 
 def _clef_name(sign: str, line: str, octave_change: int, part: TokensPart) -> str:

@@ -7,6 +7,11 @@ from training.omr_datasets.staff_merging import (
     EncodedSymbolWithPos,
     merge_upper_and_lower_staff,
 )
+from training.omr_datasets.time_signatures import (
+    UnsupportedTimeSignatureError,
+    numeric_time_signature_token,
+    symbol_time_signature_token,
+)
 from training.transformer.training_vocabulary import VocabularyStats, check_token_lines
 
 
@@ -42,7 +47,14 @@ class _StaffState:
             -10, EncodedSymbol(clef_name, empty, empty, empty, empty, position.value)
         )
         self.key = EncodedSymbolWithPos(-9, EncodedSymbol("keySignature_0"))
-        self.time = EncodedSymbolWithPos(-8, EncodedSymbol("timeSignature/4"))
+        # Staffs without *M draw no time signature, so they get no token
+        self.time: EncodedSymbolWithPos | None = None
+        # Numerator of the last *M, to check the *met symbol which comes after it
+        self.beats: int | None = None
+        # Where set_time put its token and what was in force before it, so that a *met
+        # symbol which follows can replace it
+        self._time_index: int | None = None
+        self._time_before: EncodedSymbol | None = None
         self.explicit_clef_seen = False
 
         self.position = position
@@ -78,6 +90,7 @@ class _StaffState:
             return
         if symbols:
             self.data_seen = False
+            self._time_index = None
         self.result.extend(EncodedSymbolWithPos(self.line_no, sym) for sym in symbols)
 
     def set_key(self, new_key: EncodedSymbol) -> None:
@@ -85,8 +98,27 @@ class _StaffState:
             self.result.append(EncodedSymbolWithPos(self.line_no, new_key))
         self.key = EncodedSymbolWithPos(-9, new_key)
 
-    def set_time(self, new_time: EncodedSymbol) -> None:
-        if self.opening_added and new_time != self.time.symbol:
+    def set_time(self, new_time: EncodedSymbol, beats: int) -> None:
+        before = self.time.symbol if self.time is not None else None
+        self._time_index = None
+        self._time_before = before
+        self.beats = beats
+        if self.opening_added and new_time != before:
+            self._time_index = len(self.result)
+            self.result.append(EncodedSymbolWithPos(self.line_no, new_time))
+        self.time = EncodedSymbolWithPos(-8, new_time)
+
+    def set_time_symbol(self, new_time: EncodedSymbol) -> None:
+        """*met(c) and *met(c|) come after *M and say how the signature is drawn."""
+        before = self._time_before
+        if self._time_index is not None:
+            if new_time == before:
+                # The same C as before, nothing changes in the image
+                del self.result[self._time_index]
+            else:
+                self.result[self._time_index] = EncodedSymbolWithPos(self.line_no, new_time)
+            self._time_index = None
+        elif self.opening_added and (self.time is None or new_time != self.time.symbol):
             self.result.append(EncodedSymbolWithPos(self.line_no, new_time))
         self.time = EncodedSymbolWithPos(-8, new_time)
 
@@ -98,8 +130,11 @@ class _StaffState:
 
     def add_note(self, symbol: EncodedSymbol) -> None:
         if not self.opening_added:
-            self.result.extend([self.clef, self.key, self.time])
+            self.result.extend([self.clef, self.key])
+            if self.time is not None:
+                self.result.append(self.time)
             self.opening_added = True
+        self._time_index = None
         self.result.append(EncodedSymbolWithPos(self.line_no, symbol))
 
 
@@ -352,10 +387,26 @@ class HumdrumKernConverter:
         circle = mapping[key_signature.split(maxsplit=1)[0]]
         return EncodedSymbol(f"keySignature_{circle}")
 
-    def parse_time_signature(self, ts: str) -> EncodedSymbol:
-        ts_val = ts.split(maxsplit=1)[0].replace("*M", "")
-        parts = ts_val.split("/")
-        return EncodedSymbol(f"timeSignature/{parts[1]}")
+    def parse_time_signature(self, ts: str) -> tuple[EncodedSymbol, int]:
+        """The token of a *M line and its numerator."""
+        match = re.match(r"\*M(\d+)/(\d+)", ts)
+        if not match:
+            raise UnsupportedTimeSignatureError(f"Unsupported time signature {ts}")
+        return EncodedSymbol(numeric_time_signature_token(match[1], match[2])), int(match[1])
+
+    def parse_meter_symbol(self, line: str) -> EncodedSymbol | None:
+        """
+        *met(c) is drawn as C and *met(c|) as cut C, whatever *M says. Verovio doesn't
+        draw C on a 3/x meter as the sample images show, those are skipped.
+        """
+        symbol = line.split(maxsplit=1)[0]
+        if symbol in ("*met(c)", "*met(C)"):
+            if self.state.beats == 3:  # noqa: PLR2004
+                raise UnsupportedTimeSignatureError("*met(c) on a 3/x meter")
+            return EncodedSymbol(symbol_time_signature_token(cut=False))
+        if symbol in ("*met(c|)", "*met(C|)"):
+            return EncodedSymbol(symbol_time_signature_token(cut=True))
+        return None
 
     def parse_duration(self, dur: str, is_rest: bool = False, is_grace: bool = False) -> str:
         if not dur:
@@ -433,8 +484,12 @@ class HumdrumKernConverter:
             s.add_barline(self.parse_barline(line))
         elif line.startswith("*k"):
             s.set_key(self.parse_key_signature(line))
-        elif line.startswith("*M"):
-            s.set_time(self.parse_time_signature(line))
+        elif re.match(r"\*M\d", line):
+            s.set_time(*self.parse_time_signature(line))
+        elif line.startswith("*met("):
+            meter_symbol = self.parse_meter_symbol(line)
+            if meter_symbol is not None:
+                s.set_time_symbol(meter_symbol)
         elif line.startswith("*clef"):
             s.set_clef(self.parse_clef(line, s.position.value))
         elif line.startswith("*"):

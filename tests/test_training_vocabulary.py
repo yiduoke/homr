@@ -10,7 +10,7 @@ from training.transformer.training_vocabulary import (
 
 data = """clef_G1 _ _ _ upper&clef_F3 _ _ _ lower
 keySignature_7 . . . .
-timeSignature/4 . . . .
+timeSignature_4/4 . . . .
 note_32 D5 # _ upper
 clef_C2 _ _ _ lower
 repeatEnd . . . ."""

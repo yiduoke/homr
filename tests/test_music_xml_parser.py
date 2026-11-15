@@ -154,7 +154,7 @@ class TestMusicXmlParser(unittest.TestCase):
         token_str = token_lines_to_str(flat_list)
         expected = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_1 . . . . .
-timeSignature/4 . . . . .
+timeSignature_common . . . . .
 note_1 G4 _ _ slurStart_slurStop upper&note_1 A3 # _ _ upper&rest_2 _ _ _ _ upper2&note_4 G3 _ _ slurStop lower
 rest_4 _ _ _ _ lower
 dynamic_pp _ _ _ _ upper
@@ -445,7 +445,7 @@ barline . . . . ."""
         token_str = token_lines_to_str(flat_list)
         expected = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_1 . . . . .
-timeSignature/4 . . . . .
+timeSignature_common . . . . .
 note_12 B5 _ _ beamStart_slurStart_slurStop upper&note_12 G5 _ _ _ upper&note_4 B1 _ _ _ lower
 note_12 G5 _ staccato beamContinue upper&note_12 D5 # _ _ upper
 note_12 D5 # staccato beamStop upper&note_12 B4 _ _ _ upper
@@ -507,7 +507,7 @@ barline . . . . ."""
         token_str = token_lines_to_str(flat_list)
         expected = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_1 D5 _ _ _ upper&note_1 D4 _ _ _ upper&note_1 B3 _ arpeggiate _ lower&note_1 D3 _ _ _ lower&note_1 G2 _ _ _ lower
 barline . . . . ."""
         self.assertEqual(token_str, expected)
@@ -554,7 +554,7 @@ barline . . . . ."""
         token_str = token_lines_to_str(flat_list)
         expected = """clef_G2 _ _ _ _ upper
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_1 G4 _ _ _ upper2&note_2 E4 _ _ _ upper&note_1 C4 _ _ _ upper2
 note_2 D4 _ _ _ upper
 barline . . . . ."""
@@ -657,7 +657,7 @@ barline . . . . ."""
         # Same input as test_music_xml_generator.test_two_voices_on_the_same_staff
         original = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_2 G4 _ _ _ upper&note_4 E4 _ _ _ upper2&note_1 C3 _ _ _ lower
 note_4 D4 _ _ _ upper2
 barline . . . . ."""
@@ -707,7 +707,7 @@ barline . . . . ."""
         left = "".join(self._eighth(step, 3, 2) for step in "CDEF")
         expected = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_2/4 . . . . .
 note_8 C5 _ _ _ upper&note_8 C3 _ _ _ lower
 note_8 D5 _ _ _ upper&note_8 D3 _ _ _ lower
 note_8G F5 _ _ _ upper
@@ -723,7 +723,7 @@ barline . . . . ."""
         left = "".join(self._eighth(step, 3, 2) for step in "CDEF")
         expected = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_2/4 . . . . .
 note_8 C5 _ _ _ upper&note_8 C3 _ _ _ lower
 note_8 D5 _ _ _ upper&note_8 D3 _ _ _ lower
 note_8G F5 _ _ _ upper
@@ -743,7 +743,7 @@ barline . . . . ."""
         left = "".join(self._eighth(step, 3, 2) for step in "CDEF")
         expected = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_2/4 . . . . .
 note_8 C5 _ _ _ upper&note_8 C3 _ _ _ lower
 note_8 D5 _ _ _ upper&note_8 D3 _ _ _ lower
 note_8G A5 _ _ _ upper&note_8G F5 _ _ _ upper
@@ -885,7 +885,7 @@ barline . . . . ."""
         token_str = token_lines_to_str(flat_list)
         expected = """clef_G2 _ _ _ _ upper
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_2 C5 _ _ _ upper
 dynamic_p _ _ dynamic_dolce _ upper
 note_2 D5 _ _ _ upper
@@ -954,7 +954,7 @@ barline . . . . ."""
         token_str = token_lines_to_str(flat_list)
         expected = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . .
+timeSignature_4/4 . . . . .
 note_2 C5 _ _ _ upper&note_2 C3 _ _ _ lower
 dynamic_pp _ _ _ _ upper&dynamic_f _ _ _ _ upper&dynamic_empty _ _ dynamic_piu _ lower
 note_2 D5 _ _ _ upper&note_2 D3 _ _ _ lower
@@ -983,7 +983,7 @@ barline . . . . ."""
         tokens = music_xml_string_to_tokens(example, sounding_pitch=True)
         flat_list = [x for xxs in tokens for xs in xxs for x in xs]
         expected = """clef_G2 _ _ _ _ upper
-timeSignature/4 . . . . .
+timeSignature_1/4 . . . . .
 note_4 C6 _ _ _ upper
 barline . . . . ."""
         self.assertEqual(token_lines_to_str(flat_list), expected)

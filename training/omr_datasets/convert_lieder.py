@@ -35,6 +35,7 @@ from training.omr_datasets.music_xml_parser import (
     music_xml_file_to_tokens,
     normalize_barlines_and_repeats,
 )
+from training.omr_datasets.time_signatures import UnsupportedTimeSignatureError
 from training.omr_datasets.verovio_staffs import (
     choose_parts,
     has_multi_measure_rests,
@@ -426,7 +427,6 @@ class MeasureCutter:
                 EncodedSymbol("clef_F4", empty, empty, empty, empty, "lower"),
             ]
         self.key = EncodedSymbol("keySignature_0")
-        self.time = EncodedSymbol("timeSignature/4")
         # Octave shifts which are active, by staff
         self.octave_shifts: dict[int, EncodedSymbol] = {}
 
@@ -435,18 +435,14 @@ class MeasureCutter:
             return 1
         return 0
 
-    def extract_measures(
-        self, count: int, always_include_time: bool = False
-    ) -> list[EncodedSymbol]:
+    def extract_measures(self, count: int) -> list[EncodedSymbol]:
         clefs = self.clefs.copy()
         key = self.key
-        time = self.time
-        # Lieder pages are crops of one continuously rendered score, so a courtesy time
-        # signature is only visible where the source XML actually redeclares it. pdmx
-        # windows are each re-rendered standalone (see generate_xml), and that
-        # renderer always draws a time signature on a fresh score - so those callers pass
-        # always_include_time=True to keep the label in sync with the image.
-        has_time = always_include_time
+        # Lieder and PDMX staffs are crops of one continuously rendered score, so a time
+        # signature is only visible where the source XML declares it in the first measure
+        # of the staff (the audit of 2026-11-15 found that only 14.6% of the PDMX staffs
+        # start with one). Staffs without one carry no time signature token.
+        time: EncodedSymbol | None = None
         carried_shifts = dict(self.octave_shifts)
         result: list[list[EncodedSymbol]] = []
         for i in range(count):
@@ -471,11 +467,9 @@ class MeasureCutter:
                     if not first_measure_before_any_non_key_or_clef:
                         measure_result.append(symbol)
                 elif "timeSignature" in symbol.rhythm:
-                    self.time = symbol
                     if not first_measure_before_any_non_key_or_clef:
                         measure_result.append(symbol)
                     else:
-                        has_time = True
                         time = symbol
                 else:
                     if symbol.rhythm == OCTAVE_SHIFT_STOP:
@@ -490,7 +484,7 @@ class MeasureCutter:
 
             if is_first_measure:
                 self._continue_octave_shifts(measure_result, carried_shifts)
-                if has_time:
+                if time is not None:
                     measure_result.insert(0, time)
                 measure_result.insert(0, key)
                 for j, clef in enumerate(reversed(clefs)):
@@ -758,6 +752,10 @@ def convert_xml_and_svg_file(
             )
         return result
 
+    except UnsupportedTimeSignatureError as e:
+        # Skipped samples are counted as skipped files, grep the log for the cause
+        eprint("Skipping, unsupported time signature:", file, e)
+        return []
     except Exception as e:
         eprint("Error while processing", file, e)
         return []

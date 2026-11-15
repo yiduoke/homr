@@ -49,6 +49,7 @@ from training.omr_datasets.convert_lieder import (
     write_text_to_file,
 )
 from training.omr_datasets.music_xml_parser import music_xml_file_to_tokens
+from training.omr_datasets.time_signatures import UnsupportedTimeSignatureError
 from training.transformer.image_utils import crop_info_path
 from training.transformer.training_vocabulary import token_lines_to_str
 
@@ -576,6 +577,9 @@ def convert_file(file: Path) -> tuple[list[str], dict[str, int]]:  # noqa: PLR09
     except subprocess.CalledProcessError as e:
         tool = "musicxml2ly" if "musicxml2ly" in str(e.cmd[0]) else "lilypond"
         return [], {f"failed_{tool}": 1}
+    except UnsupportedTimeSignatureError as e:
+        eprint("Skipping", file, e)
+        return [], {"failed_unsupported_time_signature": 1}
     except Exception as e:
         eprint("Error while processing", file, repr(e)[:200])
         return [], {"failed_other": 1}

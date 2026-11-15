@@ -10,7 +10,74 @@ from homr.simple_logging import eprint
 nonote = "."
 empty = "_"  # used for decorations on note, if there is no decoration
 
-VALID_TIME_SIGNATURE_DENOMINATORS = [1, 2, 3, 4, 6, 8, 12, 16, 32, 48]
+# The time signatures the model can read: the 34 numeric ones which have at least 50
+# occurrences in the training data (99.7% of all printed ones), plus the symbols.
+# Anything else is not trained on, the dataset conversions skip such samples.
+NUMERIC_TIME_SIGNATURES = [
+    (2, 2),
+    (3, 2),
+    (4, 2),
+    (1, 4),
+    (2, 4),
+    (3, 4),
+    (4, 4),
+    (5, 4),
+    (6, 4),
+    (7, 4),
+    (8, 4),
+    (9, 4),
+    (10, 4),
+    (1, 8),
+    (2, 8),
+    (3, 8),
+    (4, 8),
+    (5, 8),
+    (6, 8),
+    (7, 8),
+    (9, 8),
+    (11, 8),
+    (12, 8),
+    (13, 8),
+    (15, 8),
+    (5, 16),
+    (7, 16),
+    (9, 16),
+    (11, 16),
+    (12, 16),
+    (13, 16),
+    (15, 16),
+    (17, 16),
+    (19, 16),
+]
+TIME_SIGNATURE_COMMON = "timeSignature_common"
+TIME_SIGNATURE_CUT = "timeSignature_cut"
+TIME_SIGNATURE_PREFIX = "timeSignature_"
+
+
+def time_signature_token(beats: int, beat_type: int) -> str:
+    """Token of a numeric time signature, e.g. timeSignature_3/4."""
+    return f"{TIME_SIGNATURE_PREFIX}{beats}/{beat_type}"
+
+
+def numeric_time_signature_tokens() -> list[str]:
+    return [time_signature_token(beats, beat_type) for beats, beat_type in NUMERIC_TIME_SIGNATURES]
+
+
+def parse_time_signature_token(token: str) -> tuple[int, int, str | None]:
+    """
+    Returns (beats, beat type, symbol) of a time signature token. The symbol is
+    "common" or "cut" for C and cut C (4/4 and 2/2), and None for numbers.
+    """
+    if token == TIME_SIGNATURE_COMMON:
+        return 4, 4, "common"
+    if token == TIME_SIGNATURE_CUT:
+        return 2, 2, "cut"
+    match = re.fullmatch(rf"{TIME_SIGNATURE_PREFIX}(\d+)/(\d+)", token)
+    if not match:
+        raise ValueError(f"Not a time signature token: {token}")
+    return int(match[1]), int(match[2]), None
+
+
 DYNAMICS = [
     "pppp",
     "ppp",
@@ -114,7 +181,6 @@ def build_rhythm() -> dict[str, int]:
 
     # signatures
     rhythm.extend([f"keySignature_{c}" for c in range(-7, 8)])
-    rhythm.extend([f"timeSignature/{c}" for c in VALID_TIME_SIGNATURE_DENOMINATORS])
 
     # rhythm, kern durations are based on https://www.humdrum.org/rep/kern/
     rhythm.extend([f"rest_{c}m" for c in range(2, 11)])  # multirests
@@ -141,6 +207,12 @@ def build_rhythm() -> dict[str, int]:
     rhythm.extend(OCTAVE_CLEFS)
     rhythm.extend(OCTAVE_SHIFTS)
     rhythm.append(OCTAVE_SHIFT_STOP)
+
+    # Complete time signatures replace the former timeSignature/<denominator> tokens, which
+    # sat after the key signatures. Appended last so the tokens added above keep
+    # their order, see training/transformer/meter_vocabulary.py for the checkpoint conversion.
+    rhythm.extend(numeric_time_signature_tokens())
+    rhythm.extend([TIME_SIGNATURE_COMMON, TIME_SIGNATURE_CUT])
 
     return build_dict(rhythm)
 

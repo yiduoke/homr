@@ -6,7 +6,7 @@ from training.transformer.training_vocabulary import read_token_lines
 
 HEADER = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
 keySignature_0 . . . . .
-timeSignature/4 . . . . ."""
+timeSignature_4/4 . . . . ."""
 
 BARLINE = "barline . . . . ."
 
