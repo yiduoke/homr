@@ -531,6 +531,16 @@ Keep tuplet changes, harder-data reweighting, octave experiments and RL out of b
   `<alter>` and `<accidental>` to MusicXML.
 - Measures: printed-accidental precision/recall per class, plus everything from run 1.
 
+**Run-1 data (2026-11-15)**: main sets relabeled for existing images in
+`/workspace/homr566/datasets_meter/` (every label equal to the old one except time-signature
+lines; kept: GrandStaff 43,437, PDMX 139,461, hard 90,744, Lieder 43,027, ASAP 5,491,
+Scriabin 1,602; about 1% dropped for meters outside the vocabulary). Mix = round 3's recipe:
+70,000 original staffs from GrandStaff, Lieder and PDMX only (PDMX with its complexity-2
+scores, i.e. its original range; PrIMuS and musetrainer are gone in 566), plus the octave
+sets relabeled with beams at round 3's exposure. Hard PDMX, ASAP and Scriabin wait for the
+separate harder-data experiment. Control lists (same lines, old `timeSignature/<den>`
+tokens) are built too, in case a control run is wanted.
+
 **Order of work**: P1-P5 and the label audits (helpers, on the box) -> run-1 code +
 tests -> regenerate run-1 tokens -> train run 1 -> evaluate -> run-2 code + tests ->
 regenerate run-2 tokens -> train run 2 -> evaluate. Every result goes into
