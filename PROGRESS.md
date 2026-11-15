@@ -262,10 +262,12 @@ Upstream joins pages itself since PR #149 (`homr.main` with several images or a 
 | La Campanella | upstream relieur | **69.53%** | **69.88%** | **69.18%** |
 
 Relieur keeps more correct notes on both pieces (72 more full matches on Mazeppa, 67 on
-La Campanella), so `merge_pages.py` does lose notes. Relieur's low Mazeppa precision
-comes from keeping the ossia and "Piano à 7 octaves" staves as extra parts (10,977
-unmatched predicted notes). Next step: use relieur and drop parts that cover only a few
-pages, then score again; `merge_pages.py` can then be retired.
+La Campanella), so `merge_pages.py` does lose some. But on Mazeppa relieur's output is
+broken: one part with 410 bars and about 14,400 notes, roughly twice the piece (202 bars,
+7,213 notes), hence the 10,977 unmatched predicted notes. It is not the ossia staves
+(`run/drop_minor_parts.py` finds nothing to drop). On La Campanella relieur works and is
+better. Until the Mazeppa duplication is understood (possibly an upstream bug worth
+reporting), keep `merge_pages.py` for Mazeppa-like scores with extra staves.
 
 ### Upstream 566 on our test set (2026-11-15)
 
@@ -367,9 +369,8 @@ octave-only round is deferred. Keep experiments separate (one change each).
    - Tuplet repair: a beamed group whose durations do not fill its beat is a tuplet
      (Mazeppa's biggest loss, see the audit). Check upstream's existing triplet
      restoration (`homr/triplet_restoration.py`) first and extend it to 5, 6, 7.
-   - Page joining: switch to upstream's relieur (it keeps notes `merge_pages.py` loses,
-     see "Page joining" above) and drop ossia-like parts that cover only a few pages;
-     score again on both references.
+   - Page joining: find why relieur doubles Mazeppa (see "Page joining" above) and why
+     `merge_pages.py` loses notes relieur keeps; then use one joining for everything.
    - Accidentals: carry accidentals through the bar and respect the key signature where
      the model disagrees with itself; measure on La Campanella (216 accidental errors).
    Before blaming training, compare raw per-page predictions with the merged MusicXML,
@@ -390,6 +391,9 @@ octave-only round is deferred. Keep experiments separate (one change each).
    4/4 is drawn as C (LilyPond does by default), so renders must be forced to draw what
    the token says; check the engraver's own output (e.g. LilyPond source, Verovio MEI)
    for a sample before training. Keep cutting and octave data fixed in this round.
+   Suggested: add a tuplet group token (e.g. "6 in the time of 4") in the same data
+   regeneration, since both changes write what is printed and need the same new data;
+   test them as separate variants.
 4. **Note accuracy from real scans,** chosen by what step 1 leaves: if notes are missing
    from the crop, fix cropping; if recognition fails on dense chords and tuplets, build
    real-scan training examples for those cases (e.g. OpenScore scans, if bar alignment
