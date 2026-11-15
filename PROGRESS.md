@@ -51,6 +51,28 @@ in. The main goal is now general note accuracy on 566 (see "Next"); octave round
 - First things to pick up: verify the regenerated indexes (sizes, beam tokens), then
   the cheap post-decoding fixes and the time-signature round in "Next".
 
+## Reproducibility and AI use (for the paper)
+
+- Every number in this file should be reproducible from a commit in this repo (code) plus
+  a commit in yiduoke/homr-research (scripts, data, outputs). From 2026-11-15 on, each
+  new result gets an entry in `run/EXPERIMENTS.md` (homr-research): date, ID, homr
+  commit, model file, training index and checksums, exact command, output path, result.
+  Older results are traceable through this file and the session transcripts, less
+  precisely.
+- Before anything goes into a paper: rerun it from a script (not from a helper's report),
+  and record the run in `EXPERIMENTS.md`.
+- The Mazeppa, La Campanella and Rachmaninoff references were transcribed by Claude and
+  checked only in part; the owner (a pianist) is to verify them bar by bar before they
+  are used in a paper. The Bach, Mozart and Beethoven references are expert KernScores
+  encodings converted by script.
+- AI use, to be disclosed in any paper: Claude (Anthropic) and Codex (OpenAI) wrote most
+  code and scripts, ran experiments, converted data, transcribed three references and
+  drafted analyses; cheaper Claude models (Sonnet, Haiku) did searches and checks. The
+  owner chose the direction, marked every octave bracket in the test set by hand, and
+  checks the results.
+- Double-blind review (ISMIR): publish an anonymized copy of the code and research repo
+  for reviewers; make both public under the owner's name after acceptance.
+
 ## Where homr comes from
 
 homr (liebharc/homr) adapts its segmentation networks from oemer and its transformer
@@ -72,7 +94,7 @@ printed (only visible ones); upstream switched to sounding accidentals in run 79
 | Held-out staff test | `training/transformer/octave_eval.py` |
 | Individual-note scorer | `validation/score_notes.py`; definitions and usage in `validation/note_scoring.md` |
 | Bracket-aware staff cutting | `homr/octave_bracket_rows.py`, used in `homr/staff_parsing.py`; `HOMR_FIXED_MARGIN=1` switches back to upstream's cutting |
-| Local only (git-excluded `run/`) | Test pages, scorers, results, reference transcriptions; on the owner's laptop, not on GitHub |
+| Research workspace `run/` | Its own private repo **yiduoke/homr-research** (since 2026-11-15): test pages and marked PDFs, source score PDFs (checksums in `scores/SOURCES.sha256`), scorers and scripts, reference transcriptions, engine outputs and audio, box scripts and logs (`box_scripts/`). Git-excluded from this repo; commit there after every experiment |
 
 ### Local `run/` layout (laptop only)
 
