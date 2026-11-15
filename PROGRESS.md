@@ -32,6 +32,11 @@ Last updated: 2026-11-15.
 | `run/out/compare/<piece>/` | Whole-piece transcriptions (MusicXML + audio) for ours and upstream 566, plus references |
 | `run/out/compare/*/<piece>-reference.musicxml` | Careful Claude-made transcriptions of Mazeppa (202 bars) and La Campanella (147 bars). Test only |
 | `run/merge_pages.py`, `run/render_wav.py` | Join per-page MusicXML into one score; render a plain-synth WAV |
+| `run/openscore_scans/` | Real-scan experiment: 18 IMSLP source PDFs of 19 random OpenScore Lieder songs (`songs.csv`), downloaded by hand, plus three OpenScore `.mscx` files. Not used for training or testing yet |
+
+History of the octave rounds 1-3 (data, settings, per-epoch results) is in
+[Training.md](Training.md#octave-shifts-round-three-epoch-1-octave-r3e1-7ef6ff3). Rounds 4
+and 5 are summarized below and were not published.
 
 ## Current results
 
@@ -81,6 +86,22 @@ differences there are octave brackets.
   shifts, finding fewer than ours (Mazeppa 19 vs 30, La Campanella 53 vs 57).
 - Upstream's time-signature handling reads only the beat type and guesses the count,
   which breaks on 6/8, 3/2 and meter changes; this is the most audible remaining error.
+- Real scans for training: OpenScore Lieder transcriptions keep the source edition's
+  system and page breaks, and each song names its IMSLP source file. On two songs checked
+  (Chaminade, Amoroso; Poldowski, L'heure exquise) the systems per page match the scan
+  exactly. IMSLP blocks scripted downloads, so scans have to be fetched by hand; bar-level
+  alignment is not checked yet. Songs rarely have octave brackets, so this helps general
+  real-scan reading more than brackets.
+
+## Rounds 4 and 5 (not published)
+
+| Round | Change from round 3 | Start | Epochs |
+|---|---|---|---|
+| 4 | New inserted-bracket copies (`AUG_SUFFIX=oct4`): 8vb start chance 0.45, more single-note and run-of-short brackets; 8vb staffs repeated 3x | round 3 epoch 1 | 2 |
+| 5 | Round 4 data without the extra 8vb repeat, plus copies rendered with tight brackets (`LILY_TIGHT_OTTAVA=0.35`) | round 3 epoch 1 | 2 |
+
+Both reach 98-100% on held-out synthetic staffs and gain about 18 real brackets, but
+double the false marks (see above). Neither replaces the published model.
 
 ## Next
 
