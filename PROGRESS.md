@@ -23,11 +23,13 @@ in. The main goal is now general note accuracy on 566 (see "Next"); octave round
 - Running on the GPU box: regenerating training data with 566's converters (with beams).
   GrandStaff (45,635 staffs), PDMX (199,706) and Lieder (43,149) done; beam tokens
   present in sampled token files. The hard PDMX subset (complexity 2-3, scored test
-  pieces excluded) started 19:56 UTC into `datasets/pdmx/hard`. Box details and
-  how to check progress: `run/HANDOFF_LOCAL.md` (laptop only).
-- Running on the box: a check whether KernScores' real scans match their transcriptions
-  system by system (`/workspace/kern_check/`), to decide if they can become the first
-  real-scan training pairs. Result not yet recorded here.
+  pieces excluded) failed at 20:00 UTC because MuseScore's logs had filled the disk
+  (31 GB in `/root/.local/share/MuseScore/MuseScore4/logs`); logs deleted, rerun as
+  `r6_hard2.sh` (tmux `r6hard2`, deletes those logs every 5 minutes), status ends with
+  "ALL DONE HARD2". Box details and how to check progress: `run/HANDOFF_LOCAL.md`
+  (laptop only).
+- KernScores scan check done: usable after filtering (see "Real scans paired with
+  transcriptions" under Next).
 - No training is running. Nothing new is published; round 3 epoch 1 is still the
   fork's model.
 - First things to pick up: verify the regenerated indexes (sizes, beam tokens), then
@@ -555,6 +557,27 @@ octave-only round is deferred. Keep experiments separate (one change each).
    pieces that scans and transcriptions agree bar by bar. Check that our Beethoven control
    pages (Schirmer) are not the same edition. This is the first real-scan training data
    for homr.
+   *Check (2026-11-15, Sonnet helper; scripts and results in `/workspace/kern_check/` on
+   the box):* systems per piece counted on the scans with a simple left-edge detector
+   (homr's segmentation was too heavy for the busy CPU; bar-line counting was too noisy
+   and dropped), compared with the .krn's `g=original` line breaks + 1 (`g=z` is another
+   layout). Only 10 Mozart and 4 Beethoven files have page breaks, so totals per piece
+   were compared:
+
+   | Repo | Pieces | With markers | Systems equal (no odd system heights) | Mismatch |
+   |---|---|---|---|---|
+   | Mozart | 69 | 69 | 66 (60) | 3 |
+   | Beethoven | 101 PDFs | 101 | 75 (47) | 26 |
+   | Chopin mazurkas | 52 | 12 | 7 (4) | 5 |
+
+   Most mismatches are off by 1-2 systems (likely detector noise); Beethoven 29-4, 30-1,
+   30-2 PDFs hold about twice the .krn (two movements); Mozart 12-2 and Chopin 7-3
+   unexplained. Read by eye, 8 systems (Mozart 01-1, 14-1; Beethoven 15-1; Chopin 7-2):
+   all notes, accidentals, rhythms, clefs and bar counts match. The scans carry fingering
+   and pedal marks the .krn lacks (the model would see them unlabelled). Use: keep pieces
+   whose counts match (about 110 so far), cut systems with homr's own staff detection
+   when the box is free, convert the .krn (invisible rests `ryy`, spine splits, layout
+   tags) to tokens.
    Planned mix for the first note round (to be tested): about 40% complexity 0-1, 30%
    complexity 2, 30% complexity 3 and the most virtuoso pieces from the sources above;
    fresh scores first, repeats at most about 2x. Judge on the references plus one simple
