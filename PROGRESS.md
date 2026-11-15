@@ -34,7 +34,7 @@ in. The main goal is now general note accuracy on 566 (see "Next"); octave round
   vocabulary (another reason for the tuplet token). Disk cleaned on 2026-11-15 (PDMX SVG
   renders and superseded 509-era data deleted): 55% used. Box details and how to check
   progress: `run/HANDOFF_LOCAL.md` (laptop only).
-- KernScores scan check done: usable after filtering (see "Real scans paired with
+- KernScores scan check done: 168 pieces usable (homr recount, 14 dropped; run/EXPERIMENTS.md E3). Not part of the meter and accidental runs (fixed data mix); a separate real-scan round later. Earlier note: usable after filtering (see "Real scans paired with
   transcriptions" under Next). Running since 20:40 UTC: recount of systems on every scan
   page with homr's own staff detection on the GPU (tmux `kerncount`,
   `/workspace/kern_check/homr_count.py`, results `homr_count.json`, staff positions saved
