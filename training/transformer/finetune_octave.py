@@ -4,8 +4,11 @@ The octave branch grows two token lists (rhythm 260 -> 285, articulation 62 -> 8
 and leaves the architecture alone, so every weight of checkpoint 465 has a home in
 the new model. Tensors with unchanged shapes are copied as they are; the six that
 grew are copied row by row, matching tokens by *name* (articulation indices moved,
-rhythm indices did not). Rows for tokens the old model never saw start at the mean
-of the old rows, except accentStrong_* which start from their accent_* sibling.
+rhythm indices moved too once the timeSignature/<denominator> tokens were replaced by
+complete time signatures). Rows for tokens the old model never saw start at the mean
+of the old rows, except accentStrong_* which start from their accent_* sibling and
+the time signatures which start from the old row of their denominator
+(see meter_vocabulary.py).
 
 Unlike upstream's `--fine` mode (which unfreezes only the lift head), everything
 trains here: the new tokens live in the rhythm head and need the decoder to learn
@@ -34,6 +37,7 @@ from training.run_id import get_run_id
 from training.transformer import train as base
 from training.transformer.data_loader import DataLoader, label_names, load_dataset
 from training.transformer.distribute import Distribute
+from training.transformer.meter_vocabulary import grow_rows, time_signature_source_row
 from training.transformer.metrics import HomrTrainer
 
 GROWN = {
@@ -49,7 +53,13 @@ REBUILT = {"decoder.note_mask"}
 
 
 def sibling(token: str, old_index: dict[str, int]) -> int | None:
-    """Old token a new one should start from, e.g. accentStrong_staccato <- accent_staccato."""
+    """
+    Old token a new one should start from, e.g. accentStrong_staccato <- accent_staccato
+    and timeSignature_3/4 <- timeSignature/4 (see meter_vocabulary.py).
+    """
+    time_signature_row = time_signature_source_row(token, old_index)
+    if time_signature_row is not None:
+        return time_signature_row
     if "accentStrong" in token:
         candidate = token.replace("accentStrong", "accent")
         parts = sorted(set(candidate.split("_")))
@@ -78,19 +88,11 @@ def warm_start(model: TrOMR, checkpoint: str, old_vocab_path: str) -> None:
             copied += 1
             continue
         head = GROWN[key]
-        old_index, new_index = old_vocab[head], new_vocab[head]
-        if old.shape[0] != len(old_index) or state[key].shape[0] != len(new_index):
-            raise ValueError(f"{key}: {tuple(old.shape)} / {tuple(state[key].shape)} vs vocab")
-        target = old.mean(dim=0, keepdim=True).expand_as(state[key]).clone().to(state[key].dtype)
-        for token, new_row in new_index.items():
-            old_row = old_index.get(token)
-            if old_row is None:
-                old_row = sibling(token, old_index)
-                fresh += 1
-            else:
-                remapped += 1
-            if old_row is not None:
-                target[new_row] = old[old_row]
+        target, rows, new_rows = grow_rows(
+            old, state[key], old_vocab[head], new_vocab[head], sibling
+        )
+        remapped += rows
+        fresh += new_rows
         state[key] = target
     missing = [k for k in state if k not in old_state]
     if missing:

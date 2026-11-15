@@ -23,7 +23,7 @@ The vocabulary follows these rules:
    - `4.` is a dotted quarter note
    - `12` represents one note of an eighth-note triplet
 5. Key signatures follow the [circle of fifths definition](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/fifths/).
-6. Time signatures contain only the [beat type](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/time/). The number of beats is reconstructed from the median measure length.
+6. Time signatures are complete: `timeSignature_<beats>/<beat-type>` for the 34 numeric signatures which are common in the training data, e.g. `timeSignature_3/4` or `timeSignature_6/8`, plus `timeSignature_common` (C, written as 4/4 with `symbol="common"`) and `timeSignature_cut` (cut C, 2/2 with `symbol="cut"`). A staff has the token only if the image shows the signature, so a staff which continues the meter of the line before has none. The writer carries the last recognised signature over to the next lines and pages, and estimates the measure length from the notes only if none was recognised. The tokens are appended to the end of the rhythm vocabulary. A checkpoint which has the former `timeSignature/<beat-type>` tokens is converted with `training/transformer/meter_vocabulary.py`: rows are matched by token name, each new signature starts from the old row of its beat type (C from `/4`, cut C from `/2`) and the old rows are dropped.
 7. Multiple articulations may appear together, e.g. `note_4 D5 # accent_arpeggiate_tenuto`. Not all combinations are supported, since the transformer can only generate symbols it encountered during training. Refer to the vocabulary for the full list.
 
 The complete vocabulary is defined in `homr/transformer/vocabulary.py`.
@@ -61,7 +61,7 @@ Shifts by two octaves (15ma, 15mb) aren't supported.
 ```
 clef_G2 _ _ _ _ upper
 keySignature_0 . . . . .
-timeSignature/8 . . . . .
+timeSignature_6/8 . . . . .
 note_4. C5 _ _ _ upper&note_4. E4 _ _ _ upper
 note_8 D5 _ _ beamStart upper
 note_16 E5 _ staccato beamContinue_slurStart upper
