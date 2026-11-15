@@ -28,8 +28,11 @@ in. The main goal is now general note accuracy on 566 (see "Next"); octave round
   `r6_hard2.sh` (tmux `r6hard2`, deletes those logs every 5 minutes), status ends with
   "ALL DONE HARD2". Done at 20:23 UTC: 92,984 staffs in `datasets/pdmx/hard/index.txt`.
   The main PDMX set (complexity up to 2) and this one (2-3) share the complexity-2
-  pieces; deduplicate before mixing. Disk is at 90%; the `rendered_scores` folders
-  (26 GB, intermediate) can go if space runs out. Box details and how to check
+  pieces; deduplicate before mixing. Also converted: ASAP (5,832 staffs, about 150 pieces)
+  and KernScores Scriabin (1,847 staffs, 149 pieces), test pieces excluded; 62 ASAP and 54
+  Scriabin pieces were dropped because their tuplets or 128th/256th notes don't fit the
+  vocabulary (another reason for the tuplet token). Disk is at 90%; the `rendered_scores` folders
+  SVGs were deleted on 2026-11-15; disk is at 55%. Box details and how to check
   progress: `run/HANDOFF_LOCAL.md` (laptop only).
 - KernScores scan check done: usable after filtering (see "Real scans paired with
   transcriptions" under Next). Running since 20:40 UTC: recount of systems on every scan
