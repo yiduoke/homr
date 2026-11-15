@@ -465,8 +465,15 @@ octave-only round is deferred. Keep experiments separate (one change each).
    2308.09370) wrote accidentals "depending on how they are placed", i.e. only visible
    ones (in D major: semantic C#, Cb, Cb written as C, Cb, C). Upstream switched to the
    semantic encoding in run 79 (April 2024); that run's entry shows 80.9 diffs against
-   22.3 for run 77, possibly not comparable. Find out why upstream switched (Training.md
-   around runs 76-90 and the commits from April 2024) before switching back. Upstream
+   22.3 for run 77, not comparable (the Polyphonic-TrOMR log calls 80.9 a "manual
+   validation result"). No reason for the switch is written down anywhere; run 79 is
+   described only as an attempt. Upstream kept it: run 80 fixed accidentals in the data,
+   run 81 (depth reverted) reached 13.1, better than run 77; courtesy accidentals came in
+   June 2024 and uniform encoding across datasets in January 2026 (commit af59798,
+   `strip_naturals`). Today's labels are mixed: a printed `<accidental>` wins, otherwise
+   the sounding `<alter>`; printed naturals are dropped. Visible-only labels were never
+   compared head to head with the current ones, so this would be a fair, separate
+   experiment. Upstream
    trains its own runs for about 14-24 h each, so a from-scratch run is normal here
    (about 1-3 days on one RTX 3090); fine-tuning 566 with re-labelled accidentals (and a
    reset accidental head) is the cheaper first test.
