@@ -58,7 +58,7 @@ Depending on the input, preprocessing the image can improve the results. A commo
 
 ## Limitations
 
-Octave shifts (8va, 8vb) are read by the fork's fine-tune; per-piece results and limits are in [Training.md](Training.md#octave-shifts-round-three-epoch-1-octave-r3e1-7ef6ff3). See the symbol table in [Ideas for Contributors](IDEAS_FOR_CONTRIBUTORS.md#support-more-symbols) for what homr reads and what it doesn't, e.g. octave lines, octave clefs, beams and glissandos.
+Octave shifts (8va, 8vb) are read by the fork's fine-tune; per-piece results and limits are in [Training.md](Training.md#octave-shifts-round-three-epoch-1-octave-r3e1-7ef6ff3). The fork's current status, results and next steps are in [PROGRESS.md](PROGRESS.md). See the symbol table in [Ideas for Contributors](IDEAS_FOR_CONTRIBUTORS.md#support-more-symbols) for what homr reads and what it doesn't, e.g. octave lines, octave clefs, beams and glissandos.
 
 ## Technical Details
 
