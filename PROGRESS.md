@@ -19,6 +19,15 @@ Upstream has since released model 566 (2026-11-13), which also reads octave brac
 in. The plan is to fine-tune 566 with our bracket data, after testing how much that
 still adds.
 
+## Where homr comes from
+
+homr (liebharc/homr) adapts its segmentation networks from oemer and its transformer
+from Polyphonic-TrOMR (NetEase; paper arXiv 2308.09370). Upstream's run 0 is the TrOMR
+paper's weights; from March 2024 the author trained his own runs, first in a fork of
+Polyphonic-TrOMR, then in homr; model 566 is the latest. TrOMR wrote accidentals as
+printed (only visible ones); upstream switched to sounding accidentals in run 79 (April
+2024) without recording why (details under Next, step 3). This fork forked homr.
+
 ## Where things are
 
 | What | Where |
