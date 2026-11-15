@@ -526,9 +526,21 @@ octave-only round is deferred. Keep experiments separate (one change each).
 
    KernScores overlaps GrandStaff's sources (Beethoven, Mozart, Haydn, Scarlatti, Joplin,
    Chopin); its new value is Scriabin. ASAP is MusicXML and the most virtuoso. Mutopia
-   needs a LilyPond to MusicXML step. The KernScores repos ship about 500 reference PDFs,
-   possibly scans of the source editions: check whether they could pair with the kern
-   files as real-scan training data.
+   needs a LilyPond to MusicXML step (python-ly; lossy, so keep only pieces whose engraved
+   note counts per bar match).
+
+   **Real scans paired with transcriptions (found 2026-11-15).** The KernScores repos
+   ship the source editions as scanned PDFs (one raster image per page, no fonts; the
+   READMEs call them the source editions), and the .krn files record line and page
+   breaks (`!!LO:LB`, `!!LO:PB`) and the edition (`!!!SMS`). Scans / transcriptions:
+   Beethoven sonatas 101/103 (nearly one-to-one), Mozart sonatas 69/69 and Chopin
+   mazurkas 52/52 (one-to-one), Haydn 100/25, Scarlatti 545/65, Scriabin 65/207, Joplin
+   52/47 (need matching). Plan: render scan pages, find systems with homr's staff
+   detection, split the .krn at its line breaks, keep pages whose system counts match,
+   and make each scanned system plus its tokens a training pair. First check on a few
+   pieces that scans and transcriptions agree bar by bar. Check that our Beethoven control
+   pages (Schirmer) are not the same edition. This is the first real-scan training data
+   for homr.
    Planned mix for the first note round (to be tested): about 40% complexity 0-1, 30%
    complexity 2, 30% complexity 3 and the most virtuoso pieces from the sources above;
    fresh scores first, repeats at most about 2x. Judge on the references plus one simple
