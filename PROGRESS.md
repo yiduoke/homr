@@ -446,6 +446,21 @@ octave-only round is deferred. Keep experiments separate (one change each).
    regeneration and be tested as separate variants. Measure first how many of La
    Campanella's 216 accidental errors are forgotten carries (same pitch altered earlier
    in the bar).
+   MusicXML holds both: `<pitch><alter>` is the sounding pitch on every affected note
+   (key signature, printed or carried accidental); `<accidental>` is the printed sign,
+   only where one is printed (including courtesy accidentals). The Claude references do
+   this; homr writes only `<alter>`, so whether an accidental was printed is lost and
+   notation programs redraw accidentals their own way:
+
+   | File | Notes | With sounding alteration | With printed accidental |
+   |---|---|---|---|
+   | Mazeppa reference | 7,213 | 2,634 | 2,053 |
+   | La Campanella reference | 4,250 | 3,404 | 642 |
+   | Rachmaninoff reference | 1,837 | 1,175 | 242 |
+   | homr 566, La Campanella | 4,293 | 3,109 | 73 |
+
+   The references' `<accidental>` elements can serve to measure printed-accidental
+   accuracy once homr writes them.
 4. **Note accuracy from real scans,** chosen by what step 1 leaves: if notes are missing
    from the crop, fix cropping; if recognition fails on dense chords and tuplets, build
    real-scan training examples for those cases (e.g. OpenScore scans, if bar alignment
