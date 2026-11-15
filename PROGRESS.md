@@ -442,7 +442,84 @@ of Mazeppa's notes and 68% of La Campanella's fully right by the individual-note
 That would need much more varied real training data, or constrained decoding and a
 render-and-compare check.
 
-## Next
+## Next phase: complete time signatures, then printed accidentals (2026-11-15)
+
+Set by the owner's professor (email of 2026-11-15). Start from upstream 566. Prepare both
+data changes now; train in two stages so each effect and any regression can be traced.
+Keep tuplet changes, harder-data reweighting, octave experiments and RL out of both runs.
+
+**Before either run (shared preparation)**
+- P1. Beam tokens present in every regenerated set (done for GrandStaff, PDMX, Lieder,
+  hard PDMX, ASAP, Scriabin: 2026-11-15 samples; re-check on the final indexes).
+- P2. Deduplicate PDMX main (complexity <= 2) and PDMX hard (2-3): they share the
+  complexity-2 pieces.
+- P3. Remove evaluation pieces from every source: the 21 PDMX phrases, the five KernScores
+  reference movements (Bach BWV 848 prelude and fugue, Mozart K. 331/1, K. 309/1,
+  Beethoven Op. 13/1), every piece with pages in `run/scores/real` (scans and controls,
+  as long as the controls stay in evaluation: Bach WTC, Beethoven sonatas Schirmer,
+  Brahms Op. 116, Chopin Scherzo 1, ...), the listening-room pieces, Polish Scores and
+  SMB. Match by composer + work in every index (GrandStaff, PDMX, Lieder, ASAP, Scriabin,
+  KernScores scan pairs, LilyPond and MuseScore octave sets); write the exclusion list
+  and the dropped counts into EXPERIMENTS.md.
+- P4. Freeze the comparison pipeline: one commit of `validation/score_notes.py`, one page
+  joiner, one cutting mode. Quantify the joining loss on the references first (relieur
+  pairs parts by position: Mazeppa page 11 loses 431 notes; our merge_pages drops minor
+  parts) and fix or report it, so it is not mistaken for a training effect.
+- P5. Fixed elsewhere for both runs: staff cropping, dataset proportions, octave exposure
+  (same LilyPond/MuseScore octave share as round 3).
+
+**Run 1: complete time signatures**
+- Tokens: `timeSignature_<num>/<den>` for every printed numeric signature (vocabulary
+  from the counts in the data, plus `timeSignature_common` (C) and `timeSignature_cut`
+  (cut C). Remove `timeSignature/<den>`. New rows initialised from the old denominator
+  row of the same denominator (C from 4, cut from 2).
+- Labels must describe the image: the renderer decides what is drawn.
+  - MuseScore (PDMX, Lieder, ASAP, MuseScore octave): numeric unless
+    `<time symbol="common|cut">`; check on rendered crops.
+  - Verovio (GrandStaff kern): C only with `*met(c)` / `*met(c|)`; check on crops.
+  - LilyPond (octave data): draws 4/4 as C and 2/2 as cut C unless
+    `\numericTimeSignature`; current labels say /4 and /2. Re-label from the .ly
+    settings, verified on crops; re-render only if they disagree.
+  - Reuse renders; regenerate tokens only where agreement is verified on a sample of
+    images per dataset and per case; otherwise fix the rendering.
+  - Systems without a printed signature carry no time-signature token (already so for
+    Lieder; PDMX windows always draw one). Pickups must keep their short first bar.
+- Code: every parser (music_xml_parser, humdrum_kern_parser, music21_kern_parser,
+  music21_xml_parser, convert_lieder, staff_merging, convert_lilypond), the vocabulary,
+  `_remove_redudant_clefs_keys_and_time_signatures`, the decoder's rhythm head size, and
+  the MusicXML writer (`build_time_signature`: write beats/beat-type and
+  `symbol="common|cut"`). Carry the last recognised meter across systems and pages
+  (also in the page joiner) until a new one is printed; use
+  `find_division_and_time_signature_nominators` only when none was ever recognised.
+  Meter changes with the same denominator (3/4 -> 4/4) must survive.
+- Measures: exact meter recognition per printed signature, meter-change detection
+  (precision/recall), and per-note precision, recall and F1 for pitch, onset and
+  duration on every reference, with every page checked for regressions.
+
+**Run 2: printed accidentals (from the run-1 checkpoint)**
+- Labels: the printed sign (`#`, `b`, `N`, `##`, `bb`, or no sign), not the sounding
+  alteration; "no sign" stays distinct from natural. The lift head's classes keep their
+  names but change meaning (`#` used to mean "sounds sharp", now "sharp printed"): reset
+  or re-initialise that head's output layer rather than trusting old weights, and record
+  the choice.
+- Label source, verified on images (absent source elements do not mean no sign):
+  - MuseScore sets: the kept `rendered_scores/*.musicxml` is MuseScore's own export, whose
+    `<accidental>` elements should match what it drew; check on crops incl. courtesy
+    accidentals, ties across bars, and two voices on one staff.
+  - GrandStaff: render the kern with Verovio to MEI and use written `@accid` (not
+    `@accid.ges`); check on crops.
+  - LilyPond: derive from LilyPond's default accidental rule and check on crops.
+- Decoding: after the model, compute sounding pitch from key signature, accidentals
+  carried within the bar (per staff and octave), and ties across bar lines; write both
+  `<alter>` and `<accidental>` to MusicXML.
+- Measures: printed-accidental precision/recall per class, plus everything from run 1.
+
+**Order of work**: P1-P5 and the label audits (helpers, on the box) -> run-1 code +
+tests -> regenerate run-1 tokens -> train run 1 -> evaluate -> run-2 code + tests ->
+regenerate run-2 tokens -> train run 2 -> evaluate. Every result goes into
+`run/EXPERIMENTS.md` (homr-research).
+
+## Next (before 2026-11-15 professor's plan)
 
 Agreed with the owner on 2026-11-15 (after review by Codex): general note accuracy is the
 main project; time signatures are a bounded first improvement run alongside it; another
