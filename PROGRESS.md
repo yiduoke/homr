@@ -518,6 +518,14 @@ Keep tuplet changes, harder-data reweighting, octave experiments and RL out of b
   - GrandStaff: render the kern with Verovio to MEI and use written `@accid` (not
     `@accid.ges`); check on crops.
   - LilyPond: derive from LilyPond's default accidental rule and check on crops.
+  - Audit (2026-11-15, `run/audits/accidental_report.md`): MuseScore sets and their
+    Verovio renders: MuseScore's exported `<accidental>` (98-99.6% of bars exact by count;
+    Verovio crops 6,462/6,462). GrandStaff: Verovio 6.4.1 MEI `@accid` plus kern `n`, with
+    `X` (forced, 0.15% of notes) drawn and `y` hidden. LilyPond: neither rule (98%) nor
+    XML (95%) exact; re-engrave and read the signs from LilyPond's SVG. Today's lift label
+    differs from the printed sign on 24-48% of notes with a lift (mostly key-signature
+    alterations with no printed sign). Bugs to fix in run 2, not run 1: printed `##`/`bb`
+    become "none"; `strip_naturals` removes every printed natural.
 - Decoding: after the model, compute sounding pitch from key signature, accidentals
   carried within the bar (per staff and octave), and ties across bar lines; write both
   `<alter>` and `<accidental>` to MusicXML.
