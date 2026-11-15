@@ -9,6 +9,7 @@ import stat
 import subprocess
 import sys
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import cv2
@@ -331,40 +332,46 @@ def _create_musicxml_and_svg_files() -> None:
 
     eprint("Starting with", len(all_jobs), "jobs")
 
-    BATCH_SIZE = 50
-    failed_files: list[str] = []
+    _run_musescore_jobs(MuseScore, all_jobs)
 
-    batches = [all_jobs[i : i + BATCH_SIZE] for i in range(0, len(all_jobs), BATCH_SIZE)]
 
-    for batch_idx, batch in enumerate(batches):
+def _run_musescore_jobs(musescore: str, all_jobs: list[dict[str, str]]) -> None:
+    """
+    Runs MuseScore on the jobs in batches of 50, retrying a failed batch job by job.
+
+    MUSESCORE_WORKERS (default 1) batches run at the same time, each with its own job
+    file; one MuseScore process only keeps one or two cores busy.
+    """
+    batch_size = 50
+    batches = [all_jobs[i : i + batch_size] for i in range(0, len(all_jobs), batch_size)]
+    workers = max(1, int(os.environ.get("MUSESCORE_WORKERS", "1")))
+
+    def run(job_file: str, jobs: list[dict[str, str]]) -> bool:
+        with open(job_file, "w") as f:
+            json.dump(jobs, f)
+        try:
+            return os.system(musescore + f" --force -j {job_file}") == 0  # noqa: S605
+        finally:
+            if os.path.exists(job_file):
+                os.remove(job_file)
+
+    def run_batch(batch_idx: int) -> list[str]:
+        batch = batches[batch_idx]
         eprint(f"Processing batch {batch_idx + 1}/{len(batches)} ({len(batch)} jobs)")
-
-        with open("job.json", "w") as f:
-            json.dump(batch, f)
-
-        if os.system(MuseScore + " --force -j job.json") == 0:  # noqa: S605
-            os.remove("job.json")
-            continue
-
-        env = os.environ.copy()
-        # No need to run GUI, so we can use offscreen backend
-        env["QT_QUICK_BACKEND"] = "software"
-        env["QT_QPA_PLATFORM"] = "offscreen"
-
-        # Batch failed - retry each job individually
+        if run(f"job_{batch_idx}.json", batch):
+            return []
         eprint(f"Batch {batch_idx + 1} failed, retrying individually")
-        os.remove("job.json")
-
+        failed = []
         for job in batch:
-            with open("job.json", "w") as f:
-                json.dump([job], f)
-
-            if os.system(MuseScore + " --force -j job.json") != 0:  # noqa: S605
+            if not run(f"job_{batch_idx}.json", [job]):
                 eprint("Failed:", job["in"])
-                failed_files.append(job["in"])
+                failed.append(job["in"])
+        return failed
 
-            if os.path.exists("job.json"):
-                os.remove("job.json")
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        failed_files = [
+            path for failed in pool.map(run_batch, range(len(batches))) for path in failed
+        ]
 
     if failed_files:
         eprint(f"\nMuseScore export finished with {len(failed_files)} failed file(s):")
@@ -399,47 +406,7 @@ def create_musicxml_and_svg_files_from_mxl(paths: list[Path], dest: str) -> None
 
     eprint("Starting with", len(all_jobs), "jobs")
 
-    BATCH_SIZE = 50
-    failed_files: list[str] = []
-
-    batches = [all_jobs[i : i + BATCH_SIZE] for i in range(0, len(all_jobs), BATCH_SIZE)]
-
-    for batch_idx, batch in enumerate(batches):
-        eprint(f"Processing batch {batch_idx + 1}/{len(batches)} ({len(batch)} jobs)")
-
-        with open("job.json", "w") as f:
-            json.dump(batch, f)
-
-        if os.system(MuseScore + " --force -j job.json") == 0:  # noqa: S605
-            os.remove("job.json")
-            continue
-
-        env = os.environ.copy()
-        # No need to run GUI, so we can use offscreen backend
-        env["QT_QUICK_BACKEND"] = "software"
-        env["QT_QPA_PLATFORM"] = "offscreen"
-
-        # Batch failed - retry each job individually
-        eprint(f"Batch {batch_idx + 1} failed, retrying individually")
-        os.remove("job.json")
-
-        for job in batch:
-            with open("job.json", "w") as f:
-                json.dump([job], f)
-
-            if os.system(MuseScore + " --force -j job.json") != 0:  # noqa: S605
-                eprint("Failed:", job["in"])
-                failed_files.append(job["in"])
-
-            if os.path.exists("job.json"):
-                os.remove("job.json")
-
-    if failed_files:
-        eprint(f"\nMuseScore export finished with {len(failed_files)} failed file(s):")
-        for path in failed_files:
-            eprint(" ", path)
-    else:
-        eprint("MuseScore export completed with no failures.")
+    _run_musescore_jobs(MuseScore, all_jobs)
 
 
 def write_text_to_file(text: str, path: str) -> None:
@@ -820,7 +787,9 @@ def write_index(
     with open(index_path, "w") as f:
         file_number = 0
         skipped_files = 0
-        with multiprocessing.Pool(processes=8, maxtasksperchild=2) as p:
+        with multiprocessing.Pool(
+            processes=int(os.environ.get("HOMR_CONVERT_WORKERS", "8")), maxtasksperchild=2
+        ) as p:
             results = p.imap_unordered(convert, music_xml_files)
             while True:
                 try:
