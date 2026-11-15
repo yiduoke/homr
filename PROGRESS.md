@@ -16,8 +16,21 @@ find 263 but double the false marks, so they were not published.
 
 Upstream has since released model 566 (2026-11-13), which also reads octave brackets
 (fewer than ours), reads beams, and is better at notes. Branch `octave-on-566` merges it
-in. The plan is to fine-tune 566 with our bracket data, after testing how much that
-still adds.
+in. The main goal is now general note accuracy on 566 (see "Next"); octave rounds wait.
+
+## State at handoff (2026-11-15, evening UTC)
+
+- Running on the GPU box: regenerating training data with 566's converters (with beams).
+  GrandStaff done (45,635 staffs), PDMX done (199,706 staffs), Lieder in progress, then
+  the hard PDMX subset (complexity 2-3, scored test pieces excluded). Box details and
+  how to check progress: `run/HANDOFF_LOCAL.md` (laptop only).
+- Running on the box: a check whether KernScores' real scans match their transcriptions
+  system by system (`/workspace/kern_check/`), to decide if they can become the first
+  real-scan training pairs. Result not yet recorded here.
+- No training is running. Nothing new is published; round 3 epoch 1 is still the
+  fork's model.
+- First things to pick up: verify the regenerated indexes (sizes, beam tokens), then
+  the cheap post-decoding fixes and the time-signature round in "Next".
 
 ## Where homr comes from
 
