@@ -260,8 +260,13 @@ test only). Pitches right per bar (legacy measure, `run/score_vs_ref.py`), upper
 | Upstream 566 | 78% / 64% | 87% / 64% | 34 / 6; 22 / 17 |
 
 Ours and 566 are the same here (hardly any octave brackets). The lower staff is weak.
-`validation/score_notes.py` refuses these outputs ("Parts have different measure counts;
-establish their alignment first"): the two output staves disagree on bar count.
+
+Individual notes (`validation/score_notes.py`, now aligning each staff separately when an
+output's staves disagree on bar count): homr writes this piece on three staves (69, 69
+and 43 bars; the third holds part of the four-staff climax). Scoring the two main staves
+and counting the third staff's 290 notes as extras (so pessimistic): ours 52.3% notes
+fully right (pitch alone 68.3%), upstream 566 57.2% (68.7%). A fairer score would assign
+extra staves to the hand whose range they fit; not done yet.
 
 ### Page joining: ours vs upstream's (2026-11-15)
 
