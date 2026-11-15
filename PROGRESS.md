@@ -495,6 +495,17 @@ octave-only round is deferred. Keep experiments separate (one change each).
    from the crop, fix cropping; if recognition fails on dense chords and tuplets, build
    real-scan training examples for those cases (e.g. OpenScore scans, if bar alignment
    holds). Hand-checked pages and references stay test-only.
+   **Harder music without real scans.** Upstream's `convert_pdmx.py` keeps only PDMX
+   scores with complexity <= 2 and at most two tracks ("complexity 3 often has octave
+   shifts (unsupported) and long sequences") and samples about 20,000 files. PDMX piano
+   scores (1-2 tracks) by complexity: 0: 44,844; 1: 168,026; 2: 8,089; 3: 609. By composer
+   (matched in composer/title, approximate), complexity 1 / 2 / 3: Chopin 25/100/48,
+   Liszt 3/12/40, Beethoven 78/46/52, Debussy 2/26/26, Rachmaninoff 1/11/14, Scriabin
+   2/10/4, Ravel 169/29/6. So most virtuoso repertoire is excluded or rarely sampled.
+   Candidate round: fine-tune 566 with all complexity 2-3 piano scores (octave shifts are
+   supported now), plus virtuoso piano from Mutopia (a clone is in `run/mutopia`),
+   KernScores and possibly ASAP. Must exclude every test piece (PDMX likely has La
+   Campanella, Liebestraum, ...) and check copyright for 20th-century composers.
 5. **Octave work: one round on 566 at most,** later, with matched bracket/no-bracket
    pairs and 8vb exposure back to round 3's level.
 
