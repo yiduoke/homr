@@ -515,6 +515,24 @@ octave-only round is deferred. Keep experiments separate (one change each).
    bracket control pages (Bach WTC, Beethoven sonatas, Brahms Op. 116) stay in training.
    Complexity 2-3: 21 scores excluded, about 7,190 kept, queued on the box into
    `datasets/pdmx/hard`.
+   **Other hard sources (surveyed 2026-11-15, downloaded to the box at
+   `/workspace/extra_scores/`, 1.3 GB, nothing converted yet):**
+
+   | Source | Format | Piano scores | Hard composers | Scored test pieces inside (exclude) |
+   |---|---|---|---|---|
+   | KernScores (craigsapp repos) | Humdrum | 616 | Scriabin 207, Chopin 76, Beethoven 103 | Scriabin Op. 8 No. 12, Sonata No. 4 |
+   | ASAP (fosfrancesco/asap-dataset) | MusicXML | 235 | Liszt 17, Chopin 36, Beethoven 63, Schumann 11, Ravel 4, Rachmaninoff 4 | La Campanella, Mephisto No. 1, Mazeppa, Chopin Ballade 4, Chopin Scherzo 1 |
+   | Mutopia (`run/mutopia`, local) | LilyPond | about 770 | Chopin 50-67, Schumann 35, Rachmaninoff 10, Scriabin 7-9, Liszt 4 | Chopin Ballade 4, Rachmaninoff Op. 23 No. 2 and Op. 3 No. 2, Pictures |
+
+   KernScores overlaps GrandStaff's sources (Beethoven, Mozart, Haydn, Scarlatti, Joplin,
+   Chopin); its new value is Scriabin. ASAP is MusicXML and the most virtuoso. Mutopia
+   needs a LilyPond to MusicXML step. The KernScores repos ship about 500 reference PDFs,
+   possibly scans of the source editions: check whether they could pair with the kern
+   files as real-scan training data.
+   Planned mix for the first note round (to be tested): about 40% complexity 0-1, 30%
+   complexity 2, 30% complexity 3 and the most virtuoso pieces from the sources above;
+   fresh scores first, repeats at most about 2x. Judge on the references plus one simple
+   piece (a reference for e.g. Mozart K. 331's theme would show forgetting).
 5. **Octave work: one round on 566 at most,** later, with matched bracket/no-bracket
    pairs and 8vb exposure back to round 3's level.
 
