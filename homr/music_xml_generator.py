@@ -21,6 +21,7 @@ from homr.transformer.vocabulary import (
     octaves_of_clef,
     octaves_of_shift,
     sort_token_chords,
+    split_slur_and_beam,
     transpose_octaves,
 )
 
@@ -147,6 +148,7 @@ def build_part(
         part.append(measure)
     convert_ties(part)
     add_stems(part)
+    convert_beams(part)
     _remove_position_attributes(part)
     return part
 
@@ -170,6 +172,9 @@ def build_measures(
             measure.append(
                 build_measure_rest(EncodedSymbol("measureRest", position=position), state)
             )
+
+    def last_measure() -> ET.Element | None:
+        return measures[-1] if measures else None
 
     def close_current_measure() -> None:
         nonlocal clock, measure_number, rest_measures
@@ -251,44 +256,62 @@ def build_measures(
             time_signature_no += 1
             build_time_signature(symbol, attributes, state)
         elif "barline" in rhythm:
-            if rhythm != "barline":
-                barline = build_or_get_barline(current_measure, "right")
+            # A barline right after another one (e.g. at the start of a line, or after a
+            # repeat that already ended the measure) doesn't start a new measure. The
+            # first measure of a part is kept even without notes: it's a pickup measure
+            # in which this part has nothing, and dropping it would shift the part.
+            is_empty_pickup = not measures and not has_notes(current_measure)
+            ending_measure = (
+                current_measure if has_notes(current_measure) or is_empty_pickup else last_measure()
+            )
+            if rhythm != "barline" and ending_measure is not None:
+                barline = build_or_get_barline(ending_measure, "right")
                 build_barline_style(symbol, barline)
-
-            close_current_measure()
-            measure_number += 1
-            current_measure = ET.Element("measure", number=str(measure_number))
+            if ending_measure is current_measure:
+                close_current_measure()
+                measure_number += 1
+                current_measure = ET.Element("measure", number=str(measure_number))
         elif rhythm == "repeatStart":
-            close_current_measure()
-            measure_number += 1
-            current_measure = ET.Element("measure", number=str(measure_number))
+            # The repeated section starts with the next measure. If the current one has no
+            # notes yet (the repeat sign is at the start of a line), that's this one.
+            if has_notes(current_measure):
+                close_current_measure()
+                measure_number += 1
+                current_measure = ET.Element("measure", number=str(measure_number))
 
-            barline = build_or_get_barline(current_measure, "right")
+            barline = build_or_get_barline(current_measure, "left")
             build_repeat(symbol, barline)
         elif rhythm == "repeatEnd":
-            barline = build_or_get_barline(current_measure, "right")
-            build_repeat(symbol, barline)
-
-            close_current_measure()
-            measure_number += 1
-            current_measure = ET.Element("measure", number=str(measure_number))
+            ending_measure = current_measure if has_notes(current_measure) else last_measure()
+            if ending_measure is not None:
+                barline = build_or_get_barline(ending_measure, "right")
+                build_repeat(symbol, barline)
+            if ending_measure is current_measure:
+                close_current_measure()
+                measure_number += 1
+                current_measure = ET.Element("measure", number=str(measure_number))
         elif rhythm == "repeatEndStart":
-            barline = build_or_get_barline(current_measure, "right")
-            build_repeat(EncodedSymbol("repeatEnd"), barline)
-
-            close_current_measure()
-            measure_number += 1
-            current_measure = ET.Element("measure", number=str(measure_number))
-            barline = build_or_get_barline(current_measure, "right")
+            ending_measure = current_measure if has_notes(current_measure) else last_measure()
+            if ending_measure is not None:
+                barline = build_or_get_barline(ending_measure, "right")
+                build_repeat(EncodedSymbol("repeatEnd"), barline)
+            if ending_measure is current_measure:
+                close_current_measure()
+                measure_number += 1
+                current_measure = ET.Element("measure", number=str(measure_number))
+            barline = build_or_get_barline(current_measure, "left")
             build_repeat(EncodedSymbol("repeatStart"), barline)
         elif rhythm.startswith("voltaStart"):
             volta_number = state.start_volta(measure_number)
             barline = build_or_get_barline(current_measure, "left")
             build_barline_ending(symbol, barline, volta_number)
         elif rhythm.startswith(("voltaStop", "voltaDiscontinue")):
-            volta_number = state.stop_volta(measure_number)
-            barline = build_or_get_barline(current_measure, "right")
-            build_barline_ending(symbol, barline, volta_number)
+            # Comes after the barline that ended the volta's last measure
+            stopped_measure = current_measure if has_notes(current_measure) else last_measure()
+            if stopped_measure is not None:
+                volta_number = state.stop_volta(int(stopped_measure.get("number", "0")))
+                barline = build_or_get_barline(stopped_measure, "right")
+                build_barline_ending(symbol, barline, volta_number)
 
         elif rhythm.startswith(("dynamic", "octaveShift")) or symbol.articulation.startswith(
             "dynamic"
@@ -301,10 +324,10 @@ def build_measures(
         else:
             eprint("Symbol isn't supported yet ", symbol)
 
-    if len(list(current_measure)) > 0:
+    if has_notes(current_measure) or not measures:
         stop_octave_shifts(current_measure, state)
         close_current_measure()
-    elif measures:
+    else:
         stop_octave_shifts(measures[-1], state)
     # A clef opens a second attributes element, so look at the whole first measure
     if measures[0].find("attributes/time") is None:
@@ -435,6 +458,14 @@ def build_or_get_attributes(
     if last_attributes is not None and not force_new:
         return last_attributes
     return ET.SubElement(measure, "attributes")
+
+
+def has_notes(measure: ET.Element) -> bool:
+    """
+    Whether a measure has notes or rests. A measure without them only holds what
+    precedes the first note of a line: clef, key, time signature or a new-system mark.
+    """
+    return measure.find("note") is not None
 
 
 def build_or_get_barline(measure: ET.Element, location: str) -> ET.Element:
@@ -693,6 +724,166 @@ def convert_ties(part: ET.Element) -> None:
             if before is None:
                 continue
             tie_event(before, event)
+
+
+_BEAM_TYPES = {"beamStart": "begin", "beamContinue": "continue", "beamStop": "end"}
+_BEAMS_PER_TYPE = {"eighth": 1, "16th": 2, "32nd": 3, "64th": 4, "128th": 5}
+
+
+@dataclass
+class _BeamEvent:
+    """A chord of one position of the model, with the state of its primary beam."""
+
+    notes: list[ET.Element]
+    position: str
+    is_grace: bool
+    state: str | None
+    start: tuple[int, int]  # measure and time within it
+    end: tuple[int, int]
+
+
+def convert_beams(part: ET.Element) -> None:
+    """Turn the primary beam states of the model into complete beams.
+
+    The model predicts for each chord whether its primary beam starts, continues
+    or stops. Groups are formed per position of the model (e.g. upper2) rather
+    than per MusicXML voice, as voices can swap between chords. Rests don't
+    interrupt a group and it can cross a barline. A beam which continues on the
+    other staff joins the open group there, the notes then move into its voice.
+    A group with only one note, or a state which doesn't fit, is repaired rather
+    than written as it is. Secondary beams and hooks follow from the durations.
+    """
+    open_groups: dict[tuple[str, bool], list[_BeamEvent]] = {}
+    groups: list[list[_BeamEvent]] = []
+
+    def close(key: tuple[str, bool]) -> None:
+        group = open_groups.pop(key, [])
+        if len(group) >= 2:
+            groups.append(group)
+
+    for event in _beam_events(part):
+        key = (event.position, event.is_grace)
+        if event.state is None or _beam_count(event.notes[0]) == 0:
+            close(key)
+            continue
+        if event.state == "begin":
+            close(key)
+        elif key not in open_groups:
+            other = _cross_staff_group(open_groups, event)
+            if other is not None:
+                _join_voice(open_groups[other], event)
+                open_groups[other].append(event)
+                if event.state == "end":
+                    close(other)
+                continue
+        open_groups.setdefault(key, []).append(event)
+        if event.state == "end":
+            close(key)
+    for key in list(open_groups):
+        close(key)
+    for group in groups:
+        _write_beams([event.notes for event in group])
+
+
+def _beam_events(part: ET.Element) -> list[_BeamEvent]:
+    """The chords with notes of a part in the order of time, beams are removed."""
+    events: list[tuple[int, _BeamEvent]] = []
+    for measure_no, measure in enumerate(part.findall("measure")):
+        times = _note_times(measure)
+        for event in group_into_events(measure):
+            first = event[0]
+            position = first.get(_POSITION_ATTRIBUTE)
+            state = None
+            for note in event:
+                for beam in note.findall("beam"):
+                    if beam.get("number") == "1" and state is None:
+                        state = beam.text
+                    note.remove(beam)
+            if position is None or first.find("rest") is not None:
+                continue
+            start, end = times[id(first)]
+            beam_event = _BeamEvent(
+                event,
+                position,
+                first.find("grace") is not None,
+                state,
+                (measure_no, start),
+                (measure_no, end),
+            )
+            events.append((len(events), beam_event))
+    events.sort(key=lambda e: (e[1].start, e[0]))
+    return [event for _, event in events]
+
+
+def _note_times(measure: ET.Element) -> dict[int, tuple[int, int]]:
+    """Start and end of each note in a measure, in divisions."""
+    result: dict[int, tuple[int, int]] = {}
+    time = 0
+    last_start = 0
+    for child in measure:
+        if child.tag in ("backup", "forward"):
+            duration = int(child.findtext("duration", "0"))
+            time += -duration if child.tag == "backup" else duration
+        elif child.tag == "note":
+            duration = int(child.findtext("duration", "0"))
+            if child.find("chord") is not None:
+                result[id(child)] = (last_start, last_start + duration)
+                continue
+            last_start = time
+            result[id(child)] = (time, time + duration)
+            time += duration
+    return result
+
+
+def _cross_staff_group(
+    open_groups: dict[tuple[str, bool], list[_BeamEvent]], event: _BeamEvent
+) -> tuple[str, bool] | None:
+    """The open group on the other staff which the event can continue, if there is one."""
+    staff = event.notes[0].findtext("staff", "1")
+    candidates = [
+        key
+        for key, group in open_groups.items()
+        if key[1] == event.is_grace
+        and group[-1].notes[0].findtext("staff", "1") != staff
+        and group[-1].end <= event.start
+    ]
+    return candidates[0] if len(candidates) == 1 else None
+
+
+def _join_voice(group: list[_BeamEvent], event: _BeamEvent) -> None:
+    """A beam is drawn within a voice, so the notes move into the voice of the group."""
+    voice = group[0].notes[0].findtext("voice", "1")
+    for note in event.notes:
+        voice_el = note.find("voice")
+        if voice_el is not None:
+            voice_el.text = voice
+
+
+def _beam_count(note: ET.Element) -> int:
+    return _BEAMS_PER_TYPE.get(note.findtext("type", ""), 0)
+
+
+def _write_beams(group: list[list[ET.Element]]) -> None:
+    counts = [_beam_count(event[0]) for event in group]
+    for index, event in enumerate(group):
+        note = event[0]
+        staff = note.find("staff")
+        position = list(note).index(staff) + 1 if staff is not None else len(note)
+        for level in range(1, counts[index] + 1):
+            has_previous = index > 0 and counts[index - 1] >= level
+            has_next = index < len(group) - 1 and counts[index + 1] >= level
+            if has_previous and has_next:
+                beam_type = "continue"
+            elif has_previous:
+                beam_type = "end"
+            elif has_next:
+                beam_type = "begin"
+            else:
+                beam_type = "forward hook" if index == 0 else "backward hook"
+            beam = ET.Element("beam", number=str(level))
+            beam.text = beam_type
+            note.insert(position, beam)
+            position += 1
 
 
 def group_into_events(measure: ET.Element) -> list[list[ET.Element]]:
@@ -958,13 +1149,17 @@ def build_note_or_rest(
     slur_number = staff_num
     ET.SubElement(note, "voice").text = str(get_xml_voice(staff_num, rhythmic_layer))
     ET.SubElement(note, "staff").text = str(staff_num)
-    # Used for voices and stems, removed at the end of build_part
+    slurs, beam = split_slur_and_beam(model_note.slur)
+    # Used for voices, stems and beams, removed at the end of build_part
     note.set(_POSITION_ATTRIBUTE, model_note.position)
+    if beam in _BEAM_TYPES and model_pitch not in (empty, nonote):
+        # Completed by convert_beams
+        ET.SubElement(note, "beam", number="1").text = _BEAM_TYPES[beam]
 
     # The other notes of a group, e.g. in the other staff, aren't part of the tuplet
     is_tuplet = model_duration.actual_notes != model_duration.normal_notes
     build_articulations(note, model_note.articulation, tuplet_mark if is_tuplet else "", state)
-    build_slurs(note, model_note.slur, slur_number)
+    build_slurs(note, slurs, slur_number)
     build_image_position(note, model_note)
 
     return note
