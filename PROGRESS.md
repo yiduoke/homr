@@ -222,6 +222,32 @@ coverage. Check each staff crop against its labels before training. Keep these p
 held out and report all three metrics; fixing meter alone cannot explain or guarantee
 closing the note-level gap.
 
+### Note-error audit (2026-11-15)
+
+Where upstream 566's note errors come from, as a share of reference notes (grace notes
+apart). Script `run/audit_note_errors.py`, results `run/out/compare/note-error-audit.json`;
+bar alignment from `validation/score_notes.py`, one-to-one matching per bar and staff.
+
+| Category | Mazeppa (6,873 notes) | La Campanella (4,234) |
+|---|---|---|
+| Fully right (pitch, onset, duration) | 32.7% | 68.3% |
+| Right pitch, wrong onset | **35.9%** (1,676 of them tuplet notes) | 6.2% |
+| Right pitch and onset, wrong duration | 4.5% | 1.1% |
+| Wrong pitch at the right onset | 7.4% (octave 62, accidental 99, step 42, other 305) | **16.3%** (octave 263, accidental 216, step 31, other 182) |
+| Missing | 13.2% (only 155 in chords of 3+) | 6.4% |
+| In bars with no aligned output bar | 6.3% | 1.7% |
+| Extra output notes | 430 | 334 |
+
+- Mazeppa is mainly a rhythm problem: about 73% of its notes have the right pitch. The
+  reference has 3,153 tuplet notes; 566 marks 1,288, so unmarked or misread tuplets shift
+  every later onset in the bar.
+- La Campanella's pitch errors are octaves (missed 8va brackets, which our octave data
+  addresses) and accidentals.
+- Page joining may lose notes on Mazeppa: 7,156 notes in the raw pages, 6,620 after
+  `run/merge_pages.py`. About 280 are ossia parts dropped on purpose; the rest is
+  unexplained and may be double counting at page edges. Check first.
+- Missing notes are mostly single notes, not chord members.
+
 ### Upstream 566 on our test set (2026-11-15)
 
 | Version | Scan brackets found (of 322) | False marks | Chopin LilyPond italic "8va" (of 11) | La Campanella MuseScore (of 40) |
@@ -306,26 +332,51 @@ render-and-compare check.
 
 ## Next
 
-In order of priority:
+Agreed with the owner on 2026-11-15 (after review by Codex): general note accuracy is the
+main project; time signatures are a bounded first improvement run alongside it; another
+octave-only round is deferred. Keep experiments separate (one change each).
 
-1. **Time signatures.** Read the printed numerator instead of guessing the beat count
-   from bar lengths. Mostly code, cheap, very audible (one wrong meter misplaces every
-   later bar), and nobody upstream is working on it. Measure on the two references.
-   Today the parser keeps only the beat type (`timeSignature/4`), and C and ¢ arrive as
-   `/4` and `/2` with their `symbol` attribute dropped. Plan: one token per whole
-   signature (`timeSignature_3/4`, `timeSignature_6/8`, ... a fixed list of about 30-40)
-   plus `timeSignature_common` and `timeSignature_cut`, written back to MusicXML with the
-   C or ¢ symbol. Trap: every engraver decides on its own whether 4/4 is drawn as C
-   (LilyPond does by default), so the training renders must be forced to draw exactly
-   what the token says, and a sample of images checked against their tokens before
-   training. Needs one fine-tuning round on 566.
-2. **Note accuracy on real scans, on top of 566.** Real-scan training data, e.g. the
-   OpenScore scans if bar alignment holds; our hand-checked pages and the references stay
-   test-only. The bigger project, and where this fork has an edge.
-3. **Octave work: one round on 566 at most,** only if the 566 test shows our data still
-   adds enough brackets. Regenerate the octave training data with the merged parser (it
-   now emits beam tokens), add matched bracket/no-bracket pairs, set 8vb exposure back to
-   round 3's level, change one thing, and judge on brackets and notes. Then stop.
+1. **Cheap note fixes after decoding, measured with `validation/score_notes.py` and
+   `run/audit_note_errors.py` on the two references.** No training needed:
+   - Tuplet repair: a beamed group whose durations do not fill its beat is a tuplet
+     (Mazeppa's biggest loss, see the audit). Check upstream's existing triplet
+     restoration (`homr/triplet_restoration.py`) first and extend it to 5, 6, 7.
+   - Page joining: find out whether `run/merge_pages.py` really drops about 250 Mazeppa
+     notes beyond the ossia parts (compare per-page outputs, kept in
+     `run/out/compare/<piece>/pages-upstream566/`, with the merged file), and fix it.
+   - Accidentals: carry accidentals through the bar and respect the key signature where
+     the model disagrees with itself; measure on La Campanella (216 accidental errors).
+   Before blaming training, compare raw per-page predictions with the merged MusicXML,
+   and check a few reference passages against the scan too.
+2. **Regenerate the training data with upstream 566's converters** on the GPU box (beam
+   tokens; the box's datasets are 509-era). Needed before any training on 566.
+3. **Time signatures (one controlled round on 566).** Today the parser keeps only the
+   beat type (`timeSignature/4`); C and ¢ arrive as `/4` and `/2` with their `symbol`
+   attribute dropped, and `homr/music_xml_generator.py` guesses the count from the
+   median bar length. Plan: one token per whole signature (`timeSignature_3/4`,
+   `timeSignature_6/8`, ... a fixed list of about 30-40) plus `timeSignature_common` and
+   `timeSignature_cut`, keeping the old `/d` tokens as fallback and initialising new rows
+   from them; written back to MusicXML with the C or ¢ symbol. Places to change:
+   `homr/transformer/vocabulary.py`, `training/omr_datasets/music_xml_parser.py`,
+   `humdrum_kern_parser.py`, `music21_kern_parser.py`, `convert_lieder.py`,
+   `staff_merging.py`, `homr/music_xml_generator.py` (`build_time_signature`,
+   `find_division_and_time_signature_nominators`). Trap: every engraver decides whether
+   4/4 is drawn as C (LilyPond does by default), so renders must be forced to draw what
+   the token says; check the engraver's own output (e.g. LilyPond source, Verovio MEI)
+   for a sample before training. Keep cutting and octave data fixed in this round.
+4. **Note accuracy from real scans,** chosen by what step 1 leaves: if notes are missing
+   from the crop, fix cropping; if recognition fails on dense chords and tuplets, build
+   real-scan training examples for those cases (e.g. OpenScore scans, if bar alignment
+   holds). Hand-checked pages and references stay test-only.
+5. **Octave work: one round on 566 at most,** later, with matched bracket/no-bracket
+   pairs and 8vb exposure back to round 3's level.
+
+More reference transcriptions (e.g. one simpler piece such as the Beethoven) would show
+whether the error rates hold outside dense virtuoso music; they are expensive to make,
+and any piece transcribed for testing must never be trained on.
+
+Operational details for this laptop and the GPU box (paths, model slot, box scripts)
+are in the local, git-excluded `run/HANDOFF_LOCAL.md`.
 
 ## Rules
 
