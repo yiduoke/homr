@@ -477,10 +477,14 @@ Keep tuplet changes, harder-data reweighting, octave experiments and RL out of b
   - MuseScore (PDMX, Lieder, ASAP, MuseScore octave): numeric unless
     `<time symbol="common|cut">`; check on rendered crops.
   - Verovio (GrandStaff kern): C only with `*met(c)` / `*met(c|)`; check on crops.
-  - LilyPond (octave data): draws 4/4 as C and 2/2 as cut C unless
-    `\numericTimeSignature`; current labels say /4 and /2. Decided with the owner
-    (2026-11-15): keep the existing octave images and fix only their labels (C / cut C
-    where drawn), verified on crops.
+  - LilyPond (octave data): numbers unless the source marks a symbol (musicxml2ly writes
+    `\numericTimeSignature`); the earlier assumption that it draws 4/4 as C was wrong
+    (audit 2026-11-15, `run/audits/meter_report.md`). Images agree with the source in
+    every dataset: regenerate tokens, no re-render. Label fixes from the audit: drop
+    tokens of hidden signatures (`print-object="no"`, 246 staffs) and GrandStaff's
+    default `/4` without `*M` (124); drop 435 GrandStaff samples that draw C on 3/4 or
+    3/8. Vocabulary: 34 numeric meters + C + cut C (99.7% of printed signatures).
+    Same-denominator changes are 60-73% of all meter changes (about 14,000 staffs).
   - Reuse renders; regenerate tokens only where agreement is verified on a sample of
     images per dataset and per case; otherwise fix the rendering.
   - Systems without a printed signature carry no time-signature token (already so for
