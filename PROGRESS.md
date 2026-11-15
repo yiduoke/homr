@@ -475,8 +475,13 @@ octave-only round is deferred. Keep experiments separate (one change each).
    ones (in D major: semantic C#, Cb, Cb written as C, Cb, C). Upstream switched to the
    semantic encoding in run 79 (April 2024); that run's entry shows 80.9 diffs against
    22.3 for run 77, not comparable (the Polyphonic-TrOMR log calls 80.9 a "manual
-   validation result"). No reason for the switch is written down anywhere; run 79 is
-   described only as an attempt. Upstream kept it: run 80 fixed accidentals in the data,
+   validation result"). No reason for the 2024 switch is written down (Training.md,
+   commits and issues checked); run 79 is described only as an attempt. The one
+   discussion is issue liebharc/homr#49 (January 2026): PrIMuS labels dropped carried
+   accidentals; the options were to encode "all pitches ... on how they sound" or, failing
+   that, to "consider changing the training to work with the visible symbols" ("we had
+   something similar in the past"); they fixed the data (PR #52). The old visible-symbol
+   code was removed in a dead-code cleanup (commit fd1f1f8, September 2025). Upstream kept it: run 80 fixed accidentals in the data,
    run 81 (depth reverted) reached 13.1, better than run 77; courtesy accidentals came in
    June 2024 and uniform encoding across datasets in January 2026 (commit af59798,
    `strip_naturals`). Today's labels are mixed: a printed `<accidental>` wins, otherwise
