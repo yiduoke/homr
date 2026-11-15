@@ -257,17 +257,18 @@ Upstream joins pages itself since PR #149 (`homr.main` with several images or a 
 | Piece | Joining | Full match F1 | Recall | Precision |
 |---|---|---|---|---|
 | Mazeppa | `run/merge_pages.py` | **34.84%** | 33.41% | **36.40%** |
-| Mazeppa | upstream relieur | 24.01% | **34.41%** | 18.44% |
+| Mazeppa | upstream relieur | **35.38%** | **34.06%** | **36.80%** |
 | La Campanella | `run/merge_pages.py` | 67.96% | 68.31% | 67.62% |
 | La Campanella | upstream relieur | **69.53%** | **69.88%** | **69.18%** |
 
-Relieur keeps more correct notes on both pieces (72 more full matches on Mazeppa, 67 on
-La Campanella), so `merge_pages.py` does lose some. But on Mazeppa relieur's output is
-broken: one part with 410 bars and about 14,400 notes, roughly twice the piece (202 bars,
-7,213 notes), hence the 10,977 unmatched predicted notes. It is not the ossia staves
-(`run/drop_minor_parts.py` finds nothing to drop). On La Campanella relieur works and is
-better. Until the Mazeppa duplication is understood (possibly an upstream bug worth
-reporting), keep `merge_pages.py` for Mazeppa-like scores with extra staves.
+Relieur is better on both pieces (47 more full matches on Mazeppa, 67 on La Campanella),
+so `merge_pages.py` loses notes. (An earlier Mazeppa run looked doubled because homr's
+own `*_teaser.png` preview images were passed in alongside the pages; homr.main does not
+skip them or de-duplicate its inputs.) Relieur has one real bug: `homr/relieur.py:101-102`
+pairs parts by position, not by name. On Mazeppa page 11 the small extra staff is the
+first part, so it lands in the piano part and that page's 431 piano notes are dropped;
+pages 4 and 5 have an extra part that is never joined. Fixing the pairing should raise
+relieur's Mazeppa score further. Then retire `merge_pages.py`.
 
 ### Upstream 566 on our test set (2026-11-15)
 
@@ -369,8 +370,10 @@ octave-only round is deferred. Keep experiments separate (one change each).
    - Tuplet repair: a beamed group whose durations do not fill its beat is a tuplet
      (Mazeppa's biggest loss, see the audit). Check upstream's existing triplet
      restoration (`homr/triplet_restoration.py`) first and extend it to 5, 6, 7.
-   - Page joining: find why relieur doubles Mazeppa (see "Page joining" above) and why
-     `merge_pages.py` loses notes relieur keeps; then use one joining for everything.
+   - Page joining: switch to upstream's relieur, after fixing its part pairing (by name,
+     not position) so pages whose small extra staff comes first keep their piano notes;
+     drop ossia-like parts with `run/drop_minor_parts.py`; score again; retire
+     `run/merge_pages.py`. Candidate for an upstream issue if the owner wants one.
    - Accidentals: carry accidentals through the bar and respect the key signature where
      the model disagrees with itself; measure on La Campanella (216 accidental errors).
    Before blaming training, compare raw per-page predictions with the merged MusicXML,
