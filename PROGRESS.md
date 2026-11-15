@@ -331,6 +331,13 @@ a bracket is detected. So step 3 below is worth one round.
   rarely have brackets, so this would help general real-scan reading.
 - **Not supported by homr at all:** pedal markings, glissando; cadenza notes are read as
   grace or ordinary notes.
+- **Tuplet numbers are not recorded.** A tuplet is encoded only through note lengths
+  (`note_24` = 1/24 of a whole note, `note_20`, `note_28`, ...). A sextuplet of
+  sixteenths and two sixteenth-note triplets both become `note_24`, and the MusicXML
+  writer groups them in threes, so a printed "6" comes out as two "3" groups (playback
+  is right, the printed look is not). 4-in-the-time-of-3 cannot be encoded at all (same
+  length as a dotted note). Keeping the number would need a tuplet group token and
+  retraining, like the beam tokens in 566.
 
 ## Priorities (2026-11-15)
 
