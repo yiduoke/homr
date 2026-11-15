@@ -21,8 +21,9 @@ in. The main goal is now general note accuracy on 566 (see "Next"); octave round
 ## State at handoff (2026-11-15, evening UTC)
 
 - Running on the GPU box: regenerating training data with 566's converters (with beams).
-  GrandStaff done (45,635 staffs), PDMX done (199,706 staffs), Lieder in progress, then
-  the hard PDMX subset (complexity 2-3, scored test pieces excluded). Box details and
+  GrandStaff (45,635 staffs), PDMX (199,706) and Lieder (43,149) done; beam tokens
+  present in sampled token files. The hard PDMX subset (complexity 2-3, scored test
+  pieces excluded) started 19:56 UTC into `datasets/pdmx/hard`. Box details and
   how to check progress: `run/HANDOFF_LOCAL.md` (laptop only).
 - Running on the box: a check whether KernScores' real scans match their transcriptions
   system by system (`/workspace/kern_check/`), to decide if they can become the first
