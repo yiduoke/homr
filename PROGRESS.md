@@ -155,6 +155,26 @@ Ignoring octave, La Campanella is about 87% for every version, so its difference
 octave brackets. On Mazeppa, ignoring octave, round 3 with upstream's cutting matches 509
 on the upper staff (89%) and is a little behind on the lower (85% vs 88%).
 
+### Upstream 566 on our test set (2026-11-15)
+
+| Version | Scan brackets found (of 322) | False marks | Chopin LilyPond italic "8va" (of 11) | La Campanella MuseScore (of 40) |
+|---|---|---|---|---|
+| Ours, round 3 e1, bracket-aware (published) | **244** | 14 | **11** | **35** |
+| 566, upstream's cutting | 180 | **8** | 1 | 26 |
+| 566, bracket-aware cutting | 159 | 10 | 1 | 32 |
+
+Per system on the four marked pieces (correct / missed / false of 217): ours 152 / 65 /
+13, 566 with upstream's cutting 114 / 103 / 5, with bracket-aware cutting 97 / 120 / 9.
+
+Notes with 566 and bracket-aware cutting: Mazeppa drops to 67% / 73% (from 78% / 79%),
+La Campanella stays at 77% / 80%.
+
+Reading: our data adds about 64 real brackets over 566, and 566 barely reads an italic
+"8va" label (1 of 11), the same blind spot our round 1 had before the LilyPond styles.
+566 makes fewer false marks. Bracket-aware cutting does not help 566 on scans and hurts
+its notes on dense pages, so it should not be the default; at most, grow the region when
+a bracket is detected. So step 3 below is worth one round.
+
 ## Rounds 4 and 5 (not published)
 
 | Round | Change from round 3 | Start | Epochs |
@@ -218,14 +238,19 @@ render-and-compare check.
 
 ## Next
 
-Running now: testing 566 on our pages (brackets per page and per system, notes against
-the references, with both cutting modes). Its result decides step 3.
-
 In order of priority:
 
 1. **Time signatures.** Read the printed numerator instead of guessing the beat count
    from bar lengths. Mostly code, cheap, very audible (one wrong meter misplaces every
    later bar), and nobody upstream is working on it. Measure on the two references.
+   Today the parser keeps only the beat type (`timeSignature/4`), and C and ¢ arrive as
+   `/4` and `/2` with their `symbol` attribute dropped. Plan: one token per whole
+   signature (`timeSignature_3/4`, `timeSignature_6/8`, ... a fixed list of about 30-40)
+   plus `timeSignature_common` and `timeSignature_cut`, written back to MusicXML with the
+   C or ¢ symbol. Trap: every engraver decides on its own whether 4/4 is drawn as C
+   (LilyPond does by default), so the training renders must be forced to draw exactly
+   what the token says, and a sample of images checked against their tokens before
+   training. Needs one fine-tuning round on 566.
 2. **Note accuracy on real scans, on top of 566.** Real-scan training data, e.g. the
    OpenScore scans if bar alignment holds; our hand-checked pages and the references stay
    test-only. The bigger project, and where this fork has an edge.
