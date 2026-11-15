@@ -138,6 +138,19 @@ for round 3 on the same harder staffs, with no invented brackets on 60 clean sta
 | Upstream 566 | 78% / **79%** | 76% / 78% |
 | Upstream 509 (upstream's default at our 3 Nov merge) | 68% / 76% | n/a |
 
+How far from correct upstream 566 still is on these two pieces (bars well read / badly
+read, upper and lower staff):
+
+| Piece | Bars | Bars at least 90% right | Bars under 50% right |
+|---|---|---|---|
+| Mazeppa | 202 | 93 / 107 | 18 / 16 |
+| La Campanella | 147 | 72 / 67 | 18 / 11 |
+
+So about one pitch in five is wrong and only about half the bars are nearly right. These
+are dense virtuoso pieces (Mazeppa also a dirty scan); upstream's own Polish-scores
+benchmark puts 566 at a 14.6% error rate on cleaner scans. There is no reference yet for a
+simpler piece, so it is unknown whether this rate holds outside such music.
+
 Ignoring octave, La Campanella is about 87% for every version, so its differences are
 octave brackets. On Mazeppa, ignoring octave, round 3 with upstream's cutting matches 509
 on the upper staff (89%) and is a little behind on the lower (85% vs 88%).
@@ -186,6 +199,22 @@ on the upper staff (89%) and is a little behind on the lower (85% vs 88%).
   rarely have brackets, so this would help general real-scan reading.
 - **Not supported by homr at all:** pedal markings, glissando; cadenza notes are read as
   grace or ordinary notes.
+
+## Priorities (2026-11-15)
+
+Overall accuracy matters more than new features:
+
+| Problem | Cost on Mazeppa / La Campanella | Heard in playback |
+|---|---|---|
+| Wrong notes, octave aside | About 11-15% of pitches per bar | Everywhere |
+| Wrong meter (6/8, 3/2, changes) | Every bar after the error is misplaced | Very |
+| Missed octave brackets | About 5-8 points | In some passages |
+| Missing features (glissando, pedal) | Rare, or not played at all | Hardly |
+
+Post-training on 566 is suited to adding or sharpening specific things (brackets, meter);
+it is not expected to lift general note accuracy on such pieces from about 78% to 95%.
+That would need much more varied real training data, or constrained decoding and a
+render-and-compare check.
 
 ## Next
 
