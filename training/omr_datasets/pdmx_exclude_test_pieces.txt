@@ -1,23 +1,27 @@
 campanella
+paganini & no. 3
+paganini & no.3
 mazeppa
-liebestraum
-liebesträume
-mephisto
-hungarian rhapsody
-rhapsodie hongroise
-ungarische rhapsodie
+liebestraum & 3
+liebesträume & 3
+mephisto & 1
+hungarian rhapsody & no. 2
+hungarian rhapsody & no.2
+rhapsodie hongroise & 2
+ungarische rhapsodie & 2
 totentanz
+mussorgsky
+moussorgsky
 pictures at an exhibition
 tableaux d'une exposition
-promenade
-gnomus
 jeux d'eau
 gaspard
-scarbo
-ondine
-le gibet
-scherzo
-ballade
+scherzo & op. 20
+scherzo & op.20
+scherzo & no. 1 & chopin
+ballade & op. 52
+ballade & op.52
+ballade & no. 4 & chopin
 pathetique
 pathétique
 petrushka
@@ -26,9 +30,9 @@ petruschka
 well-tempered
 well tempered
 wohltemperierte
+wtc
 bwv 848
 bwv848
-bwv 846
 k. 309
 k.309
 k309
@@ -40,17 +44,15 @@ k331
 kv 331
 kv331
 alla turca
-op. 3 no. 2
-op.3 no.2
-op 3 no 2
-prelude in c# minor
-prelude in c sharp minor
-prélude en ut dièse mineur
-op. 116
-op.116
-fantasien
-op. 8 no. 12
-op.8 no.12
-sonata no. 4
-op. 30
-op.30
+rachmaninoff & op. 3
+rachmaninov & op. 3
+rachmaninoff & c# minor
+rachmaninoff & c sharp minor
+brahms & op. 116
+brahms & op.116
+fantasien & 116
+scriabin & op. 8
+scriabin & op.8
+scriabin & op. 30
+scriabin & op.30
+scriabin & sonata no. 4

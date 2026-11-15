@@ -30,19 +30,21 @@ rendered_scores = os.path.join(_subset_root, "rendered_scores")
 # Complexity 3 often has octave shifts and long sequences (see max_seq_len), so by default
 # we skip those files. PDMX_MIN_COMPLEXITY / PDMX_MAX_COMPLEXITY / PDMX_TARGET_FILES change
 # the selection; PDMX_EXCLUDE names a file with one lowercase phrase per line, and scores
-# whose title, song name or composer contains one are left out (e.g. test pieces).
+# whose title, song name or composer contains one are left out (e.g. test pieces);
+# "a & b" requires every part.
 _MIN_COMPLEXITY = int(os.environ.get("PDMX_MIN_COMPLEXITY", "0"))
 _MAX_COMPLEXITY = int(os.environ.get("PDMX_MAX_COMPLEXITY", "2"))
 _MAX_TRACKS = 2
 _TARGET_FILES = int(os.environ.get("PDMX_TARGET_FILES", "20000"))  # ~100K images
 
 
-def _excluded_phrases() -> list[str]:
+def _excluded_phrases() -> list[list[str]]:
     path = os.environ.get("PDMX_EXCLUDE")
     if not path:
         return []
     with open(path, encoding="utf-8") as f:
-        return [line.strip().lower() for line in f if line.strip()]
+        # "scriabin & op. 30" matches only when every part is present
+        return [[part.strip() for part in line.lower().split("&")] for line in f if line.strip()]
 
 
 def _load_filtered_paths() -> list[Path]:  # noqa: C901
@@ -72,7 +74,7 @@ def _load_filtered_paths() -> list[Path]:  # noqa: C901
                 names = " ".join(
                     (row.get(k) or "").lower() for k in ("title", "song_name", "composer_name")
                 )
-                if any(phrase in names for phrase in excluded):
+                if any(all(part in names for part in phrase) for phrase in excluded):
                     n_excluded += 1
                     continue
             rel_mxl = row["mxl"].lstrip("./")
