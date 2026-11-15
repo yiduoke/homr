@@ -11,7 +11,7 @@ import math
 import sys
 import xml.etree.ElementTree as ET
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from fractions import Fraction
 from pathlib import Path
 from typing import Literal
@@ -162,10 +162,7 @@ def parse_musicxml(xml: str) -> Score:
         if any(not part for part in parts):
             raise ValueError("Score has no measures")
         per_staff = tuple(
-            tuple(
-                Measure(m.number, tuple(n for n in m.notes if n.staff == staff))
-                for m in part
-            )
+            tuple(Measure(m.number, tuple(n for n in m.notes if n.staff == staff)) for m in part)
             for part, (offset, count) in zip(parts, part_staves, strict=True)
             for staff in range(offset + 1, offset + count + 1)
         )
@@ -271,9 +268,73 @@ def count_matches(
     return len(assigned)
 
 
+def _mean_pitches(bars: list[tuple[Measure, ...]]) -> list[float | None]:
+    """Mean pitch of each staff over the whole score (None for a staff without notes)."""
+    return [
+        (sum(n.pitch for m in staff for n in m.notes) / count)
+        if (count := sum(len(m.notes) for m in staff))
+        else None
+        for staff in bars
+    ]
+
+
+def _nearest(pitch: float, means: list[float | None], fallback: int) -> int:
+    """1-based reference staff whose mean pitch is closest; lowest index wins ties."""
+    candidates = [(abs(pitch - mean), k) for k, mean in enumerate(means) if mean is not None]
+    return min(candidates)[1] + 1 if candidates else min(fallback, len(means))
+
+
+def _remap_measure(measure: Measure, means: list[float | None]) -> Measure:
+    """Assign each predicted staff in one bar to the nearest reference staff by mean pitch."""
+    by_staff: dict[int, list[Note]] = {}
+    for note in measure.notes:
+        by_staff.setdefault(note.staff, []).append(note)
+    target = {
+        staff: _nearest(sum(n.pitch for n in notes) / len(notes), means, staff)
+        for staff, notes in by_staff.items()
+    }
+    return Measure(
+        measure.number,
+        tuple(replace(n, staff=target[n.staff]) for n in measure.notes),
+    )
+
+
+def remap_staves(reference: Score, prediction: Score) -> Score:
+    """Fit a prediction with a different staff count onto the reference's staves.
+
+    Each predicted staff, bar by bar, goes to the reference staff with the closest mean
+    pitch, so an extra staff (a four-staff climax) lands on the staff it sits nearest to.
+    If the bars of each staff are kept apart (different bar counts per part), each
+    staff is mapped as a whole; staves landing on one reference staff are merged by bar index.
+    """
+    means = _mean_pitches(_staff_bars(reference))
+    if not prediction.staff_measures:
+        return Score(tuple(_remap_measure(m, means) for m in prediction.measures), reference.staves)
+    merged: list[list[Measure]] = [[] for _ in range(reference.staves)]
+    for k, bars in enumerate(prediction.staff_measures):
+        (mean,) = _mean_pitches([bars])
+        target = _nearest(mean, means, k + 1) if mean is not None else min(k + 1, reference.staves)
+        slot = merged[target - 1]
+        for i, bar in enumerate(bars):
+            notes = tuple(replace(n, staff=target) for n in bar.notes)
+            if i < len(slot):
+                slot[i] = Measure(slot[i].number, slot[i].notes + notes)
+            else:
+                slot.append(Measure(bar.number, notes))
+    return Score((), reference.staves, tuple(tuple(slot) for slot in merged))
+
+
 def score_notes(reference: Score, prediction: Score, tolerance: float = DEFAULT_TOLERANCE) -> dict:
     if not math.isfinite(tolerance) or tolerance < 0:
         raise ValueError("Timing tolerance must be finite and nonnegative")
+    if reference.staves != prediction.staves:
+        predicted_staves = prediction.staves
+        result = score_notes(reference, remap_staves(reference, prediction), tolerance)
+        result["staff_remap"] = {
+            "predicted_staves": predicted_staves,
+            "reference_staves": reference.staves,
+        }
+        return result
     if reference.staff_measures or prediction.staff_measures:
         return _score_per_staff(reference, prediction, tolerance)
     pairs = align_measures(reference, prediction)
@@ -340,9 +401,7 @@ def _score_per_staff(reference: Score, prediction: Score, tolerance: float) -> d
         raise ValueError("Reference and prediction must have the same staff layout")
     ref_bars, pred_bars = _staff_bars(reference), _staff_bars(prediction)
     staff_pairs = [
-        align_measures(
-            Score(ref_bars[k], reference.staves), Score(pred_bars[k], reference.staves)
-        )
+        align_measures(Score(ref_bars[k], reference.staves), Score(pred_bars[k], reference.staves))
         for k in range(reference.staves)
     ]
     metrics = {}
@@ -456,6 +515,8 @@ def main() -> None:
     for result in results:
         values = [f"{100 * result['metrics'][metric]['combined']['f1']:.2f}" for metric in METRICS]
         mode = " [per-staff bar alignment]" if result.get("alignment_mode") == "per_staff" else ""
+        if "staff_remap" in result:
+            mode += " [extra staves mapped to nearest reference staff]"
         sys.stdout.write(result["name"] + "\t" + "\t".join(values) + mode + "\n")
         strict = result["metrics"]["pitch_onset_duration"]["combined"]
         sys.stdout.write(

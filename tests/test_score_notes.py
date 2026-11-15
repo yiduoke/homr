@@ -228,7 +228,29 @@ class TestIndividualNoteScoring(unittest.TestCase):
             with self.subTest(tolerance=tolerance), self.assertRaises(ValueError):
                 score_notes(score, score, tolerance)
         with self.assertRaises(ValueError):
-            score_notes(score, _score((), staves=2))
+            align_measures(score, _score((), staves=2))
+
+    def test_extra_staff_maps_to_nearest_reference_staff(self) -> None:
+        high, low = Note(1, 72, 0, 1), Note(2, 48, 0, 1)
+        ref = _score((high, low), (high, low), staves=2)
+        # Three staves: a middle-high staff (mean 70) and a low staff in bar 1; in bar 2 the
+        # extra staff sits low (mean 50), so it goes to the other reference staff.
+        hyp = _score(
+            (Note(1, 72, 0, 1), Note(2, 69, 0, 1), Note(3, 48, 0, 1)),
+            (Note(1, 72, 0, 1), Note(2, 50, 0, 1), Note(3, 48, 0, 1)),
+            staves=3,
+        )
+        result = score_notes(ref, hyp)
+        self.assertEqual(result["staff_remap"], {"predicted_staves": 3, "reference_staves": 2})
+        strict = result["metrics"]["pitch_onset_duration"]
+        self.assertEqual(strict["staves"][0], Counts(2, 2, 3).report())
+        self.assertEqual(strict["staves"][1], Counts(2, 2, 3).report())
+        # Matching layouts are untouched.
+        self.assertNotIn("staff_remap", score_notes(ref, ref))
+        # Fewer staves than the reference also works.
+        self.assertEqual(
+            score_notes(hyp, ref)["metrics"]["pitch_inventory"]["combined"]["reference"], 6
+        )
 
     def test_cli_json_and_input_protection(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

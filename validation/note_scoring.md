@@ -82,3 +82,8 @@ The local Mazeppa and La Campanella results and diagnosis are recorded in
 [PROGRESS.md](../PROGRESS.md#individual-note-rescoring-2026-11-15). Their reference
 transcriptions and real pages remain evaluation-only. These two pieces are not evidence
 of generalization to other music.
+
+If the staff counts differ (for example homr writes a four-staff climax as an extra staff,
+or an engine writes four parts), each predicted staff is mapped, bar by bar, to the
+reference staff with the closest mean pitch before scoring. The result carries
+`staff_remap`. Equal layouts are scored unchanged.
