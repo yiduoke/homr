@@ -218,14 +218,21 @@ render-and-compare check.
 
 ## Next
 
-1. Finish testing 566 on our pages: brackets per page and per system, notes against the
-   references, with both cutting modes.
-2. If our data still adds brackets over 566: regenerate the octave training data with the
-   merged parser (it now emits beam tokens), add matched bracket/no-bracket pairs, set 8vb
-   exposure back to round 3's level, fine-tune 566 with one change per round, and judge
-   on brackets and notes.
-3. Time signatures: read the printed numerator instead of guessing.
-4. Real-scan training data from OpenScore, if bar alignment holds.
+Running now: testing 566 on our pages (brackets per page and per system, notes against
+the references, with both cutting modes). Its result decides step 3.
+
+In order of priority:
+
+1. **Time signatures.** Read the printed numerator instead of guessing the beat count
+   from bar lengths. Mostly code, cheap, very audible (one wrong meter misplaces every
+   later bar), and nobody upstream is working on it. Measure on the two references.
+2. **Note accuracy on real scans, on top of 566.** Real-scan training data, e.g. the
+   OpenScore scans if bar alignment holds; our hand-checked pages and the references stay
+   test-only. The bigger project, and where this fork has an edge.
+3. **Octave work: one round on 566 at most,** only if the 566 test shows our data still
+   adds enough brackets. Regenerate the octave training data with the merged parser (it
+   now emits beam tokens), add matched bracket/no-bracket pairs, set 8vb exposure back to
+   round 3's level, change one thing, and judge on brackets and notes. Then stop.
 
 ## Rules
 
