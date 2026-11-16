@@ -10,6 +10,7 @@ from __future__ import annotations
 import music21 as m21
 import music21.stream
 
+from homr.accidentals import printed_lifts_from_sounding
 from homr.transformer.vocabulary import EncodedSymbol, sort_token_chords
 from training.omr_datasets.music21_kern_parser import (
     _convert_m21_part,
@@ -26,7 +27,8 @@ def convert_xml_to_parts_music21(xml_text: str) -> list[list[EncodedSymbol]]:
     and merged into a single token list, matching the native parser's behavior of
     keeping both staves of a grand staff as one part.
     chord markers are resolved via sort_token_chords before returning.
-    strip_naturals and _strip_position are applied by the caller.
+    The printed signs follow from the sounding alterations by rule (the music21 pitches don't
+    say what the MusicXML printed). _strip_position is applied by the caller.
     """
     try:
         score = m21.converter.parse(xml_text, format="musicxml")
@@ -57,12 +59,12 @@ def convert_xml_to_parts_music21(xml_text: str) -> list[list[EncodedSymbol]]:
                 tokens = _remove_redundant_key_changes(tokens)
                 tokens = _fix_final_repeat_start(tokens)
                 tokens = [t for chord in sort_token_chords(tokens) for t in chord]
-                result.append(tokens)
+                result.append(printed_lifts_from_sounding(tokens))
         else:
             tokens = _convert_m21_part(part)
             tokens = _remove_redundant_key_changes(tokens)
             tokens = _fix_final_repeat_start(tokens)
             tokens = [t for chord in sort_token_chords(tokens) for t in chord]
-            result.append(tokens)
+            result.append(printed_lifts_from_sounding(tokens))
 
     return result

@@ -16,7 +16,6 @@ import cv2
 import numpy as np
 from PIL import Image
 
-from homr.circle_of_fifths import strip_naturals
 from homr.download_utils import download_file, unzip_file
 from homr.simple_logging import eprint
 from homr.transformer.vocabulary import (
@@ -624,7 +623,6 @@ def _split_file_into_staffs(  # noqa: PLR0913
         )
 
         if contains_only_supported_clefs(selected_measures):
-            selected_measures = strip_naturals(selected_measures)
             result.append(_write_tokens(staff_image_file_name, token_file_name, selected_measures))
         current_voice = (current_voice + 1) % number_of_voices
 

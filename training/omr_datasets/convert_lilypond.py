@@ -38,7 +38,6 @@ from pathlib import Path
 
 import cv2
 
-from homr.circle_of_fifths import strip_naturals
 from homr.simple_logging import eprint
 from homr.transformer.vocabulary import EncodedSymbol
 from training.omr_datasets.convert_lieder import (
@@ -560,9 +559,7 @@ def convert_file(file: Path) -> tuple[list[str], dict[str, int]]:  # noqa: PLR09
                         "staff_space": staff.staff_space * scale,
                     }
                     write_text_to_file(json.dumps(crop_info), crop_info_path(base + ".png"))
-                    write_text_to_file(
-                        token_lines_to_str(strip_naturals(symbols)), base + ".tokens"
-                    )
+                    write_text_to_file(token_lines_to_str(symbols), base + ".tokens")
                     lines.append(
                         str(Path(base + ".png").relative_to(git_root))
                         + ","

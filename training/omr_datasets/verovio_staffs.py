@@ -16,7 +16,6 @@ from pathlib import Path
 
 import cv2
 
-from homr.circle_of_fifths import strip_naturals
 from homr.simple_logging import eprint
 from homr.transformer.vocabulary import EncodedSymbol
 from training.omr_datasets.music_xml_parser import Measure
@@ -399,7 +398,7 @@ def split_into_staffs(  # noqa: PLR0913
                 if system.page not in pngs:
                     pngs[system.page] = _rasterize(score.pages[system.page - 1], f"{base}-page.png")
                 _write_crop(pngs[system.page], staff, image_file)
-            result.append((part, image_file, str(base) + ".tokens", strip_naturals(symbols)))
+            result.append((part, image_file, str(base) + ".tokens", symbols))
     for page_png in pngs.values():
         Path(page_png).unlink(missing_ok=True)
     return result

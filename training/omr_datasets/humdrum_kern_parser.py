@@ -1,7 +1,7 @@
 import re
 from enum import Enum
 
-from homr.circle_of_fifths import strip_naturals
+from homr.accidentals import printed_lifts_from_sounding, sounding_lift
 from homr.transformer.vocabulary import EncodedSymbol, empty, nonote
 from training.omr_datasets.staff_merging import (
     EncodedSymbolWithPos,
@@ -138,14 +138,21 @@ class _StaffState:
         self.result.append(EncodedSymbolWithPos(self.line_no, symbol))
 
 
-def convert_kern_to_tokens(lines: list[str]) -> list[EncodedSymbol]:
+def convert_kern_to_tokens(
+    lines: list[str], printed_signs: list[str | None] | None = None
+) -> list[EncodedSymbol]:
+    """
+    printed_signs: The sign drawn for each note in the order of the returned notes, e.g. the
+    written @accid of the MEI which Verovio renders for the kern, see
+    homr.accidentals.printed_lifts_from_sounding. Without it the signs are derived by rule.
+    """
     staffs, warnings = _convert_into_staffs(lines)
     if warnings:
         raise ValueError(" ".join(warnings))
     if len(staffs) != 2:
         raise ValueError("Skip scores with only 1 staff")
     staffs = list(reversed(staffs))  # reverse to get treble first
-    return _post_process(merge_upper_and_lower_staff(staffs))
+    return _post_process(merge_upper_and_lower_staff(staffs), printed_signs)
 
 
 def convert_kern_to_parts(lines: list[str]) -> list[list[EncodedSymbol]]:
@@ -154,10 +161,12 @@ def convert_kern_to_parts(lines: list[str]) -> list[list[EncodedSymbol]]:
     return [_post_process(merge_upper_and_lower_staff([staff])) for staff in staffs]
 
 
-def _post_process(symbols: list[EncodedSymbol]) -> list[EncodedSymbol]:
+def _post_process(
+    symbols: list[EncodedSymbol], printed_signs: list[str | None] | None = None
+) -> list[EncodedSymbol]:
     symbols = _remove_redundant_key_changes(symbols)
     symbols = _fix_final_repeat_start(symbols)
-    return strip_naturals(symbols)
+    return printed_lifts_from_sounding(symbols, printed_signs)
 
 
 def _convert_into_staffs(lines: list[str]) -> tuple[list[list[EncodedSymbolWithPos]], list[str]]:
@@ -302,8 +311,18 @@ class HumdrumKernConverter:
 
         self.state = _StaffState(position)
 
-    def _accidental_to_lift(self, accidental: str) -> str:
-        return {"-": "b", "--": "bb", "#": "#", "##": "##", "n": "N"}.get(accidental, empty)
+    def _accidental_to_lift(self, accidental: str | None, token: str) -> str:
+        """
+        The sounding alteration with the markers of the token, replaced by the printed sign
+        in _post_process: n is a printed natural, X forces the sign and y hides it.
+        """
+        alter = {"-": -1, "--": -2, "#": 1, "##": 2}.get(accidental or "", 0)
+        return sounding_lift(
+            alter,
+            natural=accidental == "n",
+            force="X" in token,
+            hide="y" in token,
+        )
 
     def _articulation_from_suffix(self, suffix: str) -> tuple[str, str]:
         for symbol in self.ignore_beams:
@@ -451,7 +470,7 @@ class HumdrumKernConverter:
         if is_rest:
             return EncodedSymbol(rhythm_key, empty, empty, empty, empty, position)
 
-        lift_val = self._accidental_to_lift(accidental)
+        lift_val = self._accidental_to_lift(accidental, token)
         pitch_val = self.kern_note_to_pitch(pitch)
         articulation_val, slur_val = self._articulation_from_suffix(suffix)
         return EncodedSymbol(rhythm_key, pitch_val, lift_val, articulation_val, slur_val, position)

@@ -18,9 +18,10 @@ boundaries, then returns a flat list of symbols.
 """
 
 import xml.etree.ElementTree as ET
-from collections import defaultdict
+from collections import Counter, defaultdict
 from typing import Iterable, Sequence, SupportsIndex, TypeVar, overload
 
+from homr.accidentals import UnsupportedAccidentalError, sign_from_music_xml
 from homr.music_xml_generator import DURATION_NAMES
 from homr.simple_logging import eprint
 from homr.transformer.vocabulary import (
@@ -579,17 +580,27 @@ class TokensPart:
         return self.tuplets.get_tuplet_factor(note, position)
 
 
-def _lift_from_pitch_or_accidental(pitch: ET.Element, note: ET.Element) -> str:
-    # explicit courtesy accidental overrides calculated
+SKIPPED_ACCIDENTALS: Counter[str] = Counter()
+"""Printed signs without a class (quarter tones) in the pieces skipped for them, by name."""
+
+
+def _lift_from_accidental(note: ET.Element, strict: bool) -> str:
+    """
+    The sign printed before the note, which is the <accidental> element and nothing else. The
+    alteration of the pitch says how the note sounds, not if a sign is drawn: a note without
+    <accidental> has no sign even if altered (key signature, earlier sign in the bar).
+    strict: raise UnsupportedAccidentalError for signs without a class (training skips the
+    piece and counts it), else use the closest one.
+    """
     accs = _children(note, "accidental")
-    if accs:
-        v = _text(accs[0])
-        return {"sharp": "#", "flat": "b", "natural": "N"}.get(v, empty)
-    alter = _child(pitch, "alter")
-    if alter is None:
+    if not accs:
         return empty
-    val = int(float(_text(alter, "0")))
-    return _alter_to_lifts(val)
+    name = _text(accs[0])
+    try:
+        return sign_from_music_xml(name, strict)
+    except UnsupportedAccidentalError:
+        SKIPPED_ACCIDENTALS[name] += 1
+        raise
 
 
 def _count_dots(note: ET.Element) -> int:
@@ -664,18 +675,6 @@ def _clef_name(sign: str, line: str, octave_change: int, part: TokensPart) -> st
     if name not in OCTAVE_CLEFS:
         raise ValueError(f"Unsupported octave clef {name}")
     return name
-
-
-def _alter_to_lifts(alter: int) -> str:
-    if alter < -1:
-        return "bb"
-    if alter == -1:
-        return "b"
-    if alter == 1:
-        return "#"
-    if alter > 1:
-        return "##"
-    return "N"
 
 
 def _pitch_name(pitch: ET.Element) -> str:
@@ -886,7 +885,7 @@ def _process_note(part: TokensPart, note: ET.Element) -> None:
     pitch = _children(note, "pitch")
     if len(pitch) > 0:
         pitch_name = _pitch_name(pitch[0])
-        lift = _lift_from_pitch_or_accidental(pitch[0], note)
+        lift = _lift_from_accidental(note, strict=not part.sounding_pitch)
         rhythm = _rhythm_token("note", base_duration, dots, is_grace)
         sym = EncodedSymbol(rhythm, pitch_name, lift, art, _add_beam(slur, note))
 

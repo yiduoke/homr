@@ -17,7 +17,7 @@ import music21.note
 import music21.spanner
 import music21.stream
 
-from homr.circle_of_fifths import strip_naturals
+from homr.accidentals import printed_lifts_from_sounding, sounding_lift
 from homr.transformer.vocabulary import EncodedSymbol, empty
 from training.omr_datasets.time_signatures import (
     UnsupportedTimeSignatureError,
@@ -63,19 +63,16 @@ def _rhythm_token(prefix: str, kern_val: int, dots: int, is_grace: bool) -> str:
     return f"{prefix}_{kern_val}{'G' if is_grace else ''}{'.' * dots}"
 
 
-_ACC_MAP: dict[str, str] = {
-    "sharp": "#",
-    "double-sharp": "##",
-    "flat": "b",
-    "double-flat": "bb",
-    "natural": "N",
-}
-
-
-def _get_lift(acc: object) -> str:
-    if acc is None:
-        return empty
-    return _ACC_MAP.get(str(getattr(acc, "name", "")), empty)
+def _get_lift(pitch: object) -> str:
+    """
+    The sounding alteration of the pitch with a marker if the kern has a natural sign (n), the
+    music21 accidental of such a note is a natural. The kern markers X and y get lost in
+    music21. The printed sign is derived in printed_lifts_from_sounding.
+    """
+    alter = int(round(float(getattr(pitch, "alter", 0) or 0)))
+    accidental = getattr(pitch, "accidental", None)
+    natural = str(getattr(accidental, "name", "")) == "natural"
+    return sounding_lift(alter, natural=natural)
 
 
 _ARTIC_MAP: dict[str, str] = {
@@ -203,7 +200,7 @@ def _note_to_symbol(
     step = str(getattr(pitch, "step", "C"))
     octave = int(getattr(pitch, "octave", 4) or 4)
     pitch_str = f"{step}{octave}"
-    lift = _get_lift(getattr(pitch, "accidental", None))
+    lift = _get_lift(pitch)
     art, slur = _get_articulations(note)
     return EncodedSymbol(rhythm, pitch_str, lift, art, slur)
 
@@ -377,7 +374,7 @@ def convert_kern_to_parts_music21(lines: list[str]) -> list[list[EncodedSymbol]]
     Multi-movement kern files (parsed by music21 as an Opus) are handled by
     concatenating same-indexed parts across all scores, mirroring the native parser.
     The same normalisation steps are applied per score before concatenation:
-    _remove_redundant_key_changes -> _fix_final_repeat_start -> strip_naturals
+    _remove_redundant_key_changes -> _fix_final_repeat_start -> printed_lifts_from_sounding
     """
     kern_text = "\n".join(lines)
     try:
@@ -397,6 +394,6 @@ def convert_kern_to_parts_music21(lines: list[str]) -> list[list[EncodedSymbol]]
             tokens = _convert_m21_part(part)
             tokens = _remove_redundant_key_changes(tokens)
             tokens = _fix_final_repeat_start(tokens)
-            tokens = strip_naturals(tokens)
+            tokens = printed_lifts_from_sounding(tokens)
             result[p_idx].extend(tokens)
     return result
