@@ -20,7 +20,9 @@ Environment: FT_EPOCHS (6), FT_LR (5e-5), FT_BATCH (32), FT_MAX_FILES (-1 = all)
 FT_CKPT, FT_OLD_VOCAB, FT_RESUME (checkpoint folder name inside current_training),
 FT_DATASETS (comma-separated substrings of index paths, for smoke tests), FT_EVAL_ONLY,
 FT_INIT (safetensors to continue from), FT_TRAIN_INDEX / FT_VAL_INDEX (prebuilt lists),
-FT_NAME (output file prefix).
+FT_NAME (output file prefix),
+FT_RESET_LIFT (1: start the lift head again, for a checkpoint whose lift was the sounding
+alteration; see lift_reset.py).
 """
 
 import json
@@ -37,6 +39,7 @@ from training.run_id import get_run_id
 from training.transformer import train as base
 from training.transformer.data_loader import DataLoader, label_names, load_dataset
 from training.transformer.distribute import Distribute
+from training.transformer.lift_reset import reset_lift_head
 from training.transformer.meter_vocabulary import grow_rows, time_signature_source_row
 from training.transformer.metrics import HomrTrainer
 
@@ -163,6 +166,10 @@ def main() -> None:
         eprint("Initialised from", init)
     elif not resume:
         warm_start(model, checkpoint, old_vocab)
+    if os.environ.get("FT_RESET_LIFT") == "1" and not resume:
+        # After either way of loading weights: the old lift meant the sounding alteration
+        names = reset_lift_head(model)
+        eprint("Lift head re-initialised:", ", ".join(names))
 
     run_id = get_run_id()
     args = TrainingArguments(
