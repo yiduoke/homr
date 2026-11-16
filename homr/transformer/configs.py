@@ -10,7 +10,9 @@ root_dir = os.getcwd()
 
 class FilePaths:
     def __init__(self) -> None:
-        model_name = "pytorch_model_566-ccd1cb311c368b5711dd238d2464c615397a3f2b"
+        # Upstream 566 fine-tuned for complete time signatures and printed accidentals,
+        # released on the fork (see download_weights in homr/main.py)
+        model_name = "pytorch_model_meteracc-r2s7-afae0e3"
         self.encoder_path = os.path.join(
             workspace,
             f"encoder_{model_name}.onnx",

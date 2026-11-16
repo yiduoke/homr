@@ -396,12 +396,16 @@ def get_all_image_files_in_folder(folder: str) -> list[str]:
 
 def download_weights(segnet_use_gpu: bool, transformer_use_gpu: bool, coreml_encoder: bool) -> None:
     base_url = "https://github.com/liebharc/homr/releases/download/onnx_checkpoints/"
-    # The fork's own fine-tuned models (pytorch_model_octave-*) are on the fork's release,
-    # upstream models (like 566) on upstream's.
-    if "pytorch_model_octave" in default_config.filepaths.decoder_path:
-        transformer_url = "https://github.com/yiduoke/homr/releases/download/octave_checkpoints/"
-    else:
-        transformer_url = base_url
+    # The fork's own fine-tuned models are on the fork's releases, upstream models (like 566)
+    # on upstream's.
+    fork_releases = {
+        "pytorch_model_octave": "octave_checkpoints",
+        "pytorch_model_meteracc": "meteracc_checkpoints",
+    }
+    transformer_url = base_url
+    for prefix, release in fork_releases.items():
+        if prefix in default_config.filepaths.decoder_path:
+            transformer_url = f"https://github.com/yiduoke/homr/releases/download/{release}/"
     models = [segnet_path_onnx_fp16 if segnet_use_gpu else segnet_path_onnx]
     if transformer_use_gpu:
         # CUDA runs the whole transformer on the fp16 models.
