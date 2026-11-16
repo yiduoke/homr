@@ -1,6 +1,8 @@
 import itertools
 import math
 import os
+from concurrent.futures import Future
+from dataclasses import dataclass
 
 import cv2
 import numpy as np
@@ -13,7 +15,7 @@ from homr.octave_bracket_rows import find_dashed_line_rows, find_top_of_content
 from homr.point_mapping import PointMapping, chain, identity, undo_crop, undo_resize
 from homr.simple_logging import eprint
 from homr.staff_dewarping import StaffDewarping, dewarp_staff_image
-from homr.staff_parsing_tromr import parse_staff_tromr
+from homr.staff_parsing_tromr import finish_parse_staff_tromr, start_parse_staff_tromr
 from homr.staff_regions import StaffRegions
 from homr.system_repair import _layout
 from homr.transformer.configs import Config, default_config
@@ -276,7 +278,20 @@ def _get_symbol_center(symbol: EncodedSymbol) -> tuple[float, float] | None:
     return float(center[0]), float(center[1])
 
 
-def parse_staff_image(
+@dataclass
+class StartedStaff:
+    """A staff whose image is prepared and whose transformer inference is running."""
+
+    index: int
+    debug: Debug
+    staff: Staff
+    staff_image: NDArray
+    staff_to_page: PointMapping
+    page_to_input_image: PointMapping
+    future: "Future[list[EncodedSymbol]]"
+
+
+def start_parse_staff_image(
     debug: Debug,
     index: int,
     staff: Staff,
@@ -284,16 +299,24 @@ def parse_staff_image(
     regions: StaffRegions,
     config: Config,
     page_to_input_image: PointMapping = identity,
-) -> list[EncodedSymbol]:
+) -> StartedStaff:
     staff_image, transformed_staff, staff_to_page = prepare_staff_image(
         debug, index, staff, image, regions=regions
     )
     eprint("Running TrOmr inference on staff image", index)
-    result = parse_staff_tromr(staff_image=staff_image, staff=transformed_staff, config=config)
+    future = start_parse_staff_tromr(transformed_staff, staff_image, config)
+    return StartedStaff(
+        index, debug, transformed_staff, staff_image, staff_to_page, page_to_input_image, future
+    )
+
+
+def finish_parse_staff_image(started: StartedStaff) -> list[EncodedSymbol]:
+    debug, staff_image = started.debug, started.staff_image
+    result = finish_parse_staff_tromr(started.staff, started.future.result())
     for symbol in result:
         center = _get_symbol_center(symbol)
         if center is not None:
-            symbol.image_coordinates = page_to_input_image(staff_to_page(center))
+            symbol.image_coordinates = started.page_to_input_image(started.staff_to_page(center))
     if debug.debug:
         result_image = staff_image.copy()
         for i, symbol in enumerate(result):
@@ -312,8 +335,23 @@ def parse_staff_image(
                 1,
             )
 
-        debug.write_image_with_fixed_suffix(f"_staff-{index}_output.jpg", result_image)
+        debug.write_image_with_fixed_suffix(f"_staff-{started.index}_output.jpg", result_image)
     return result
+
+
+def parse_staff_image(
+    debug: Debug,
+    index: int,
+    staff: Staff,
+    image: NDArray,
+    regions: StaffRegions,
+    config: Config,
+    page_to_input_image: PointMapping = identity,
+) -> list[EncodedSymbol]:
+    started = start_parse_staff_image(
+        debug, index, staff, image, regions, config, page_to_input_image
+    )
+    return finish_parse_staff_image(started)
 
 
 def _slots_in_layout(row: tuple[bool, ...], layout: tuple[bool, ...]) -> tuple[int, ...] | None:
@@ -407,6 +445,8 @@ def parse_staffs(
     i = 0
     results: dict[tuple[int, int], list[EncodedSymbol]] = {}
     regions = StaffRegions(staffs)
+    # The inference of a staff runs in the background while the next staff is prepared
+    started: list[tuple[tuple[int, int], int, StartedStaff]] = []
     for voice in range(number_of_voices):
         for staff_index, row in enumerate(staffs):
             if voice not in parts[staff_index]:
@@ -416,14 +456,22 @@ def parse_staffs(
                 i += 1
                 continue
             staff = row.staffs[parts[staff_index].index(voice)]
-            result_staff = parse_staff_image(
-                debug, i, staff, image, regions, config, page_to_input_image
+            started.append(
+                (
+                    (staff_index, voice),
+                    i,
+                    start_parse_staff_image(
+                        debug, i, staff, image, regions, config, page_to_input_image
+                    ),
+                )
             )
             i += 1
-            if len(result_staff) == 0:
-                eprint("Skipping empty staff", i - 1)
-                continue
-            results[(staff_index, voice)] = result_staff
+    for key, index, started_staff in started:
+        result_staff = finish_parse_staff_image(started_staff)
+        if len(result_staff) == 0:
+            eprint("Skipping empty staff", index)
+            continue
+        results[key] = result_staff
 
     voices = []
     for voice in range(number_of_voices):

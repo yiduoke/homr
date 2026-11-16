@@ -48,6 +48,13 @@ class ScoreDecoder:
             "attention",
         ]
 
+    def clone(self) -> "ScoreDecoder":
+        """
+        A decoder with its own IO binding on the same session, so that several
+        threads can decode different staffs at the same time.
+        """
+        return ScoreDecoder(self.net, self.fp16, self.use_gpu, self.config, self.ignore_index)
+
     def generate(
         self,
         start_tokens: NDArray,
@@ -221,7 +228,11 @@ def get_decoder(config: Config) -> ScoreDecoder:
             fp16 = True
 
     else:
-        onnx_transformer = ort.InferenceSession(config.filepaths.decoder_path)
+        # A decoding step is too small to profit from several threads (one thread is
+        # faster than ten), so the staffs are decoded in parallel instead, see Staff2Score.
+        options = ort.SessionOptions()
+        options.intra_op_num_threads = 1
+        onnx_transformer = ort.InferenceSession(config.filepaths.decoder_path, options)
         fp16 = False
 
     return ScoreDecoder(onnx_transformer, fp16, use_gpu, config=config)
