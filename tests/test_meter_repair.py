@@ -49,19 +49,14 @@ def test_carried_meter_which_fits_nothing_is_replaced_by_the_length_of_the_bars(
 def test_the_meter_returns_after_the_misfit_bars() -> None:
     odd = _bar("4", "4", "4")
     usual = _bar("4", "4", "4", "4")
-    xml, memory = _write(odd * 3 + usual * 2, "timeSignature_4/4")
+    xml, memory = _write(odd * 4 + usual * 2, "timeSignature_4/4")
 
-    assert _meters(xml) == [(1, "3/4"), (4, "4/4")]
+    assert _meters(xml) == [(1, "3/4"), (5, "4/4")]
     assert memory.part(0).token == "timeSignature_4/4"
 
 
-def test_two_odd_bars_keep_the_carried_meter() -> None:
-    lines = (
-        _bar("4", "4", "4", "4")
-        + _bar("4", "4", "4")
-        + _bar("4", "4", "4")
-        + _bar("4", "4", "4", "4")
-    )
+def test_three_odd_bars_keep_the_carried_meter() -> None:
+    lines = _bar("4", "4", "4", "4") + _bar("4", "4", "4") * 3 + _bar("4", "4", "4", "4")
 
     xml, _ = _write(lines, "timeSignature_4/4")
 
@@ -104,3 +99,10 @@ def test_part_time_signature_is_unchanged_without_misfit() -> None:
 
     assert isinstance(memory.part(0), PartTimeSignature)
     assert memory.part(0).token == "timeSignature_4/4"
+
+
+def test_a_length_which_needs_another_denominator_keeps_the_meter() -> None:
+    # Bars of 9/8 under 4/4 are more likely misread tuplets than a change of meter
+    xml, _ = _write(_bar("8", "8", "8", "8", "8", "8", "8", "8", "8") * 5, "timeSignature_4/4")
+
+    assert _meters(xml) == [(1, "4/4")]

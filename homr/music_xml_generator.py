@@ -410,7 +410,7 @@ def build_measures(
 
 
 # Bars in a row which don't fit the meter in force but have the same length
-min_misfit_bars = 3
+min_misfit_bars = 4
 
 
 def _meter_of(time: ET.Element) -> tuple[int, int] | None:
@@ -453,11 +453,13 @@ def _content_length(measure: ET.Element, division: int) -> Fraction | None:
 
 
 def _meter_for_length(length: Fraction, in_force: tuple[int, int]) -> tuple[int, int] | None:
-    """The meter of the length, with the denominator of the one in force first."""
-    for beat_type in (in_force[1], 4, 8, 2, 16):
-        beats = length * beat_type
-        if beats.denominator == 1 and 0 < beats <= max_beats_of_guessed_meter:
-            return int(beats), beat_type
+    """
+    The meter of the length with the denominator of the one in force. A length which needs
+    another denominator is more likely a misread tuplet than another meter.
+    """
+    beats = length * in_force[1]
+    if beats.denominator == 1 and 0 < beats <= max_beats_of_guessed_meter:
+        return int(beats), in_force[1]
     return None
 
 
