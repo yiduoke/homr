@@ -544,6 +544,19 @@ sets relabeled with beams at round 3's exposure. Hard PDMX, ASAP and Scriabin wa
 separate harder-data experiment. Control lists (same lines, old `timeSignature/<den>`
 tokens) are built too, in case a control run is wanted.
 
+**Run 1 result (2026-11-15 evening; details `run/EXPERIMENTS.md` R1, `run/eval_run1/`)**:
+trained 2 epochs (~1 h); control run with identical data and settings but old tokens.
+Notes (full-match F1, 566 / control / run 1): Mazeppa 34.8/33.6/35.8, Campanella
+68.0/66.7/69.9, Rachmaninoff 57.8/59.0/58.9, Bach prelude 91.4/90.9/90.0, fugue
+86.0/82.4/82.4, K. 331 99.6 all, K. 309 96.9/95.8/95.5, Pathetique 97.0/96.5/97.0.
+The meter change itself is neutral to positive (run 1 vs control); the fine-tune recipe
+costs up to 3.6 points on classical pieces (control vs 566) - check the mix before run 2.
+Meter: run 1 writes C/cut C and full numerators (Pathetique 4/6 exact, 566 0/6; changes
+5/5). Weakness: a misread is carried (Mazeppa 2/4 read as 3/4 at m129): bars in the right
+meter 60% vs 82% for 566, which re-guesses per page. Ideas: drop a carried meter when
+several bars in a row don't fit it; more meter-change data. The references hold only 18
+printed signatures: the owner's meter test set (due Wed 18 Nov) decides.
+
 **Order of work**: P1-P5 and the label audits (helpers, on the box) -> run-1 code +
 tests -> regenerate run-1 tokens -> train run 1 -> evaluate -> run-2 code + tests ->
 regenerate run-2 tokens -> train run 2 -> evaluate. Every result goes into
