@@ -616,6 +616,18 @@ Seed repeat R2s7 (FT_SEED=7) reproduces it: mean notes F1 80.1 for both runs (56
 sounding pitch 99.0%; single pieces vary up to ~1.8 points between identical runs, so judge
 changes on two runs. Mazeppa stays ~1 point below 566 in both runs.
 
+**Fix plan agreed with the owner (2026-11-16), from the timing and pitch audits**:
+
+| Problem (audit share) | Fix | Kind |
+|---|---|---|
+| Tuplets (64% of timing errors) | Run 3: printed tuplet numbers; then a bar-fill repair for unmarked tuplets using the meter | training + code |
+| Ossia staves (part of 35% layout loss; Mazeppa p. 11) | Ossias are alternatives (owner): drop them per page before joining, not after | code (branch `layout`) |
+| Four-staff piano systems become a spurious third part (Rachmaninoff p. 5, ~290 extras) | Merge the extra staves into the two hands | code (branch `layout`) |
+| Bach "wrong staff" (11% of pitch errors) | Not a reading error: the model writes notes on the printed staff, the reference files them by voice across staves. Add staff-agnostic scores | scoring |
+| Octave brackets missed (11%; La Campanella 229 of 293) | First measure the released model on the 322-bracket test set (round 3: 244, 566: 180); then an octave round on the released model, or a writer fix if brackets are read but lost | training or code |
+| Meter misread carried (Pathetique 60%, Mazeppa) | Drop a carried meter when several bars in a row don't fit it | code |
+| Missing chord notes, accidentals | General reading quality: more varied and real-scan training data | training, later |
+
 **Run 3 plan: printed tuplet numbers (agreed with the owner 2026-11-16)**. Today a tuplet is
 only its resulting duration (`note_12` = triplet eighth); the printed number is not in the
 labels, so the model ignores it (Pathetique 6 and 7). Same principle as run 2: the model reads
