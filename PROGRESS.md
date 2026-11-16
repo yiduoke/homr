@@ -526,6 +526,9 @@ Keep tuplet changes, harder-data reweighting, octave experiments and RL out of b
     differs from the printed sign on 24-48% of notes with a lift (mostly key-signature
     alterations with no printed sign). Bugs to fix in run 2, not run 1: printed `##`/`bb`
     become "none"; `strip_naturals` removes every printed natural.
+- Asked upstream why run 79 switched to sounding alterations (owner approved;
+  https://github.com/liebharc/homr/discussions/226, 2026-11-15). Check for an answer
+  before training run 2.
 - Decoding: after the model, compute sounding pitch from key signature, accidentals
   carried within the bar (per staff and octave), and ties across bar lines; write both
   `<alter>` and `<accidental>` to MusicXML.
