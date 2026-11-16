@@ -527,8 +527,13 @@ Keep tuplet changes, harder-data reweighting, octave experiments and RL out of b
     alterations with no printed sign). Bugs to fix in run 2, not run 1: printed `##`/`bb`
     become "none"; `strip_naturals` removes every printed natural.
 - Asked upstream why run 79 switched to sounding alterations (owner approved;
-  https://github.com/liebharc/homr/discussions/226, 2026-11-15). Check for an answer
-  before training run 2.
+  https://github.com/liebharc/homr/discussions/226, 2026-11-15). Answer (liebharc,
+  2026-11-15 11:10 pm Pacific): switched "because it's simpler" - the training data and
+  homr's MusicXML use sounding alterations, and the transformer learns the carry rules
+  itself; a branch predicting staff positions instead of pitches added code without
+  improving accuracy. So judge run 2 on printed signs (a new output) with no loss in
+  sounding accuracy; if sounding accuracy drops, keep sounding labels and add printed
+  signs as a separate output instead.
 - Decoding: after the model, compute sounding pitch from key signature, accidentals
   carried within the bar (per staff and octave), and ties across bar lines; write both
   `<alter>` and `<accidental>` to MusicXML.
