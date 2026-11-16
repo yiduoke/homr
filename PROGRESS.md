@@ -628,6 +628,28 @@ changes on two runs. Mazeppa stays ~1 point below 566 in both runs.
 | Meter misread carried (Pathetique 60%, Mazeppa) | Drop a carried meter when several bars in a row don't fit it | code |
 | Missing chord notes, accidentals | General reading quality: more varied and real-scan training data | training, later |
 
+**Status of the fix plan (2026-11-16 afternoon)**:
+- Code fixes done on branch `layout` (yiduoke/homr, head 4299394, pushed; not merged): ossia drop
+  (`homr/system_repair.py`), four-staff piano merge (`homr/piano_staffs.py`), meter carry
+  replacement after 4 misfit bars in the same denominator (`_repair_meter`), `score_notes.py
+  --ignore-staff`. Full-match F1 vs run2s7: Rachmaninoff 61.7 -> 88.9 (bars 62/69 -> 62/62),
+  Mazeppa 33.6 -> 37.8 (p. 11 scorable again, p. 16 42.9 -> 76.7), all other pieces identical.
+  Rachmaninoff p. 1 "89.4 -> 86.9" is a scoring artefact (output byte-identical; the baseline used
+  per-staff alignment because of the spurious parts); like-for-like both staves 74.8 -> 89.8.
+  Known risk: a four-staff SATB/quartet system with G G F F clefs would be merged. The meter rule is
+  deliberately strict (looser versions turned misread tuplets into 9/8, 13/16), so Pathetique's
+  missed changes wait for run 3. Outputs `run/eval_run1/layout/`.
+- Octave brackets measured (`run/eval_run1/brackets_released.md`): released model 254 found / 13
+  false with bracket-aware cutting (round 3 244/14, 566 180/8); 238/4 with upstream cutting. La
+  Campanella's octave errors are reading errors of bracket extent/continuation (bar 13 start+stop
+  in one bar; bar 86 continuation missed) plus 33 false lower-staff starts. Scorer cache bug: page
+  basenames collide between the Chopin and Campanella side sets (not the 322 scans).
+- Real-scan test set (`run/test_set_plan.md`, swaps agreed with the owner for virtuosity): first
+  five scored in `run/out/testset/` (full-match F1 ours/566: Chopin Op. 10/4 92.9/86.9, Prokofiev
+  Toccata 81.5/43.8, Scherzo 3 88.8/85.0, Schumann Toccata 80.9/80.4, Islamey 54.3/51.0). 25 more
+  scans in `run/scores/testset/` (Shostakovich Op. 87 in `private/`: non-PD in US/EU/Canada, not
+  redistributed). Every test piece must be added to all training exclusion lists before the next run.
+
 **Run 3 plan: printed tuplet numbers (agreed with the owner 2026-11-16)**. Today a tuplet is
 only its resulting duration (`note_12` = triplet eighth); the printed number is not in the
 labels, so the model ignores it (Pathetique 6 and 7). Same principle as run 2: the model reads
