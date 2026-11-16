@@ -18,7 +18,8 @@ signatures and printed accidentals - and compute meaning in code, (2) evaluate e
 with a control run, seed repeats and a frozen pipeline, and (3) show where the remaining loss
 is: 64% of notes with correct pitch but wrong timing are tuplets, mostly unmarked in print.
 The released model beats 566 on 7 of 9 scored pieces (mean notes F1 80.1 vs 78.9 on the eight
-older references) and writes printed signs that 566 cannot.
+older references) and writes printed signs that 566 cannot. Missing notes and timing errors (mostly tuplets) remain
+the main loss.
 
 ## 2. Contributions
 
@@ -98,7 +99,10 @@ Notes fully right (pitch + onset + duration F1, %):
 (*Copista slightly ahead on K. 309. Other engines were run with their own page handling and our
 joiner; LEGATO and rokot-omr-2b scored lower, see EXPERIMENTS E4.)
 
-- Notes sounding right (on notes matched by position): 99.0% vs 97.2% for 566.
+- Accidental correctness on matched notes only (same letter, octave and onset as the
+  reference): 99.0% vs 97.2% for 566. This excludes missed, extra and mistimed notes (e.g.
+  Mazeppa: 1,414 of 7,213 reference notes matched), so it is not transcription accuracy;
+  that is "notes fully right" above. Never quote the 99% without this qualifier.
 - Printed accidentals (pooled over the eight older pieces; 566 writes none): sharp 92.1,
   flat 92.0, natural 88.3, double sharp 94.9, no sign 98.7 F1. Remaining errors are partly
   reference issues (cautionary naturals in K. 309, La Campanella).
