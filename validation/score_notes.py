@@ -174,8 +174,8 @@ def parse_musicxml(xml: str) -> Score:
     return Score(combined, staff_offset)
 
 
-def _inventory(notes: tuple[Note, ...]) -> Counter[tuple[int, float]]:
-    return Counter((note.staff, note.pitch) for note in notes)
+def _inventory(notes: tuple[Note, ...], ignore_staff: bool = False) -> Counter[tuple[int, float]]:
+    return Counter((0 if ignore_staff else note.staff, note.pitch) for note in notes)
 
 
 def _staff_bars(score: Score) -> list[tuple[Measure, ...]]:
@@ -190,17 +190,19 @@ def _staff_bars(score: Score) -> list[tuple[Measure, ...]]:
     ]
 
 
-def align_measures(reference: Score, prediction: Score) -> list[tuple[int, int]]:
+def align_measures(
+    reference: Score, prediction: Score, ignore_staff: bool = False
+) -> list[tuple[int, int]]:
     """Joint monotonic alignment for all staves, maximizing pitch inventory overlap.
 
     Ties prefer fewer skipped bars, then a diagonal match. Every note in a skipped
     bar remains in the precision/recall denominators. Alignment is heuristic, not
     ground truth; the report exposes all pairs for review.
     """
-    if reference.staves != prediction.staves:
+    if reference.staves != prediction.staves and not ignore_staff:
         raise ValueError("Reference and prediction must have the same staff layout")
-    ref = [_inventory(m.notes) for m in reference.measures]
-    pred = [_inventory(m.notes) for m in prediction.measures]
+    ref = [_inventory(m.notes, ignore_staff) for m in reference.measures]
+    pred = [_inventory(m.notes, ignore_staff) for m in prediction.measures]
     n, m = len(ref), len(pred)
     costs = [[(0, 0)] * (m + 1) for _ in range(n + 1)]
     paths = [[0] * (m + 1) for _ in range(n + 1)]
@@ -231,16 +233,22 @@ def align_measures(reference: Score, prediction: Score) -> list[tuple[int, int]]
 
 
 def count_matches(
-    reference: tuple[Note, ...], prediction: tuple[Note, ...], metric: Metric, tolerance: float
+    reference: tuple[Note, ...],
+    prediction: tuple[Note, ...],
+    metric: Metric,
+    tolerance: float,
+    ignore_staff: bool = False,
 ) -> int:
     """Maximum one-to-one matching; a prediction can never explain two notes."""
     if metric == "pitch_inventory":
-        return sum((_inventory(reference) & _inventory(prediction)).values())
+        return sum(
+            (_inventory(reference, ignore_staff) & _inventory(prediction, ignore_staff)).values()
+        )
     edges = [
         [
             j
             for j, actual in enumerate(prediction)
-            if expected.staff == actual.staff
+            if (ignore_staff or expected.staff == actual.staff)
             and expected.pitch == actual.pitch
             and expected.grace == actual.grace
             and abs(expected.onset - actual.onset) <= tolerance + 1e-9
@@ -395,6 +403,44 @@ def score_notes(reference: Score, prediction: Score, tolerance: float = DEFAULT_
     }
 
 
+def score_notes_ignoring_staff(
+    reference: Score, prediction: Score, tolerance: float = DEFAULT_TOLERANCE
+) -> dict:
+    """
+    Scores with the staff of a note ignored: within an aligned bar, a note matches a note of any
+    staff. The staff of a note then doesn't matter, e.g. where a reference files the notes of a
+    voice by voice across staves and a prediction by the printed staff. The bars are aligned by
+    pitch inventory over all staves. Needs one bar list for the score (parts with equal bar
+    counts), else there is no shared bar index and the result is None.
+    """
+    if not math.isfinite(tolerance) or tolerance < 0:
+        raise ValueError("Timing tolerance must be finite and nonnegative")
+    if reference.staff_measures or prediction.staff_measures:
+        return {"alignment_mode": "per_staff", "metrics": None}
+    pairs = align_measures(reference, prediction, ignore_staff=True)
+    metrics = {}
+    for metric in METRICS:
+        matched = sum(
+            count_matches(
+                reference.measures[i].notes, prediction.measures[j].notes, metric, tolerance, True
+            )
+            for i, j in pairs
+        )
+        total = Counts(
+            matched,
+            sum(len(m.notes) for m in reference.measures),
+            sum(len(m.notes) for m in prediction.measures),
+        )
+        metrics[metric] = {"combined": total.report()}
+    return {
+        "alignment_mode": "joint",
+        "reference_measures": len(reference.measures),
+        "predicted_measures": len(prediction.measures),
+        "matched_measures": len(pairs),
+        "metrics": metrics,
+    }
+
+
 def _score_per_staff(reference: Score, prediction: Score, tolerance: float) -> dict:
     """Align each staff to the reference on its own (same DP as align_measures)."""
     if reference.staves != prediction.staves:
@@ -479,6 +525,12 @@ def main() -> None:
     parser.add_argument("predictions", nargs="+", metavar="NAME=FILE.musicxml")
     parser.add_argument("--tolerance", type=float, default=DEFAULT_TOLERANCE, metavar="QUARTERS")
     parser.add_argument(
+        "--ignore-staff",
+        action="store_true",
+        help="Also score with the staff of each note ignored (matches within an aligned bar "
+        "across staves); adds a staff_agnostic entry to each result",
+    )
+    parser.add_argument(
         "--json", type=Path, dest="json_path", help="Write counts and bar alignments"
     )
     args = parser.parse_args()
@@ -493,13 +545,16 @@ def main() -> None:
             path = Path(filename)
             prediction, metadata = _read_score(path)
             input_paths.add(path.resolve())
-            results.append(
-                {
-                    "name": name,
-                    "input": metadata,
-                    **score_notes(reference, prediction, args.tolerance),
-                }
-            )
+            result = {
+                "name": name,
+                "input": metadata,
+                **score_notes(reference, prediction, args.tolerance),
+            }
+            if args.ignore_staff:
+                result["staff_agnostic"] = score_notes_ignoring_staff(
+                    reference, prediction, args.tolerance
+                )
+            results.append(result)
         if args.json_path and args.json_path.resolve() in input_paths:
             raise ValueError("JSON output must not overwrite an input score")
         report = {"schema_version": 1, "reference": ref_metadata, "results": results}
@@ -525,6 +580,12 @@ def main() -> None:
             f"{strict['unmatched_prediction']} unmatched prediction; "
             f"precision {strict['precision']:.2%}, recall {strict['recall']:.2%}\n"
         )
+        agnostic = result.get("staff_agnostic")
+        if agnostic is not None and agnostic["metrics"] is not None:
+            values = [f"{100 * agnostic['metrics'][m]['combined']['f1']:.2f}" for m in METRICS]
+            sys.stdout.write("  Staff ignored:\t" + "\t".join(values) + "\n")
+        elif agnostic is not None:
+            sys.stdout.write("  Staff ignored: not defined, the parts have different bar counts\n")
 
 
 if __name__ == "__main__":
