@@ -20,7 +20,7 @@ Environment: FT_EPOCHS (6), FT_LR (5e-5), FT_BATCH (32), FT_MAX_FILES (-1 = all)
 FT_CKPT, FT_OLD_VOCAB, FT_RESUME (checkpoint folder name inside current_training),
 FT_DATASETS (comma-separated substrings of index paths, for smoke tests), FT_EVAL_ONLY,
 FT_INIT (safetensors to continue from), FT_TRAIN_INDEX / FT_VAL_INDEX (prebuilt lists),
-FT_NAME (output file prefix),
+FT_NAME (output file prefix), FT_SEED (42; also seeds re-initialised heads),
 FT_RESET_LIFT (1: start the lift head again, for a checkpoint whose lift was the sounding
 alteration; see lift_reset.py).
 """
@@ -156,6 +156,7 @@ def main() -> None:
         train_index = base.load_and_mix_training_sets(indexes, [1.0] * len(indexes), max_files)
         datasets = load_dataset(train_index, config, val_split=0.1)
 
+    torch.manual_seed(int(os.environ.get("FT_SEED", "42")))
     model = TrOMR(config)
     init = os.environ.get("FT_INIT", "")
     if init:
@@ -177,6 +178,8 @@ def main() -> None:
         # Data loading (augmentation on the CPU) is the bottleneck here, not the GPU,
         # so compiling buys nothing and is one more thing to fail unattended.
         torch_compile=os.environ.get("FT_COMPILE", "0") == "1",
+        # Repeats of a run with another FT_SEED show how much results vary by chance
+        seed=int(os.environ.get("FT_SEED", "42")),
         eval_strategy="epoch",
         save_strategy="epoch",
         save_total_limit=3,
