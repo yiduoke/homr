@@ -14,6 +14,7 @@ from homr.accidentals import NATURAL, SIGN_TO_MUSIC_XML, AccidentalState
 from homr.simple_logging import eprint
 from homr.transformer.vocabulary import (
     OCTAVE_SHIFT_STOP,
+    TIME_SIGNATURE_PREFIX,
     EncodedSymbol,
     SymbolDuration,
     empty,
@@ -400,9 +401,149 @@ def build_measures(
             ET.SubElement(time_el, "beats").text = str(beats)
             ET.SubElement(time_el, "beat-type").text = "4"
         _insert_time_element(first_attributes, time_el)
+    final_token = _repair_meter(measures, state.division)
+    if final_token is not None:
+        state.time_token = final_token
     if state.time_token is not None:
         time_signature.token = state.time_token
     return measures
+
+
+# Bars in a row which don't fit the meter in force but have the same length
+min_misfit_bars = 3
+
+
+def _meter_of(time: ET.Element) -> tuple[int, int] | None:
+    try:
+        return int(time.findtext("beats", "")), int(time.findtext("beat-type", ""))
+    except ValueError:
+        return None
+
+
+def _meters_in_force(measures: list[ET.Element]) -> list[tuple[int, int] | None]:
+    result: list[tuple[int, int] | None] = []
+    current: tuple[int, int] | None = None
+    for measure in measures:
+        for time in measure.iter("time"):
+            current = _meter_of(time) or current
+        result.append(current)
+    return result
+
+
+def _content_length(measure: ET.Element, division: int) -> Fraction | None:
+    """
+    The length of what the measure holds in whole notes, None if there are only rests which fill
+    the measure, as their length is that of the meter in force.
+    """
+    cursor = longest = 0
+    only_measure_rests = True
+    for child in measure:
+        duration = int(child.findtext("duration", "0"))
+        if child.tag == "note":
+            if child.find("rest[@measure]") is None:
+                only_measure_rests = False
+            if child.find("chord") is None:
+                cursor += duration
+        elif child.tag == "forward":
+            cursor += duration
+        elif child.tag == "backup":
+            cursor -= duration
+        longest = max(longest, cursor)
+    return None if only_measure_rests else Fraction(longest, division)
+
+
+def _meter_for_length(length: Fraction, in_force: tuple[int, int]) -> tuple[int, int] | None:
+    """The meter of the length, with the denominator of the one in force first."""
+    for beat_type in (in_force[1], 4, 8, 2, 16):
+        beats = length * beat_type
+        if beats.denominator == 1 and 0 < beats <= max_beats_of_guessed_meter:
+            return int(beats), beat_type
+    return None
+
+
+max_beats_of_guessed_meter = 16
+
+
+def _set_meter(measure: ET.Element, beats: int, beat_type: int) -> None:
+    attributes = measure.find("attributes")
+    if attributes is None:
+        attributes = ET.Element("attributes")
+        measure.insert(0, attributes)
+    for time in attributes.findall("time"):
+        attributes.remove(time)
+    time = ET.Element("time")
+    ET.SubElement(time, "beats").text = str(beats)
+    ET.SubElement(time, "beat-type").text = str(beat_type)
+    _insert_time_element(attributes, time)
+
+
+def _remove_meter(measure: ET.Element) -> None:
+    for attributes in measure.findall("attributes"):
+        for time in attributes.findall("time"):
+            attributes.remove(time)
+
+
+def _fill_measure_rests(measure: ET.Element, duration: int) -> None:
+    for child in measure:
+        if child.tag == "backup" or (
+            child.tag == "note" and child.find("rest[@measure]") is not None
+        ):
+            duration_element = child.find("duration")
+            if duration_element is not None:
+                duration_element.text = str(duration)
+
+
+def _repair_meter(measures: list[ET.Element], division: int) -> str | None:
+    """
+    Drops a misread time signature which is carried over many bars. If several bars in a row
+    have the same length, but it is not the one of the meter in force, they are written in the
+    meter of that length instead, as the duration based guess (find_division_and_time_signature_
+    nominators) would give. The meter in force before returns after the run, if the next bar fits
+    it. A recognised signature stays where the bars fit it. Returns the token of the meter in
+    force at the end if it changed, else None.
+    """
+    in_force = _meters_in_force(measures)
+    lengths = [_content_length(measure, division) for measure in measures]
+
+    def misfit(i: int) -> bool:
+        meter = in_force[i]
+        return lengths[i] is not None and meter is not None and lengths[i] != Fraction(*meter)
+
+    i = 0
+    while i < len(measures):
+        if not misfit(i):
+            i += 1
+            continue
+        end = i
+        # The run continues over bars of the same length, and over bars with only rests
+        while end + 1 < len(measures) and (
+            lengths[end + 1] is None or (misfit(end + 1) and lengths[end + 1] == lengths[i])
+        ):
+            end += 1
+        while lengths[end] is None:
+            end -= 1
+        length, before = lengths[i], in_force[i]
+        meter = _meter_for_length(length, before) if length is not None and before else None
+        if end - i + 1 >= min_misfit_bars and meter is not None and length is not None:
+            eprint("Bars", i + 1, "to", end + 1, "don't fit the time signature, using", meter)
+            for k in range(i, end + 1):
+                _remove_meter(measures[k])
+                if lengths[k] is None:
+                    _fill_measure_rests(measures[k], int(length * division))
+            _set_meter(measures[i], *meter)
+            following = end + 1
+            original = in_force[following] if following < len(measures) else None
+            if (
+                original is not None
+                and measures[following].find("attributes/time") is None
+                and lengths[following] in (None, Fraction(*original))
+            ):
+                _set_meter(measures[following], *original)
+        i = end + 1
+    final = _meters_in_force(measures)[-1] if measures else None
+    if final is None or final == in_force[-1]:
+        return None
+    return f"{TIME_SIGNATURE_PREFIX}{final[0]}/{final[1]}"
 
 
 class GroupClock:
