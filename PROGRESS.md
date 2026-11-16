@@ -48,6 +48,15 @@ in. The main goal is now general note accuracy on 566 (see "Next"); octave round
 - Reference fixes needed (found by the run-2 diagnosis, `run/eval_run1/run2_diagnosis.md`):
   K. 309 printed reference misses cautionary naturals from m32; La Campanella printed signs
   have errors both ways; Mazeppa p. 14 bar 136.
+- Timing audit (2026-11-16, `run/eval_run1/timing_audit.md`): of notes with the right pitch
+  but wrong timing, 64% are tuplets (mostly unnumbered beamed groups), 17% bar length / meter
+  (cadenza-like bars, one Mazeppa meter misread), 9% voices and rests. Validation staffs are
+  99.2% fully right and contain only 2.5% tuplet notes. Tuplets are the next target: first a
+  post-decoding repair (a voice that overfills its bar gets its beamed run rescaled as a
+  tuplet, using the recognised meter), then a tuplet token plus training data with many
+  (unnumbered) tuplets.
+- Speed: branch `speed`, merged into `accidentals-run2`: identical output, 1.6x faster on
+  whole pieces under load, ~2.75x on a quiet machine (EXPERIMENTS.md S1).
 - Next candidates (one change per run): fix the training mix (it costs up to 3.6 points on
   classical pieces vs 566); stop carrying a meter that bars don't fit; tuplet token;
   real-scan pairs from KernScores (168 pieces ready to cut); harder data (hard PDMX, ASAP,
