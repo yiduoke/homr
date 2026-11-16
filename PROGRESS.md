@@ -55,6 +55,10 @@ in. The main goal is now general note accuracy on 566 (see "Next"); octave round
   post-decoding repair (a voice that overfills its bar gets its beamed run rescaled as a
   tuplet, using the recognised meter), then a tuplet token plus training data with many
   (unnumbered) tuplets.
+- Chopin Ballade No. 4 reference: MusicXML supplied by the owner (2026-11-16; provenance to
+  record), 96.8% pitch agreement with our PDF; released model 75.5 notes fully right vs 74.2
+  for 566 (EXPERIMENTS "Ballade reference").
+- Paper outline with final numbers: `PAPER_NOTES.md` (keep it current; PROGRESS stays the log).
 - Mazeppa's notation is irregular by design (owner found it, 2026-11-16): Henle's blog
   "Gaps in the notation: Liszt's Mazeppa étude" (Peter Jost, 13 Feb 2023,
   https://blog.henle.de/en/2023/02/13/gaps-in-the-notation-liszts-mazeppa-etude/): in the
@@ -597,6 +601,20 @@ variance plus ~10 notes from one misread key signature (sounding pitch now depen
 Seed repeat R2s7 (FT_SEED=7) reproduces it: mean notes F1 80.1 for both runs (566 78.9),
 sounding pitch 99.0%; single pieces vary up to ~1.8 points between identical runs, so judge
 changes on two runs. Mazeppa stays ~1 point below 566 in both runs.
+
+**Run 3 plan: printed tuplet numbers (agreed with the owner 2026-11-16)**. Today a tuplet is
+only its resulting duration (`note_12` = triplet eighth); the printed number is not in the
+labels, so the model ignores it (Pathetique 6 and 7). Same principle as run 2: the model reads
+what is printed, code computes the meaning. Labels: the written note value plus a tuplet-start
+token carrying the printed number (3, 4, 5, 6, 7, ...) on the group's first note and a
+tuplet-end on its last (like beams); the bracket is optional (edition style) and not a label.
+Code derives the ratio (3:2, 5:4, 6:4, 7:4 ...) from the number, the written values and the
+meter (run 1), and writes MusicXML `<time-modification>` and `<tuplet>`. Only printed numbers
+in this run; unmarked tuplets (most of Mazeppa and the Ballade) are the later bar-fill repair.
+Steps as before: audit numbers drawn in the training images per renderer, code + tests,
+relabel the same images with the same mix, train from the released model (two seeds), evaluate
+(plus printed-tuplet recall/precision). Bonus: ASAP/Scriabin pieces dropped for unencodable
+tuplets become usable.
 
 **Order of work**: P1-P5 and the label audits (helpers, on the box) -> run-1 code +
 tests -> regenerate run-1 tokens -> train run 1 -> evaluate -> run-2 code + tests ->
