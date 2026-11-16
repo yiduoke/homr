@@ -1,10 +1,10 @@
 # About the transformer vocabulary
 
-The vocabulary is closely linked to how the transformer operates. Symbols are divided into several branches. For example, `note_4 D5 # accent _ upper` represents a quarter note with pitch D5, a sharp accidental, and an accent articulation. The branches for each symbol are:
+The vocabulary is closely linked to how the transformer operates. Symbols are divided into several branches. For example, `note_4 D5 # accent _ upper` represents a quarter note with pitch D5, a printed sharp sign, and an accent articulation. The branches for each symbol are:
 
 1. **Rhythm**: covers note durations (including augmentation dots), rests, clefs, key signatures, time signatures, barlines, and general musical symbols such as repeats and dynamics. The term _rhythm_ can therefore be misleading, as it encodes more than just rhythmic values.
 2. **Pitch**: represents absolute pitches (C0–B9).
-3. **Lift**: represents accidentals (sharp, flat, natural, etc.).
+3. **Lift**: the accidental sign printed immediately before the note, see [Lift](#lift).
 4. **Articulation**: represents articulation markings (staccato, accent, trill, etc.).
 5. **Slur**: represents slurs and ties, and beams, see [Beams](#beams).
 6. **Position**: represents staff position for notes, rests, and clefs (upper or lower staff), see [Positions and voices](#positions-and-voices).
@@ -69,3 +69,28 @@ note_16 F5 # _ beamStop_slurStop upper
 note_8 G5 _ accent _ upper
 barline . . . . .
 ```
+
+## Lift
+
+The lift of a note is the accidental sign which is printed immediately before it:
+
+| Lift | Meaning |
+| ---- | ------- |
+| `_`  | no sign is printed |
+| `#`, `##` | sharp, double sharp |
+| `b`, `bb` | flat, double flat |
+| `N`  | natural (including courtesy naturals) |
+| `.`  | not a note |
+
+The lift does not say how the note sounds. In a key with F sharp, a note F4 without sign
+(`F4 _`) sounds F sharp, and `F4 N` is an F natural. A sign counts for the rest of the bar,
+for the same step and octave on the same staff, so the repeated note has no sign again. A
+note which continues a tie from the previous bar has no sign either.
+
+The sounding alteration is derived after the transformer, in `homr/accidentals.py`, which
+the labels for training use as well. MusicXML written by homr has the sounding `<alter>` and
+`<accidental>` for the printed signs.
+
+Until this meaning was introduced (runs up to 566 and the first meter run), the lift was
+the sounding alteration, with printed naturals removed. Models trained with the old meaning
+have different weights for the lift branch.
