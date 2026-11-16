@@ -79,6 +79,9 @@ class BoundingBox(AnyPolygon):
         self.size = (box[2] - box[0], box[3] - box[1])
         self.rotated_box = (self.center, self.size, 0)
         self.size = (box[2] - box[0], box[3] - box[1])
+        # what _can_shapes_possibly_touch needs, calculated once
+        self._touch_center = self.center
+        self._touch_major_axis = max(self.size)
         super().__init__(cv2.boxPoints(self.rotated_box).astype(np.int64))
 
     def draw_onto_image(self, img: NDArray, color: tuple[int, int, int] = (0, 0, 255)) -> None:
@@ -145,6 +148,9 @@ class AngledBoundingBox(AnyPolygon):
             calculate_edges_of_rotated_rectangle(self.box)
         )
         self.polygon = polygon
+        # what _can_shapes_possibly_touch needs, calculated once
+        self._touch_center = self.center
+        self._touch_major_axis = max(self.size)
 
     def is_overlapping(self, other: AnyPolygon) -> bool:
         if not self._can_shapes_possibly_touch(other):
@@ -164,28 +170,18 @@ class AngledBoundingBox(AnyPolygon):
         If this returns True, the two shapes might touch and further checks are necessary.
         """
 
-        # Get the centers and major axes of the rectangles
-        center1, axes1, _ = self.box
-        center2: Sequence[float]
-        axes2: Sequence[float]
-        if isinstance(other, BoundingBox):
-            center2, axes2, _ = (
-                other.rotated_box
-            )  # (variable) rotated_box: tuple[tuple[float, float], tuple[int, int], Literal[0]]
-        elif isinstance(other, AngledBoundingBox):
-            center2, axes2, _ = (
-                other.box
-            )  # (variable) box: tuple[tuple[float, float], tuple[int, int], float]
-        else:
-            raise ValueError(f"Unknown type {type(other)}")
-        major_axis1 = max(axes1)
-        major_axis2 = max(axes2)
+        try:
+            center2 = other._touch_center  # type: ignore[attr-defined]
+            major_axis2 = other._touch_major_axis  # type: ignore[attr-defined]
+        except AttributeError:
+            raise ValueError(f"Unknown type {type(other)}") from None
+        center1 = self._touch_center
 
         # Calculate the distance between the centers
         distance = ((center1[0] - center2[0]) ** 2 + (center1[1] - center2[1]) ** 2) ** 0.5
 
         # If the distance is greater than the sum of the major axes, the rectangles do not overlap
-        if distance > major_axis1 + major_axis2:
+        if distance > self._touch_major_axis + major_axis2:
             return False
         return True
 
@@ -531,10 +527,26 @@ def _merge_groups_optimized(groups: list[list[AngledBoundingBox]]) -> list[list[
     uf = UnionFind(n)
 
     # Try to find overlaps and union groups that overlap
-    for i in range(n):
-        for j in range(i + 1, n):
-            if _do_groups_overlap(groups[i], groups[j]):
-                uf.union(i, j)
+    if all(len(group) == 1 for group in groups):
+        # Most boxes are far away from each other, find the ones which may touch with numpy.
+        # The margin makes the filter lose no pair of _can_shapes_possibly_touch
+        # (which is evaluated on the candidates), so the result stays the same.
+        centers = np.array([group[0]._touch_center for group in groups], dtype=np.float64)
+        majors = np.array([group[0]._touch_major_axis for group in groups], dtype=np.float64)
+        for i in range(n):
+            if i + 1 >= n:
+                break
+            delta = centers[i + 1 :] - centers[i]
+            squared_distance = delta[:, 0] ** 2 + delta[:, 1] ** 2
+            limit = (majors[i + 1 :] + majors[i]) ** 2 * (1 + 1e-9) + 1e-9
+            for j in (np.nonzero(~(squared_distance > limit))[0] + i + 1).tolist():
+                if _do_groups_overlap(groups[i], groups[j]):
+                    uf.union(i, j)
+    else:
+        for i in range(n):
+            for j in range(i + 1, n):
+                if _do_groups_overlap(groups[i], groups[j]):
+                    uf.union(i, j)
 
     # Create merged groups based on the union-find results
     merged_groups: dict[int, list[AngledBoundingBox]] = {}
