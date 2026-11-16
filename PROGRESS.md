@@ -562,6 +562,16 @@ meter 60% vs 82% for 566, which re-guesses per page. Ideas: drop a carried meter
 several bars in a row don't fit it; more meter-change data. The references hold only 18
 printed signatures: the owner's meter test set (due Wed 18 Nov) decides.
 
+**Run 2 result (2026-11-16 ~1 am Pacific; `run/EXPERIMENTS.md` R2, `run/eval_run1/run2_summary.md`)**:
+from run 1, lift head reset, same mix. Notes mean F1 79.3 (566 78.9, run 1 78.6); better on
+Campanella, Rachmaninoff, both Bach; sounding pitch right on 97.8% of matched notes (566 97.2,
+run 1 96.3), so printed labels did not cost sounding accuracy here. Printed signs F1: sharp 86,
+flat 89, natural 83, double sharp 85, none 99 (566 and run 1 write none). Key and meter kept.
+Open: Mazeppa (the only real scan among the references, Soviet edition with many courtesy
+naturals) drops 2.5 points vs run 1 and 1.5 vs 566; K. 309 over-predicts naturals. Check
+whether references or the model are at fault before adopting run 2 (AGENTS.md: real scans
+must not get worse). Single runs: 1-2 point differences may be noise.
+
 **Order of work**: P1-P5 and the label audits (helpers, on the box) -> run-1 code +
 tests -> regenerate run-1 tokens -> train run 1 -> evaluate -> run-2 code + tests ->
 regenerate run-2 tokens -> train run 2 -> evaluate. Every result goes into
