@@ -6,6 +6,7 @@ from homr.system_repair import (
     _common_layout,
     _ensure_same_number_of_staffs,
     _unify_grand_staffs,
+    drop_ossia_staffs,
 )
 from homr.transformer.vocabulary import EncodedSymbol
 from training.transformer.training_vocabulary import read_token_lines
@@ -341,3 +342,46 @@ timeSignature_4/4 . . . . ."""
 
         right_hand = [s.rhythm for s in result if s.position == "upper" and "note" in s.rhythm]
         self.assertEqual(["note_12"] * 9, right_hand)
+
+
+def _sized_staff(number: float, unit: float, is_grandstaff: bool = False) -> Staff:
+    y_points = [unit * i + 100 * number for i in range(5)]
+    staff = Staff([StaffPoint(0.0, y_points, 0)])
+    staff.is_grandstaff = is_grandstaff
+    return staff
+
+
+class TestOssias(unittest.TestCase):
+    def test_drops_small_staff_above_a_system(self) -> None:
+        # Three systems of a grand staff, the third with an ossia above it (7 instead of 10)
+        rows = [MultiStaff([_sized_staff(i, 10, True)], []) for i in range(3)]
+        rows[2] = MultiStaff([_sized_staff(1.5, 7), _sized_staff(2, 10, True)], [], certain=True)
+        rows += [MultiStaff([_sized_staff(i, 10, True)], []) for i in range(3, 6)]
+
+        result = drop_ossia_staffs(rows)
+
+        self.assertEqual([[True]] * 6, _layouts(result))
+        self.assertFalse(result[2].certain)
+
+    def test_drops_small_staff_which_is_a_system_of_its_own(self) -> None:
+        rows = [MultiStaff([_sized_staff(i, 10, True)], []) for i in range(4)]
+        rows.insert(2, MultiStaff([_sized_staff(1.5, 6)], []))
+
+        result = drop_ossia_staffs(rows)
+
+        self.assertEqual(4, len(result))
+
+    def test_keeps_staffs_of_about_the_same_size(self) -> None:
+        rows = [MultiStaff([_sized_staff(i, 10 + i % 2, True)], []) for i in range(5)]
+
+        self.assertEqual(rows, drop_ossia_staffs(rows))
+
+    def test_keeps_small_staffs_if_they_are_not_a_minority(self) -> None:
+        rows = [MultiStaff([_sized_staff(i, 6 if i % 2 else 10)], []) for i in range(6)]
+
+        self.assertEqual(rows, drop_ossia_staffs(rows))
+
+    def test_keeps_a_page_of_two_staffs(self) -> None:
+        rows = [MultiStaff([_sized_staff(0, 10)], []), MultiStaff([_sized_staff(1, 5)], [])]
+
+        self.assertEqual(rows, drop_ossia_staffs(rows))

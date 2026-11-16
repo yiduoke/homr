@@ -383,9 +383,56 @@ def _ensure_same_number_of_staffs(staffs: list[MultiStaff]) -> list[MultiStaff]:
     return repaired if layout is None else _drop_single_staff_at_end(repaired, layout)
 
 
+def _staff_unit_size(staff: Staff) -> float:
+    """
+    The distance of two staff lines, from the first five lines only. The average unit size of a
+    grand staff includes the gap between its staffs.
+    """
+    lines = constants.number_of_lines_on_a_staff
+    return float(np.median([np.mean(np.diff(point.y[:lines])) for point in staff.grid]))
+
+
+# An ossia staff is printed smaller than the staffs of the page: at most this share of the
+# median unit size. Cue and ossia staffs are usually 60 to 75 percent of the normal size.
+ossia_unit_share = 0.78
+# Staffs printed smaller than the others are only ossias if they are a minority on the page
+max_ossia_share = 0.4
+
+
+def drop_ossia_staffs(staffs: list[MultiStaff]) -> list[MultiStaff]:
+    """
+    Removes the ossia staffs of a page. An ossia is a small staff, usually above a system, which
+    offers an alternative to the notes of the main staffs. It is no part of its own and would
+    otherwise become a voice of the system (or a system of its own) with extra bars. A staff is
+    an ossia if its unit size is clearly smaller than the median of the page and fewer than
+    max_ossia_share of the staffs are that small. At least one staff stays.
+    """
+    all_staffs = _flatten_staffs(staffs)
+    if len(all_staffs) < 3:  # noqa: PLR2004
+        return staffs
+    median_unit = float(np.median([_staff_unit_size(staff) for staff in all_staffs]))
+    small = [
+        staff for staff in all_staffs if _staff_unit_size(staff) < ossia_unit_share * median_unit
+    ]
+    if len(small) == 0 or len(small) >= max_ossia_share * len(all_staffs):
+        return staffs
+    small_ids = {id(staff) for staff in small}
+    result: list[MultiStaff] = []
+    for row in staffs:
+        kept = [staff for staff in row.staffs if id(staff) not in small_ids]
+        if len(kept) == len(row.staffs):
+            result.append(row)
+        elif kept:
+            result.append(MultiStaff(kept, row.connections, row.certain and len(kept) > 1))
+    if len(result) == 0:
+        return staffs
+    eprint("Removing", len(small), "small staffs, they are ossias")
+    return result
+
+
 def repair_systems(debug: Debug, staffs: list[MultiStaff]) -> list[MultiStaff]:
     """Repairs the grouping of staffs into systems, see _ensure_same_number_of_staffs."""
-    staffs = _ensure_same_number_of_staffs(staffs)
+    staffs = _ensure_same_number_of_staffs(drop_ossia_staffs(staffs))
     eprint("Systems after the repair of the layout:", [len(staff.staffs) for staff in staffs])
     debug.write_bounding_boxes_alternating_colors("systems", staffs)
     return staffs
