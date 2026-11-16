@@ -139,6 +139,14 @@ number the reader infers from the beat); the model also ignores printed numbers 
 6 and 7). Training-style validation staffs score 99.2% fully right but contain only 2.5% tuplet
 notes, so the gap is the data, not a general timing weakness.
 
+Pitch errors (EXPERIMENTS A2; 4,548 errors): 35% are bars lost to page layout (ossia pages,
+four-staff systems), 14% extra notes, 11% octave errors (mostly under printed 8va brackets the
+model missed: La Campanella 229 of 293), 11% right pitch on the other staff (Bach fugue: voices
+crossing staves; staff-agnostic pitch F1 99.3 vs 87.6, so report staff-agnostic scores too),
+11% whole notes missing, 9% chord members missing, 6% accidentals. So the largest fixes are
+layout handling (staff grouping, joining) and restoring the fork's octave-bracket strength,
+not general note reading.
+
 Mazeppa is irregular by design: in the 1852 version the outer voices lack rests on beats 2
 and 4 from the theme on, which Henle judges intentional (Peter Jost, "Gaps in the notation:
 Liszt's Mazeppa étude", Henle blog, 13 Feb 2023,

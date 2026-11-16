@@ -75,6 +75,13 @@ in. The main goal is now general note accuracy on 566 (see "Next"); octave round
   under C (footnote: move smoothly from triplets to plain eighths). Plan: keep Mazeppa as the
   real-scan test, mark these bars as "free" and report timing with and without them; cite
   this in the paper as an example of why rhythm scoring on Romantic virtuoso music needs care.
+- Pitch audit (2026-11-16, `run/eval_run1/pitch_audit.md`): 35% of pitch errors are bars
+  lost to layout (ossia, four-staff systems), 11% octave (missed 8va brackets: the released
+  model inherits 566's weaker bracket reading; round 3 found far more), 11% staff assignment
+  (Bach fugue, staff-agnostic pitch F1 99.3). Candidate next steps besides tuplets: layout
+  handling, and one octave round on the released model.
+- Real-scan test set plan (draft, owner to edit): `run/test_set_plan.md`; ASAP references for
+  ~25 virtuoso pieces + IMSLP scans; first IMSLP downloads opened for the owner.
 - Speed: branch `speed`, merged into `accidentals-run2`: identical output, 1.6x faster on
   whole pieces under load, ~2.75x on a quiet machine (EXPERIMENTS.md S1).
 - Next candidates (one change per run): fix the training mix (it costs up to 3.6 points on
