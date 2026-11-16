@@ -18,38 +18,39 @@ Upstream has since released model 566 (2026-11-13), which also reads octave brac
 (fewer than ours), reads beams, and is better at notes. Branch `octave-on-566` merges it
 in. The main goal is now general note accuracy on 566 (see "Next"); octave rounds wait.
 
-## State at handoff (2026-11-15, evening UTC)
+## State at handoff (2026-11-16, ~2 am Pacific)
 
-- Running on the GPU box: regenerating training data with 566's converters (with beams).
-  GrandStaff (45,635 staffs), PDMX (199,706) and Lieder (43,149) done; beam tokens
-  present in sampled token files. The hard PDMX subset (complexity 2-3, scored test
-  pieces excluded) failed at 20:00 UTC because MuseScore's logs had filled the disk
-  (31 GB in `/root/.local/share/MuseScore/MuseScore4/logs`); logs deleted, rerun as
-  `r6_hard2.sh` (tmux `r6hard2`, deletes those logs every 5 minutes), status ends with
-  "ALL DONE HARD2". Done at 20:23 UTC: 92,984 staffs in `datasets/pdmx/hard/index.txt`.
-  The main PDMX set (complexity up to 2) and this one (2-3) share the complexity-2
-  pieces; deduplicate before mixing. Also converted: ASAP (5,832 staffs, about 150 pieces)
-  and KernScores Scriabin (1,847 staffs, 149 pieces), test pieces excluded; 62 ASAP and 54
-  Scriabin pieces were dropped because their tuplets or 128th/256th notes don't fit the
-  vocabulary (another reason for the tuplet token). Disk cleaned on 2026-11-15 (PDMX SVG
-  renders and superseded 509-era data deleted): 55% used. Box details and how to check
-  progress: `run/HANDOFF_LOCAL.md` (laptop only).
-- KernScores scan check done: 168 pieces usable (homr recount, 14 dropped; run/EXPERIMENTS.md E3). Not part of the meter and accidental runs (fixed data mix); a separate real-scan round later. Earlier note: usable after filtering (see "Real scans paired with
-  transcriptions" under Next). Running since 20:40 UTC: recount of systems on every scan
-  page with homr's own staff detection on the GPU (tmux `kerncount`,
-  `/workspace/kern_check/homr_count.py`, results `homr_count.json`, staff positions saved
-  as `.txt` next to each page PNG in `/workspace/kern_check/pages/`). Next: a cheap
-  helper looks by eye at pieces where homr's count still disagrees with the .krn; then
-  cut matching pieces into system/token pairs and have Sonnet check a sample bar by bar.
-- Outside benchmarks (checked 2026-11-15 by a Sonnet helper, see "Benchmarks" under
-  Next). Goal: ISMIR 2027 paper (abstract 9 Mar, paper 16 Mar 2027, London) or its
-  late-breaking/demo session (about Aug 2027).
-- Fixed: `homr --init` on this branch fetched 566 from the fork's release (404); upstream
-  models now come from upstream's release (commit 5ecda33).
-- No training is running. Nothing new is published; round 3 epoch 1 is still the
-  fork's model.
-- First things to pick up: verify the regenerated indexes (sizes, beam tokens), then
-  the cheap post-decoding fixes and the time-signature round in "Next".
+- **Best model: run 2** (branch `accidentals-run2`, `pytorch_model_acc_run2_657-2f4096d...pth`
+  on the GPU box; ONNX in `/workspace/onnx/acc_run2/`). It is upstream 566 fine-tuned twice:
+  run 1 = complete time signatures (C and cut C included, carried across pages), run 2 =
+  printed accidentals (lift = the printed sign; code derives the sounding pitch). Not
+  released yet; waiting for the seed repeat (R2s7).
+- Results (frozen pipeline, `run/eval_run1/`): run 2 beats 566 on 6 of 8 references (mean
+  notes F1 79.3 -> about 80; Rachmaninoff +5.7, Campanella +4.1); notes sound right 98.8%
+  (566 97.2%). Behind 566 on Mazeppa (33.7 vs 34.8, mostly page-16 variance) and K. 309
+  (96.1 vs 96.9). Details under "Next phase" and in `run/EXPERIMENTS.md` R1, R2.
+- Running: R2s7, a repeat of run 2 with FT_SEED=7 (tmux `run2s7`, ~1:45 am Pacific), to
+  measure run-to-run variance; then score it with `run/eval_run1/` (model name run2s7).
+- Fixed in the evaluation: `run/merge_pages.py` keeps page-start time signatures for
+  meter-carrying code (`HOMR_TRUST_PAGE_TIME=1`) and no longer "repairs" printed accidentals.
+  Still open: it loses Mazeppa p. 11 and Rachmaninoff p. 5 (parts matched by id).
+- Upstream answered our accidental question (discussions/226): they switched to sounding
+  labels for simplicity. Our run 2 suggests printed labels help on accidental-heavy music.
+- Listening room (artifact HQ1b6xu88PNQuWA6Nvwfzk, `run/out/compare/index.html`): one "Ours"
+  column = our best model (now run 2) on all ten pieces, plus upstream 566, Copista,
+  Audiveris, LEGATO, rokot, Transcoda v2.1 and references.
+- Owner's open items: confirm the time signatures in the three Claude references (by Tue
+  17 Nov); mark a meter test set (Petrushka, Pathetique, Pictures, Mazeppa pages; by Wed 18
+  Nov); check the three Claude references bar by bar before the paper (mid-Feb 2027).
+- Reference fixes needed (found by the run-2 diagnosis, `run/eval_run1/run2_diagnosis.md`):
+  K. 309 printed reference misses cautionary naturals from m32; La Campanella printed signs
+  have errors both ways; Mazeppa p. 14 bar 136.
+- Next candidates (one change per run): fix the training mix (it costs up to 3.6 points on
+  classical pieces vs 566); stop carrying a meter that bars don't fit; tuplet token;
+  real-scan pairs from KernScores (168 pieces ready to cut); harder data (hard PDMX, ASAP,
+  Scriabin are converted). Paper goal: ISMIR 2027 (abstract 9 Mar, paper 16 Mar 2027).
+- Box details: `run/HANDOFF_LOCAL.md` (laptop only). Research workspace and experiment log:
+  private repo yiduoke/homr-research (`run/`, `run/EXPERIMENTS.md`).
 
 ## Reproducibility and AI use (for the paper)
 
@@ -562,15 +563,17 @@ meter 60% vs 82% for 566, which re-guesses per page. Ideas: drop a carried meter
 several bars in a row don't fit it; more meter-change data. The references hold only 18
 printed signatures: the owner's meter test set (due Wed 18 Nov) decides.
 
-**Run 2 result (2026-11-16 ~1 am Pacific; `run/EXPERIMENTS.md` R2, `run/eval_run1/run2_summary.md`)**:
-from run 1, lift head reset, same mix. Notes mean F1 79.3 (566 78.9, run 1 78.6); better on
-Campanella, Rachmaninoff, both Bach; sounding pitch right on 97.8% of matched notes (566 97.2,
-run 1 96.3), so printed labels did not cost sounding accuracy here. Printed signs F1: sharp 86,
-flat 89, natural 83, double sharp 85, none 99 (566 and run 1 write none). Key and meter kept.
-Open: Mazeppa (the only real scan among the references, Soviet edition with many courtesy
-naturals) drops 2.5 points vs run 1 and 1.5 vs 566; K. 309 over-predicts naturals. Check
-whether references or the model are at fault before adopting run 2 (AGENTS.md: real scans
-must not get worse). Single runs: 1-2 point differences may be noise.
+**Run 2 result (2026-11-16; `run/EXPERIMENTS.md` R2 and its rescore, `run/eval_run1/`)**:
+from run 1, lift head reset, same mix. After fixing the page joiner (it had overwritten printed
+naturals): notes F1 Mazeppa 33.7, Campanella 72.1, Rachmaninoff 63.5, Bach prelude 92.6,
+fugue 86.3, K. 331 99.6, K. 309 96.1, Pathetique 97.3 (566: 34.8, 68.0, 57.8, 91.4, 86.0,
+99.6, 96.9, 97.0). Sounding pitch right on 98.8% of matched notes (566 97.2, run 1 96.3).
+Printed signs read at roughly 86-99% F1 on most pieces; the low ones (K. 309 naturals,
+Campanella sharps) are mostly reference errors. Step by step (control isolates the mix):
+the round-3 mix costs up to 3.6 points on classical pieces, meter adds 2-3 on Liszt, printed
+accidentals add 2-5 on accidental-heavy pieces. Mazeppa's remaining gap is mostly page-16
+variance plus ~10 notes from one misread key signature (sounding pitch now depends on it).
+A seed repeat (R2s7) decides how much of this is chance.
 
 **Order of work**: P1-P5 and the label audits (helpers, on the box) -> run-1 code +
 tests -> regenerate run-1 tokens -> train run 1 -> evaluate -> run-2 code + tests ->
