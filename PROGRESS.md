@@ -23,8 +23,11 @@ in. The main goal is now general note accuracy on 566 (see "Next"); octave round
 - **Best model: run 2** (branch `accidentals-run2`, `pytorch_model_acc_run2_657-2f4096d...pth`
   on the GPU box; ONNX in `/workspace/onnx/acc_run2/`). It is upstream 566 fine-tuned twice:
   run 1 = complete time signatures (C and cut C included, carried across pages), run 2 =
-  printed accidentals (lift = the printed sign; code derives the sounding pitch). Not
-  released yet; waiting for the seed repeat (R2s7).
+  printed accidentals (lift = the printed sign; code derives the sounding pitch).
+  **Released** 2026-11-16 as `pytorch_model_meteracc-r2s7-afae0e3` (the seed-7 repeat):
+  https://github.com/yiduoke/homr/releases/tag/meteracc_checkpoints; branch
+  `accidentals-run2` uses it by default (`homr --init` downloads it). Model card in that
+  branch's Training.md.
 - Results (frozen pipeline, `run/eval_run1/`): run 2 beats 566 on 6 of 8 references (mean
   notes F1 79.3 -> about 80; Rachmaninoff +5.7, Campanella +4.1); notes sound right 98.8%
   (566 97.2%). Behind 566 on Mazeppa (33.7 vs 34.8, mostly page-16 variance) and K. 309
