@@ -62,7 +62,8 @@ in. The main goal is now general note accuracy on 566 (see "Next"); octave round
   tuplet, using the recognised meter), then a tuplet token plus training data with many
   (unnumbered) tuplets.
 - Chopin Ballade No. 4 reference: MusicXML transcribed by Claude in another session, given by
-  the owner on 2026-11-16 (unchecked; add to the owner's bar-by-bar check), 96.8% pitch agreement with our PDF; released model 75.5 notes fully right vs 74.2
+  the owner on 2026-11-16 (unchecked; add to the owner's bar-by-bar check; by ear the owner
+  judges it, and the other Claude references, roughly 99%+ right but not perfect), 96.8% pitch agreement with our PDF; released model 75.5 notes fully right vs 74.2
   for 566 (EXPERIMENTS "Ballade reference").
 - Paper outline with final numbers: `PAPER_NOTES.md` (keep it current; PROGRESS stays the log).
 - Mazeppa's notation is irregular by design (owner found it, 2026-11-16): Henle's blog

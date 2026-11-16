@@ -157,7 +157,9 @@ groups under C. Timing on such bars has no single correct answer; report with an
 
 - Seven of nine scored pieces are digital engravings; only Mazeppa is a real scan. The bracket
   test set (73 real scan pages, 322 hand-counted octave brackets) has no note references.
-- Three references are Claude transcriptions checked only in part, a fourth (Ballade) unchecked; KernScores references are
+- Three references are Claude transcriptions checked only in part, a fourth (Ballade) unchecked;
+  the owner (a pianist) listened and judges them roughly 99%+ right but audibly not perfect
+  (2026-11-16), so scores near the top carry about a point of reference noise; KernScores references are
   other editions (and lack C / cut C symbols); the Ballade reference is also a Claude
   transcription (unchecked). Four of nine references are Claude-made.
 - Single training runs except run 2 (two seeds). No experiment on real-scan training data yet.
