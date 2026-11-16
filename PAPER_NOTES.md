@@ -100,9 +100,13 @@ Notes fully right (pitch + onset + duration F1, %):
 joiner; LEGATO and rokot-omr-2b scored lower, see EXPERIMENTS E4.)
 
 - Accidental correctness on matched notes only (same letter, octave and onset as the
-  reference): 99.0% vs 97.2% for 566. This excludes missed, extra and mistimed notes (e.g.
-  Mazeppa: 1,414 of 7,213 reference notes matched), so it is not transcription accuracy;
-  that is "notes fully right" above. Never quote the 99% without this qualifier.
+  reference): 99.0% vs 97.2% for 566. This excludes missed, extra and mistimed notes, so it
+  is not transcription accuracy; that is "notes fully right" above. Never quote the 99%
+  without this qualifier. Caveat: `accidental_eval.py` aligns bars on its own and matches only
+  about half of the notes `score_notes.py` matches on Mazeppa (1,414 vs 2,682 of 7,213), so its
+  per-sign figures use a subset until it is switched to score_notes' alignment.
+  Mazeppa per score_notes (ours / 566): pitch anywhere in the bar 5,567 / 5,308, pitch + onset
+  2,682 / 2,719, fully right 2,328 / 2,410 of 7,213 reference notes.
 - Printed accidentals (pooled over the eight older pieces; 566 writes none): sharp 92.1,
   flat 92.0, natural 88.3, double sharp 94.9, no sign 98.7 F1. Remaining errors are partly
   reference issues (cautionary naturals in K. 309, La Campanella).
