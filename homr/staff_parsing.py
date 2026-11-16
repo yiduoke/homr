@@ -1,3 +1,4 @@
+import copy
 import itertools
 import math
 import os
@@ -12,6 +13,8 @@ from homr.debug import Debug
 from homr.image_utils import crop_image_and_return_new_top
 from homr.model import MultiStaff, Staff
 from homr.octave_bracket_rows import find_dashed_line_rows, find_top_of_content
+from homr.piano_staffs import STAFFS_PER_SYSTEM as STAFFS_PER_PIANO_SYSTEM
+from homr.piano_staffs import is_piano_system, merge_piano_system
 from homr.point_mapping import PointMapping, chain, identity, undo_crop, undo_resize
 from homr.simple_logging import eprint
 from homr.staff_dewarping import StaffDewarping, dewarp_staff_image
@@ -412,6 +415,67 @@ def _clean_up_voice(symbols: list[EncodedSymbol]) -> list[EncodedSymbol]:
     return restore_unmarked_triplets(remove_duplicated_symbols(symbols))
 
 
+def _stand_in_for_piano_system(row: MultiStaff) -> MultiStaff:
+    """A system of one grand staff which takes the place of the four staffs of a piano system."""
+    grand_staff = copy.copy(row.staffs[0])
+    grand_staff.is_grandstaff = True
+    return MultiStaff([grand_staff], row.connections, row.certain)
+
+
+def _read_piano_systems(
+    debug: Debug,
+    staffs: list[MultiStaff],
+    image: NDArray,
+    regions: StaffRegions,
+    config: Config,
+    page_to_input_image: PointMapping,
+    merged_systems: dict[int, list[EncodedSymbol]],
+    read_staffs: dict[int, list[EncodedSymbol]],
+) -> int:
+    """
+    Reads the systems of four single staffs. If their clefs are those of a piano system the
+    merged symbols go to merged_systems (by index of the system), else the symbols of their staffs
+    to read_staffs (by id), which are read once only. Returns the number of staffs read.
+    """
+    candidates = [
+        (row_index, row)
+        for row_index, row in enumerate(staffs)
+        if len(row.staffs) == STAFFS_PER_PIANO_SYSTEM
+        and not any(staff.is_grandstaff for staff in row.staffs)
+    ]
+    index = 0
+    started: list[tuple[int, list[StartedStaff]]] = []
+    for row_index, row in candidates:
+        started_row = []
+        for staff in row.staffs:
+            started_row.append(
+                start_parse_staff_image(
+                    debug, index, staff, image, regions, config, page_to_input_image
+                )
+            )
+            index += 1
+        started.append((row_index, started_row))
+    read = [
+        (row_index, [finish_parse_staff_image(staff) for staff in started_row])
+        for row_index, started_row in started
+    ]
+    complete = {
+        row_index for row_index, symbols in read if all(len(staff) > 0 for staff in symbols)
+    }
+    # A piano system shows how the page is built: its third staff may start in the treble clef
+    piano_on_page = any(staff.is_grandstaff for row in staffs for staff in row.staffs) or any(
+        is_piano_system(symbols) for row_index, symbols in read if row_index in complete
+    )
+    for row_index, symbols in read:
+        if row_index in complete and is_piano_system(symbols, piano_on_page):
+            eprint("Four staffs of system", row_index, "are a piano system, merging them")
+            merged_systems[row_index] = merge_piano_system(symbols)
+        else:
+            for staff, staff_symbols in zip(staffs[row_index].staffs, symbols, strict=True):
+                read_staffs[id(staff)] = staff_symbols
+    return index
+
+
 def parse_staffs(
     debug: Debug,
     staffs: list[MultiStaff],
@@ -427,13 +491,33 @@ def parse_staffs(
     page_to_input_image maps the coordinates of image back to the image the user provided,
     it's used to fill EncodedSymbol.image_coordinates.
     """
+    regions = StaffRegions(staffs)
+    index = 0
+    # Systems of four single staffs which are a piano system: the tokens of its staffs are
+    # merged into one grand staff. The other staffs of such systems are read below as usual.
+    merged_systems: dict[int, list[EncodedSymbol]] = {}
+    read_staffs: dict[int, list[EncodedSymbol]] = {}
+    if selected_staff < 0:
+        index = _read_piano_systems(
+            debug, staffs, image, regions, config, page_to_input_image, merged_systems, read_staffs
+        )
+        staffs = [
+            _stand_in_for_piano_system(row) if row_index in merged_systems else row
+            for row_index, row in enumerate(staffs)
+        ]
     parts = [tuple(range(len(row.staffs))) for row in staffs]
     if len({len(staff.staffs) for staff in staffs}) > 1:
         # The voices are read across systems, a system with fewer staffs hides some
         assigned = _assign_parts(staffs)
         if assigned is None:
             eprint("The layout changes on the page, reading every staff on its own")
-            staffs = [single for staff in staffs for single in staff.break_apart()]
+            singles = [(k, single) for k, row in enumerate(staffs) for single in row.break_apart()]
+            merged_systems = {
+                new_index: merged_systems[k]
+                for new_index, (k, _) in enumerate(singles)
+                if k in merged_systems
+            }
+            staffs = [single for _, single in singles]
             parts = [(0,)] * len(staffs)
         else:
             eprint("Staffs are hidden in some systems, parts of the systems:", assigned)
@@ -442,9 +526,8 @@ def parse_staffs(
     # even if it's part of a grand staff.
     number_of_voices = max(len(staff.staffs) for staff in staffs)
     layout = next(_layout(row) for row in staffs if len(row.staffs) == number_of_voices)
-    i = 0
+    i = index
     results: dict[tuple[int, int], list[EncodedSymbol]] = {}
-    regions = StaffRegions(staffs)
     # The inference of a staff runs in the background while the next staff is prepared
     started: list[tuple[tuple[int, int], int, StartedStaff]] = []
     for voice in range(number_of_voices):
@@ -456,6 +539,13 @@ def parse_staffs(
                 i += 1
                 continue
             staff = row.staffs[parts[staff_index].index(voice)]
+            if staff_index in merged_systems:
+                results[(staff_index, voice)] = merged_systems[staff_index]
+                continue
+            if id(staff) in read_staffs:
+                if len(read_staffs[id(staff)]) > 0:
+                    results[(staff_index, voice)] = read_staffs[id(staff)]
+                continue
             started.append(
                 (
                     (staff_index, voice),
