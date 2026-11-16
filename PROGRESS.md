@@ -5,7 +5,13 @@ comes next. Written for people and coding agents picking up the work. Upstream i
 liebharc/homr; its own docs (README.md, Training.md, IDEAS_FOR_CONTRIBUTORS.md,
 AGENTS.md) still apply.
 
-Last updated: 2026-11-15.
+Last updated: 2026-11-16.
+
+Related documents: [PAPER_NOTES.md](PAPER_NOTES.md) (the paper's story, final numbers only);
+[EXPERIMENTS.md](https://github.com/yiduoke/homr-research/blob/main/EXPERIMENTS.md) in the private research repo
+[yiduoke/homr-research](https://github.com/yiduoke/homr-research) (exact commands, commits,
+checksums and outputs per result; local checkout `run/`); [Training.md](Training.md) (model
+cards); release [meteracc_checkpoints](https://github.com/yiduoke/homr/releases/tag/meteracc_checkpoints).
 
 ## Summary
 

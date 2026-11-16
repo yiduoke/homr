@@ -2,9 +2,11 @@
 
 The current story for a paper (target: ISMIR 2027, abstract 9 Mar, paper 16 Mar 2027; or its
 late-breaking/demo session, about Aug 2027), with final numbers only. Day-by-day history, failed
-attempts and superseded numbers are in `PROGRESS.md`; exact commands, commits, data checksums
-and outputs are in `run/EXPERIMENTS.md` of the private research repo yiduoke/homr-research
-(experiment IDs below, e.g. R2s7). Last updated 2026-11-16.
+attempts and superseded numbers are in [PROGRESS.md](PROGRESS.md); exact commands, commits, data
+checksums and outputs are in [EXPERIMENTS.md](https://github.com/yiduoke/homr-research/blob/main/EXPERIMENTS.md) of the private research repo
+[yiduoke/homr-research](https://github.com/yiduoke/homr-research) (experiment IDs below, e.g. R2s7).
+Model card: [Training.md](Training.md); weights: release
+[meteracc_checkpoints](https://github.com/yiduoke/homr/releases/tag/meteracc_checkpoints). Last updated 2026-11-16.
 
 ## 1. Claim in one paragraph
 
