@@ -29,8 +29,8 @@ in. The main goal is now general note accuracy on 566 (see "Next"); octave round
   notes F1 79.3 -> about 80; Rachmaninoff +5.7, Campanella +4.1); notes sound right 98.8%
   (566 97.2%). Behind 566 on Mazeppa (33.7 vs 34.8, mostly page-16 variance) and K. 309
   (96.1 vs 96.9). Details under "Next phase" and in `run/EXPERIMENTS.md` R1, R2.
-- Running: R2s7, a repeat of run 2 with FT_SEED=7 (tmux `run2s7`, ~1:45 am Pacific), to
-  measure run-to-run variance; then score it with `run/eval_run1/` (model name run2s7).
+- Done: R2s7, a repeat of run 2 with FT_SEED=7 (`/workspace/onnx/acc_run2s7/`), reproduced
+  run 2 (mean 80.1 both); run-to-run spread up to ~1.8 points per piece.
 - Fixed in the evaluation: `run/merge_pages.py` keeps page-start time signatures for
   meter-carrying code (`HOMR_TRUST_PAGE_TIME=1`) and no longer "repairs" printed accidentals.
   Still open: it loses Mazeppa p. 11 and Rachmaninoff p. 5 (parts matched by id).
@@ -573,7 +573,9 @@ Campanella sharps) are mostly reference errors. Step by step (control isolates t
 the round-3 mix costs up to 3.6 points on classical pieces, meter adds 2-3 on Liszt, printed
 accidentals add 2-5 on accidental-heavy pieces. Mazeppa's remaining gap is mostly page-16
 variance plus ~10 notes from one misread key signature (sounding pitch now depends on it).
-A seed repeat (R2s7) decides how much of this is chance.
+Seed repeat R2s7 (FT_SEED=7) reproduces it: mean notes F1 80.1 for both runs (566 78.9),
+sounding pitch 99.0%; single pieces vary up to ~1.8 points between identical runs, so judge
+changes on two runs. Mazeppa stays ~1 point below 566 in both runs.
 
 **Order of work**: P1-P5 and the label audits (helpers, on the box) -> run-1 code +
 tests -> regenerate run-1 tokens -> train run 1 -> evaluate -> run-2 code + tests ->
