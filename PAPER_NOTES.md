@@ -66,8 +66,8 @@ older references) and writes printed signs that 566 cannot.
 | Bach, WTC I Prelude and Fugue BWV 848 | LilyPond 2.9 | KernScores (humdrum-tools/bach-wtc) | different edition |
 | Mozart, K. 331 theme; K. 309/1 | LilyPond 2.10 | KernScores mozart-piano-sonatas | |
 | Beethoven, Op. 13/1 | LilyPond 2.12 | KernScores beethoven-piano-sonatas | |
-| Chopin, Ballade No. 4 | LilyPond 2.18 | MusicXML supplied by the owner (provenance to be recorded) | 96.8% pitch agreement |
-| Stravinsky, Petrushka (piano) | - | none | listened to only |
+| Chopin, Ballade No. 4 | LilyPond 2.18 | transcribed by Claude (another session), unchecked | 96.8% pitch agreement with our output |
+| Stravinsky, Petrushka (3 movements, piano) | real scan (image PDF, 37 pp.) | none yet | many meter changes; candidate second real-scan reference |
 
 Pipeline (frozen, identical for every model; `run/eval_run1/`): pages rendered at 150 dpi,
 upstream's staff cutting, one homr call per piece, pages joined by `merge_pages.py` (keeps
@@ -157,8 +157,9 @@ groups under C. Timing on such bars has no single correct answer; report with an
 
 - Seven of nine scored pieces are digital engravings; only Mazeppa is a real scan. The bracket
   test set (73 real scan pages, 322 hand-counted octave brackets) has no note references.
-- Three references are Claude transcriptions checked only in part; KernScores references are
-  other editions (and lack C / cut C symbols); the Ballade reference's source is not recorded.
+- Three references are Claude transcriptions checked only in part, a fourth (Ballade) unchecked; KernScores references are
+  other editions (and lack C / cut C symbols); the Ballade reference is also a Claude
+  transcription (unchecked). Four of nine references are Claude-made.
 - Single training runs except run 2 (two seeds). No experiment on real-scan training data yet.
 - Meter carry propagates misreads; tuplets and cadenzas are unsolved.
 
