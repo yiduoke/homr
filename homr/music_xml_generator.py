@@ -10,6 +10,7 @@ from fractions import Fraction
 import numpy as np
 
 from homr import constants
+from homr.accidentals import NATURAL, SIGN_TO_MUSIC_XML, AccidentalState
 from homr.simple_logging import eprint
 from homr.transformer.vocabulary import (
     OCTAVE_SHIFT_STOP,
@@ -197,6 +198,7 @@ def build_part(
     is_first_part = index == 0
     for measure in build_measures(args, voice, is_first_part, has_two_staves, time_signature):
         part.append(measure)
+    resolve_accidentals(part)
     convert_ties(part)
     add_stems(part)
     convert_beams(part)
@@ -702,6 +704,8 @@ def rebalance_measure_voices(measure: ET.Element) -> None:
 
 # The position of the model (e.g. upper2) of a note while the part is built
 _POSITION_ATTRIBUTE = "homr-position"
+# The printed accidental of the model (the lift) of a note while the part is built
+_LIFT_ATTRIBUTE = "homr-lift"
 
 
 def _is_second_voice(note: ET.Element) -> bool:
@@ -711,6 +715,77 @@ def _is_second_voice(note: ET.Element) -> bool:
 def _remove_position_attributes(part: ET.Element) -> None:
     for note in part.iter("note"):
         note.attrib.pop(_POSITION_ATTRIBUTE, None)
+
+
+def _notes_in_time_order(measure: ET.Element, fifths: int) -> list[tuple[ET.Element, int]]:
+    """
+    The notes of a measure by start time, with the key signature (number of fifths) in force
+    at them, given the one in force at the start of the measure. The voices are written one
+    after the other, but a sign applies to all voices of the staff by the time of the notes.
+    """
+    times = _note_times(measure)
+    timed: list[tuple[int, int, ET.Element, int]] = []
+    for index, child in enumerate(measure):
+        if child.tag == "attributes" and child.find("key/fifths") is not None:
+            fifths = int(child.findtext("key/fifths", "0"))
+        elif child.tag == "note":
+            timed.append((times[id(child)][0], index, child, fifths))
+    timed.sort(key=lambda entry: (entry[0], entry[1]))
+    return [(note, key) for _, _, note, key in timed]
+
+
+def _build_accidental(sign: str, note: ET.Element) -> None:
+    """The printed sign, after the type and dots of the note."""
+    accidental = ET.Element("accidental")
+    accidental.text = SIGN_TO_MUSIC_XML[sign]
+    position = 0
+    for index, child in enumerate(note):
+        if child.tag in ("pitch", "duration", "tie", "type", "dot"):
+            position = index + 1
+    note.insert(position, accidental)
+
+
+def resolve_accidentals(part: ET.Element) -> None:
+    """
+    Turns the printed accidentals of the model into the sounding <alter> of each note and the
+    printed <accidental>, which is only written where the model saw a sign. See
+    homr.accidentals for the rule. The carried signs are shared by the voices of a staff and
+    reset by each measure; a tie from the previous measure carries the alteration of the tied
+    note. Run it before ties are converted, because they match the alteration of the notes.
+    """
+    state = AccidentalState()
+    # Per staff and voice: the pitches (with alteration) of the previous event, and of the
+    # event being read, which is a chord if there is more than one
+    previous: dict[tuple[str, str], dict[tuple[str, int], int]] = {}
+    current: dict[tuple[str, str], dict[tuple[str, int], int]] = {}
+    fifths = 0
+    for measure in part.findall("measure"):
+        state.new_bar()
+        for note, note_fifths in _notes_in_time_order(measure, fifths):
+            sign = note.attrib.pop(_LIFT_ATTRIBUTE, None)
+            pitch = note.find("pitch")
+            if pitch is None or sign is None:
+                continue
+            state.set_key(note_fifths)
+            staff = note.findtext("staff", "1")
+            voice = (staff, note.findtext("voice", "1"))
+            if note.find("chord") is None:
+                previous[voice] = current.get(voice, {})
+                current[voice] = {}
+            step, octave = pitch.findtext("step", "C"), int(pitch.findtext("octave", "4"))
+            has_stop = get_slur(note, "stop") is not None
+            tie_alter = previous.get(voice, {}).get((step, octave)) if has_stop else None
+            alter = state.sounding_alter(staff, step, octave, sign, tie_alter)
+            if get_slur(note, "start") is not None:
+                current.setdefault(voice, {})[(step, octave)] = alter
+            if alter != 0 or sign == NATURAL:
+                element = ET.Element("alter")
+                element.text = str(alter)
+                pitch.insert(1, element)
+            if sign in SIGN_TO_MUSIC_XML:
+                _build_accidental(sign, note)
+        for key in measure.findall("attributes/key/fifths"):
+            fifths = int(key.text or "0")
 
 
 def add_stems(part: ET.Element) -> None:
@@ -1065,14 +1140,6 @@ def build_repeat(barline: EncodedSymbol, xml: ET.Element) -> None:
     ET.SubElement(xml, "repeat", direction=direction)
 
 
-LIFT_TO_ALTER = {
-    "N": 0,
-    "#": 1,
-    "##": 2,
-    "b": -1,
-    "bb": -2,
-}
-
 DURATION_NAMES = {
     0: "breve",
     1: "whole",
@@ -1206,8 +1273,9 @@ def build_note_or_rest(
         ET.SubElement(pitch, "octave").text = sounding_pitch[1:]
         if model_note.lift == nonote:
             eprint("WARNING note with invalid lift", model_note)
-        elif model_note.lift != empty:
-            ET.SubElement(pitch, "alter").text = str(LIFT_TO_ALTER[model_note.lift])
+        else:
+            # Completed by resolve_accidentals: the lift is the printed sign
+            note.set(_LIFT_ATTRIBUTE, model_note.lift)
 
     if "G" in model_note.rhythm:
         base_duration = model_duration.kern
