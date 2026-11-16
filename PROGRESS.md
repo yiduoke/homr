@@ -55,6 +55,15 @@ in. The main goal is now general note accuracy on 566 (see "Next"); octave round
   post-decoding repair (a voice that overfills its bar gets its beamed run rescaled as a
   tuplet, using the recognised meter), then a tuplet token plus training data with many
   (unnumbered) tuplets.
+- Mazeppa's notation is irregular by design (owner found it, 2026-11-16): Henle's blog
+  "Gaps in the notation: Liszt's Mazeppa étude" (Peter Jost, 13 Feb 2023,
+  https://blog.henle.de/en/2023/02/13/gaps-in-the-notation-liszts-mazeppa-etude/): in the
+  1852 version the outer voices lack rests on beats 2 and 4 from the theme (m. 7 ff.; again
+  31 ff., 80 ff., 114 ff.), judged intentional; the 1839 version is in 6/4 with unmarked
+  triplets. Our Soviet edition (1852 text) also has bars like 29-30 holding six beamed groups
+  under C (footnote: move smoothly from triplets to plain eighths). Plan: keep Mazeppa as the
+  real-scan test, mark these bars as "free" and report timing with and without them; cite
+  this in the paper as an example of why rhythm scoring on Romantic virtuoso music needs care.
 - Speed: branch `speed`, merged into `accidentals-run2`: identical output, 1.6x faster on
   whole pieces under load, ~2.75x on a quiet machine (EXPERIMENTS.md S1).
 - Next candidates (one change per run): fix the training mix (it costs up to 3.6 points on
