@@ -26,7 +26,7 @@ class TestExitCode(unittest.TestCase):
             tempfile.NamedTemporaryFile(suffix=".png") as image,
             mock.patch("sys.argv", ["homr", "--no-title", image.name]),
             mock.patch("homr.main.download_weights"),
-            mock.patch("homr.main.process_image", side_effect=Exception("No noteheads found")),
+            mock.patch("homr.main.recognize_page", side_effect=Exception("No noteheads found")),
             self.assertRaises(SystemExit) as exit_info,
         ):
             main()

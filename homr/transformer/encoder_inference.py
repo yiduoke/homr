@@ -6,6 +6,7 @@ from homr.onnx_providers import (
     coreml_mlprogram_providers,
     gpu_providers,
 )
+from homr.parallelism import session_options
 from homr.simple_logging import eprint
 from homr.transformer.configs import Config
 from homr.type_definitions import NDArray
@@ -38,7 +39,9 @@ class Encoder:
             except Exception as ex:
                 eprint(ex)
                 eprint("Going on without GPU support")
-                self.encoder = ort.InferenceSession(config.filepaths.encoder_path_fp16)
+                self.encoder = ort.InferenceSession(
+                    config.filepaths.encoder_path_fp16, session_options()
+                )
                 self.fp16 = True
 
         elif config.use_coreml_encoder and coreml_available():
@@ -58,11 +61,13 @@ class Encoder:
             except Exception as ex:
                 eprint(ex)
                 eprint("Could not create the CoreML encoder session, using the CPU instead")
-                self.encoder = ort.InferenceSession(config.filepaths.encoder_path)
+                self.encoder = ort.InferenceSession(
+                    config.filepaths.encoder_path, session_options()
+                )
                 self.fp16 = False
 
         else:
-            self.encoder = ort.InferenceSession(config.filepaths.encoder_path)
+            self.encoder = ort.InferenceSession(config.filepaths.encoder_path, session_options())
             self.fp16 = False
 
         self.io_binding = self.encoder.io_binding()

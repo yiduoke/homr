@@ -15,6 +15,7 @@ from homr.onnx_providers import (
     gpu_providers,
     rocm_available,
 )
+from homr.parallelism import session_options
 from homr.segmentation.config import (
     segmentation_version,
     segnet_path_onnx,
@@ -45,7 +46,7 @@ class Segnet:
                     "Error while trying to load model on the GPU. You probably don't have a compatible gpu"  # noqa: E501
                 )
                 eprint(e)
-                self.model = ort.InferenceSession(segnet_path_onnx_fp16)
+                self.model = ort.InferenceSession(segnet_path_onnx_fp16, session_options())
                 self.fp16 = True
         elif use_gpu_inference and coreml_available():
             try:
@@ -66,19 +67,19 @@ class Segnet:
                 eprint("Error while trying to load model on CoreML, falling back to the CPU")
                 eprint(e)
                 if os.path.exists(segnet_path_onnx):
-                    self.model = ort.InferenceSession(segnet_path_onnx)
+                    self.model = ort.InferenceSession(segnet_path_onnx, session_options())
                     self.fp16 = False
                 else:
-                    self.model = ort.InferenceSession(segnet_path_onnx_fp16)
+                    self.model = ort.InferenceSession(segnet_path_onnx_fp16, session_options())
                     self.fp16 = True
         elif use_gpu_inference:
             # --gpu force without a GPU execution provider: only the fp16 model
             # has been downloaded, run it on the CPU.
             eprint("No GPU execution provider available, running on the CPU instead")
-            self.model = ort.InferenceSession(segnet_path_onnx_fp16)
+            self.model = ort.InferenceSession(segnet_path_onnx_fp16, session_options())
             self.fp16 = True
         else:
-            self.model = ort.InferenceSession(segnet_path_onnx)
+            self.model = ort.InferenceSession(segnet_path_onnx, session_options())
             self.fp16 = False
 
         self.io_binding = self.model.io_binding()

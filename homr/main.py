@@ -3,9 +3,11 @@ import glob
 import os
 import sys
 import xml.etree.ElementTree as ET
+from collections.abc import Iterator
 from concurrent.futures import Future
 from dataclasses import dataclass
 from enum import Enum
+from functools import partial
 
 import cv2
 import numpy as np
@@ -29,6 +31,7 @@ from homr.music_xml_generator import TimeSignatureMemory, XmlGeneratorArguments,
 from homr.noise_filtering import filter_predictions
 from homr.note_detection import add_notes_to_staffs, combine_noteheads_with_stems
 from homr.onnx_providers import coreml_available, cuda_available, rocm_available
+from homr.parallelism import default_workers, map_in_order
 from homr.pdf_utils import render_pdf_to_image
 from homr.point_mapping import PointMapping, chain, undo_crop, undo_resize
 from homr.relieur import process_concat
@@ -47,6 +50,7 @@ from homr.staff_position_save_load import load_staff_positions, save_staff_posit
 from homr.system_repair import repair_systems
 from homr.title_detection import detect_title, download_ocr_weights
 from homr.transformer.configs import Config, default_config
+from homr.transformer.vocabulary import EncodedSymbol
 from homr.type_definitions import NDArray
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -182,15 +186,19 @@ class ProcessingConfig:
     title_detection: bool
 
 
-def process_image(
-    image_path: str,
-    config: ProcessingConfig,
-    xml_generator_args: XmlGeneratorArguments,
-    time_signatures: TimeSignatureMemory | None = None,
-) -> str:
+@dataclass
+class RecognizedPage:
+    """What the recognition of a page found, the XML is generated from it afterwards."""
+
+    xml_file: str
+    result_staffs: list[list[EncodedSymbol]]
+    title: str
+
+
+def recognize_page(image_path: str, config: ProcessingConfig) -> RecognizedPage:
     """
-    time_signatures: Pass the same object for all pages of a score, so that a page
-    without a time signature continues with the one of the previous page.
+    Segmentation, staff detection and transformer for a page. It doesn't depend on any other
+    page, so pages can be recognized in parallel. Use write_page for the result.
     """
     eprint("Processing " + image_path)
     xml_file = replace_extension(image_path, ".musicxml")
@@ -238,19 +246,12 @@ def process_image(
             title = title_future.result(60)
         eprint("Found title:", title)
 
-        eprint("Writing XML", result_staffs)
-        xml = generate_xml(xml_generator_args, result_staffs, title, time_signatures)
-        ET.ElementTree(xml).write(xml_file, encoding="unicode", xml_declaration=True)
-
-        eprint("Finished parsing " + str(len(result_staffs)) + " staves")
         teaser_file = replace_extension(image_path, "_teaser.png")
         if config.write_staff_positions:
             staff_position_files = replace_extension(image_path, ".txt")
             save_staff_positions(multi_staffs, image.shape, staff_position_files)
         debug.write_teaser(teaser_file, multi_staffs)
         debug.clean_debug_files_from_previous_runs()
-
-        eprint("Result was written to", xml_file)
     except:
         if os.path.exists(xml_file):
             os.remove(xml_file)
@@ -258,7 +259,44 @@ def process_image(
     finally:
         if debug_cleanup is not None:
             debug_cleanup.clean_debug_files_from_previous_runs()
-    return xml_file
+    return RecognizedPage(xml_file, result_staffs, title)
+
+
+def write_page(
+    page: RecognizedPage,
+    xml_generator_args: XmlGeneratorArguments,
+    time_signatures: TimeSignatureMemory | None = None,
+) -> str:
+    """
+    time_signatures: Pass the same object for all pages of a score, so that a page
+    without a time signature continues with the one of the previous page. The pages have to
+    be written in the order of the score.
+    """
+    try:
+        eprint("Writing XML", page.result_staffs)
+        xml = generate_xml(xml_generator_args, page.result_staffs, page.title, time_signatures)
+        ET.ElementTree(xml).write(page.xml_file, encoding="unicode", xml_declaration=True)
+        eprint("Finished parsing " + str(len(page.result_staffs)) + " staves")
+        eprint("Result was written to", page.xml_file)
+    except:
+        if os.path.exists(page.xml_file):
+            os.remove(page.xml_file)
+        raise
+    return page.xml_file
+
+
+def process_image(
+    image_path: str,
+    config: ProcessingConfig,
+    xml_generator_args: XmlGeneratorArguments,
+    time_signatures: TimeSignatureMemory | None = None,
+) -> str:
+    """
+    time_signatures: Pass the same object for all pages of a score, so that a page
+    without a time signature continues with the one of the previous page.
+    """
+    page = recognize_page(image_path, config)
+    return write_page(page, xml_generator_args, time_signatures)
 
 
 @dataclass
@@ -449,8 +487,35 @@ def download_weights(segnet_use_gpu: bool, transformer_use_gpu: bool, coreml_enc
                     os.remove(downloaded_zip)
 
 
+def _initialize_worker(title_detection: bool) -> None:
+    if title_detection:
+        download_ocr_weights()
+
+
+def recognize_pages(
+    images: list[str], config: ProcessingConfig, workers: int | None = None
+) -> Iterator[tuple[str, RecognizedPage | None, BaseException | None]]:
+    """
+    Recognizes the pages on several processes, yields (image, page, error) in the order of
+    the images. Everything which depends on the order of the pages has to be done by the
+    caller with the yielded pages.
+    """
+    if workers is None:
+        workers = default_workers()
+    yield from map_in_order(
+        partial(recognize_page, config=config),
+        images,
+        workers,
+        _initialize_worker,
+        (config.title_detection,),
+    )
+
+
 def run_homr(
-    images: list, config: ProcessingConfig, xml_generator_args: XmlGeneratorArguments
+    images: list,
+    config: ProcessingConfig,
+    xml_generator_args: XmlGeneratorArguments,
+    workers: int | None = None,
 ) -> None:
     """
     Runs homr on all images in a list and merges them into musicxml using relieur
@@ -458,10 +523,14 @@ def run_homr(
     eprint("Merging", len(images), "files:", images)
     xml_paths = []
     time_signatures = TimeSignatureMemory()
-    for image_file in images:
+    for image_file, page, error in recognize_pages(images, config, workers):
         eprint("=========================================")
         try:
-            xml_paths.append(process_image(image_file, config, xml_generator_args, time_signatures))
+            if error is not None or page is None:
+                raise error or RuntimeError("No result for " + image_file)
+            # The time signature of a page continues on the next one, so the pages
+            # are written one after the other in their order
+            xml_paths.append(write_page(page, xml_generator_args, time_signatures))
             eprint("Finished", image_file)
         except Exception as e:
             eprint(f"An error occurred while processing {image_file}: {e}")
@@ -532,6 +601,14 @@ def main() -> None:
         + "pays off when processing many images. Has no effect with CUDA.",
     )
     parser.add_argument(
+        "--workers",
+        type=int,
+        default=None,
+        help="How many pages are recognized at the same time on several processes, "
+        + "every one loads the models. Default: HOMR_WORKERS or the lower of 4 and the "
+        + "number of cores.",
+    )
+    parser.add_argument(
         "--no-title", action="store_true", help="Don't detect title for faster inference"
     )
 
@@ -600,14 +677,24 @@ def main() -> None:
             image_files = get_all_image_files_in_folder(image)
             eprint("Processing", len(image_files), "files:", image_files)
             error_files = []
-            for image_file in image_files:
+            # The images are independent of each other, PDFs are processed afterwards
+            plain_images = [f for f in image_files if not f.lower().endswith(".pdf")]
+            pdf_files = [f for f in image_files if f.lower().endswith(".pdf")]
+            for image_file, page, error in recognize_pages(plain_images, config, args.workers):
                 eprint("=========================================")
                 try:
-                    if image_file.lower().endswith(".pdf"):
-                        rendered_images = render_pdf_to_image(image_file)
-                        run_homr(rendered_images, config, xml_generator_args)
-                    else:
-                        process_image(image_file, config, xml_generator_args)
+                    if error is not None or page is None:
+                        raise error or RuntimeError("No result for " + image_file)
+                    write_page(page, xml_generator_args)
+                    eprint("Finished", image_file)
+                except Exception as e:
+                    eprint(f"An error occurred while processing {image_file}: {e}")
+                    error_files.append(image_file)
+            for image_file in pdf_files:
+                eprint("=========================================")
+                try:
+                    rendered_images = render_pdf_to_image(image_file)
+                    run_homr(rendered_images, config, xml_generator_args, args.workers)
                     eprint("Finished", image_file)
                 except Exception as e:
                     eprint(f"An error occurred while processing {image_file}: {e}")
@@ -623,7 +710,7 @@ def main() -> None:
     if images_to_combine:
         # After collectiong all images we run homr on them
         try:
-            run_homr(images_to_combine, config, xml_generator_args)
+            run_homr(images_to_combine, config, xml_generator_args, args.workers)
         except InvalidProgramArgumentException as e:
             eprint(str(e))
             sys.exit(2)

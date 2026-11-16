@@ -158,7 +158,11 @@ class StaffRelationModel:
     def __init__(self, path: str = model_path) -> None:
         import onnxruntime as ort  # noqa: PLC0415
 
-        self.session = ort.InferenceSession(path, providers=["CPUExecutionProvider"])
+        from homr.parallelism import session_options  # noqa: PLC0415
+
+        self.session = ort.InferenceSession(
+            path, session_options(), providers=["CPUExecutionProvider"]
+        )
 
     def predict(self, crops: NDArray, feats: NDArray | None = None) -> NDArray:
         """Probabilities of the classes for each pair (pairs x classes)."""
