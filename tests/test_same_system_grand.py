@@ -1,4 +1,3 @@
-# ruff: noqa: S101
 import os
 from unittest import mock
 
