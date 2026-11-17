@@ -1,0 +1,76 @@
+# Test pieces to exclude from all training data (PDMX, ASAP, GrandStaff, Lieder, Scriabin kern)
+# before the next training run. One line per piece: composer | work | catalog | test name.
+# Exclude the whole work where a line names a movement of a multi-movement work only if the
+# training source stores the work as one file; otherwise the named movement is enough.
+# Sources: run/out/testset/ (real-scan test set), run/eval_run1/pages/ and
+# run/box_scripts/extra_sources.md (old test pieces), the fork's
+# training/omr_datasets/pdmx_exclude_test_pieces.txt (bracket test set). Do not edit that file from here.
+
+## Real-scan test set (run/out/testset/)
+Bach | Italian Concerto, 2nd movement (Andante) | BWV 971 | bach-italian-concerto-2
+Bach | Well-Tempered Clavier II, Prelude in C-sharp minor | BWV 873 | bach-prelude-873
+Bach | Well-Tempered Clavier II, Fugue in C-sharp minor | BWV 873 | bach-fugue-873
+Haydn | Piano Sonata in E-flat major, 1st movement | Hob. XVI:49 | haydn-hob16-49-1
+Mozart | Fantasia in C minor | K. 475 | mozart-k475
+Beethoven | Piano Sonata No. 21 "Waldstein", 1st movement | Op. 53 | beethoven-waldstein-1
+Beethoven | Piano Sonata No. 23 "Appassionata", 1st movement | Op. 57 | beethoven-appassionata-1
+Beethoven | Piano Sonata No. 29 "Hammerklavier", 4th movement (Largo and Fugue) | Op. 106 | beethoven-hammerklavier-4
+Schubert | Wanderer Fantasy (whole work; test uses bars 244-718) | D. 760, Op. 15 | schubert-wanderer-3-4
+Schubert | Impromptu in A-flat major | D. 899 No. 4, Op. 90 No. 4 | schubert-impromptu-d899-4
+Schumann | Toccata in C major | Op. 7 | schumann-toccata
+Schumann | Kreisleriana No. 1 | Op. 16 No. 1 | schumann-kreisleriana-1
+Chopin | Etude in C-sharp minor | Op. 10 No. 4 | chopin-etude-op10-4
+Chopin | Etude in B minor | Op. 25 No. 10 | chopin-etude-op25-10
+Chopin | Etude in A minor "Winter Wind" | Op. 25 No. 11 | chopin-etude-op25-11
+Chopin | Scherzo No. 3 in C-sharp minor | Op. 39 | chopin-scherzo3
+Chopin | Polonaise in A-flat major "Heroic" | Op. 53 | chopin-polonaise-op53
+Liszt | Transcendental Etude No. 5 "Feux follets" | S. 139/5 | liszt-te-5
+Liszt | Transcendental Etude No. 10 in F minor | S. 139/10 | liszt-te-10
+Liszt | Hungarian Rhapsody No. 6 | S. 244/6 | liszt-hr-6
+Liszt | Piano Sonata in B minor (whole work; test uses bars 1-305) | S. 178 | liszt-sonata
+Liszt | Grandes Etudes de Paganini No. 6 (Theme and Variations) | S. 141/6 | liszt-paganini-6
+Balakirev | Islamey | (no opus) | balakirev-islamey
+Scriabin | Piano Sonata No. 5 | Op. 53 | scriabin-sonata-5
+Debussy | Images I, No. 1 "Reflets dans l'eau" | L. 110/1 | debussy-reflets
+Debussy | Pour le piano, No. 1 Prelude | L. 95/1 | debussy-pour-le-piano-1
+Ravel | Miroirs No. 4 "Alborada del gracioso" | M. 43/4 | ravel-alborada
+Prokofiev | Toccata in D minor | Op. 11 | prokofiev-toccata
+
+## Old test pieces (run/eval_run1/pages/, run/out/compare/)
+Bach | Well-Tempered Clavier I, Prelude in C-sharp major | BWV 848 | bach-prelude-848
+Bach | Well-Tempered Clavier I, Fugue in C-sharp major | BWV 848 | bach-fugue-848
+Mozart | Piano Sonata in A major, 1st movement (theme) | K. 331 | mozart-kv331-theme
+Mozart | Piano Sonata in C major, 1st movement | K. 309 | mozart-kv309-1
+Beethoven | Piano Sonata No. 8 "Pathetique", 1st movement | Op. 13 | beethoven-pathetique-1
+Chopin | Ballade No. 4 in F minor | Op. 52 | chopin-ballade-4
+Liszt | Transcendental Etude No. 4 "Mazeppa" | S. 139/4 | mazeppa
+Liszt | La Campanella (Grandes Etudes de Paganini No. 3) | S. 141/3 | la-campanella
+Rachmaninoff | Prelude in C-sharp minor | Op. 3 No. 2 | rachmaninoff-op3-2
+Stravinsky | Three Movements from Petrushka | (arr. 1921) | stravinsky-petrushka
+
+## Also excluded by extra_sources.md or the PDMX list (bracket/side test sets)
+Chopin | Scherzo No. 1 in B minor | Op. 20 |
+Liszt | Mephisto Waltz No. 1 | S. 514 |
+Liszt | Liebestraum No. 3 | S. 541/3 |
+Liszt | Hungarian Rhapsody No. 2 | S. 244/2 |
+Liszt | Totentanz | S. 525/126 |
+Mussorgsky | Pictures at an Exhibition | (1874) |
+Ravel | Gaspard de la nuit (Ondine, Scarbo) | M. 55 |
+Ravel | Jeux d'eau | M. 30 |
+Debussy | L'isle joyeuse | L. 106 |
+Rachmaninoff | Prelude in B-flat major | Op. 23 No. 2 |
+Scriabin | Etude in D-sharp minor | Op. 8 No. 12 |
+Scriabin | Piano Sonata No. 4 | Op. 30 |
+
+## Planned test pieces (scans in run/scores/testset/, not yet scored)
+Glinka-Balakirev | The Lark (piano transcription) | (no opus) |
+Clementi | Gradus ad Parnassum (Book 1) | Op. 44 |
+Mendelssohn | Rondo capriccioso | Op. 14 |
+Brahms | Variations on a Theme of Paganini | Op. 35 |
+Grieg | Lyric Pieces Book 8, No. 6 "Wedding Day at Troldhaugen" | Op. 65 No. 6 |
+Tchaikovsky | Dumka | Op. 59 |
+Saint-Saens | Etude en forme de valse | Op. 52 No. 6 |
+Scriabin | Etudes (Op. 8; at least No. 12) | Op. 8 |
+Albeniz | Iberia Book 3 (El Albaicin) | B. 47 |
+Bartok | Allegro barbaro | Sz. 49 |
+Shostakovich | Prelude and Fugue No. 15 in D-flat major | Op. 87 No. 15 |

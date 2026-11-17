@@ -1,0 +1,20 @@
+pdmx_hard                n= 21024 staffs-in-image==label  79.1%  image has more  19.5%  fewer   1.4% | ink at border top/bottom/any 27.5/27.3/40.0% | H med 351 W med 1290 staff-space? 
+pdmx_hard (MuseScore png) n= 18821 staffs-in-image==label  83.5%  image has more  16.2%  fewer   0.3% | ink at border top/bottom/any 22.1/21.3/33.3% | H med 347 W med 1290 staff-space? 
+pdmx_hard (Verovio png)  n=  2203 staffs-in-image==label  41.8%  image has more  47.7%  fewer  10.5% | ink at border top/bottom/any 74.0/79.0/96.7% | H med 382 W med 1295 staff-space? 
+   vrv part 0            n=  2203 staffs-in-image==label  41.8%  image has more  47.7%  fewer  10.5% | ink at border top/bottom/any 74.0/79.0/96.7% | H med 382 W med 1295 staff-space? 
+asap                     n=  4174 staffs-in-image==label  83.9%  image has more  15.5%  fewer   0.6% | ink at border top/bottom/any 31.2/34.2/47.0% | H med 359 W med 1290 staff-space? 
+asap (MuseScore png)     n=  3809 staffs-in-image==label  86.6%  image has more  13.3%  fewer   0.1% | ink at border top/bottom/any 26.9/30.1/42.2% | H med 356 W med 1290 staff-space? 
+asap (Verovio png)       n=   365 staffs-in-image==label  56.2%  image has more  37.8%  fewer   6.0% | ink at border top/bottom/any 76.2/77.5/96.4% | H med 396 W med 1376 staff-space? 
+   vrv part 0            n=   365 staffs-in-image==label  56.2%  image has more  37.8%  fewer   6.0% | ink at border top/bottom/any 76.2/77.5/96.4% | H med 396 W med 1376 staff-space? 
+kern_scriabin            n=  1319 staffs-in-image==label  72.4%  image has more  26.3%  fewer   1.2% | ink at border top/bottom/any 48.4/49.5/65.7% | H med 376 W med 1224 staff-space? 
+kern_scriabin (MuseScore png) n=  1188 staffs-in-image==label  76.1%  image has more  23.8%  fewer   0.1% | ink at border top/bottom/any 45.6/45.9/62.3% | H med 374 W med 1224 staff-space? 
+kern_scriabin (Verovio png) n=   131 staffs-in-image==label  38.9%  image has more  49.6%  fewer  11.5% | ink at border top/bottom/any 74.0/82.4/96.9% | H med 395 W med 1376 staff-space? 
+   vrv part 0            n=   131 staffs-in-image==label  38.9%  image has more  49.6%  fewer  11.5% | ink at border top/bottom/any 74.0/82.4/96.9% | H med 395 W med 1376 staff-space? 
+control mixed            n=  6000 staffs-in-image==label  54.1%  image has more  40.9%  fewer   5.1% | ink at border top/bottom/any 52.0/51.6/73.4% | H med 263 W med 1290 staff-space? 
+ctl Lieder-main          n=   586 staffs-in-image==label  62.5%  image has more  34.0%  fewer   3.6% | ink at border top/bottom/any 58.7/55.6/87.4% | H med 244 W med 1290 staff-space? 
+ctl grandstaff           n=   556 staffs-in-image==label  60.8%  image has more   4.7%  fewer  34.5% | ink at border top/bottom/any 40.1/63.5/74.8% | H med 166 W med 725 staff-space? 
+ctl lilypond             n=  1628 staffs-in-image==label  32.9%  image has more  67.1%  fewer   0.0% | ink at border top/bottom/any 73.1/67.6/93.2% | H med 290 W med 1295 staff-space? 
+ctl musescore_octave     n=   519 staffs-in-image==label  58.6%  image has more  39.5%  fewer   1.9% | ink at border top/bottom/any 53.4/44.7/72.3% | H med 318 W med 1290 staff-space? 
+ctl pdmx                 n=  1961 staffs-in-image==label  56.0%  image has more  40.6%  fewer   3.4% | ink at border top/bottom/any 46.1/45.7/66.5% | H med 240 W med 1290 staff-space? 
+ctl pdmx/hard            n=   750 staffs-in-image==label  80.3%  image has more  17.9%  fewer   1.9% | ink at border top/bottom/any 24.7/25.5/36.9% | H med 346 W med 1290 staff-space? 
+control hard (3000)      n=  3000 staffs-in-image==label  80.8%  image has more  17.4%  fewer   1.8% | ink at border top/bottom/any 25.6/25.5/36.8% | H med 344 W med 1290 staff-space? 

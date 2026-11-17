@@ -1,0 +1,42 @@
+{
+ "pdmx_shared_scores": 4676,
+ "pdmx_main_lines": 139461,
+ "pdmx_hard_dup_lines_added": 57038,
+ "pdmx_hard_dup_scores_present": 4548,
+ "train_total": 109185,
+ "train_by_source": {
+  "lieder": 10940,
+  "grandstaff": 10794,
+  "musescore_octave": 9157,
+  "pdmx": 48248,
+  "lilypond": 30046
+ },
+ "val_total": 3998,
+ "val_by_source": {
+  "pdmx": 2798,
+  "grandstaff": 580,
+  "lieder": 620
+ },
+ "original_train": 69982,
+ "round_one_train": 247076,
+ "round_one_val": 27452,
+ "musescore_recut_index_lines": 28055,
+ "musescore_recut_with_bracket": 2228,
+ "musescore_recut_selected": 8912,
+ "lilypond_round3_lines_in_clean_relabeled": 26482,
+ "lilypond_staffs_kept": 25254,
+ "lilypond_with_bracket": 4305,
+ "lilypond_with_8vb": 1309,
+ "holdout_real": 1239,
+ "holdout_inserted": 2981,
+ "round3_bracket_exposures": 13798,
+ "bracket_exposures_before_topup": 13066,
+ "topup_lines": 732,
+ "bracket_exposures_after_topup": 13798,
+ "bracket_exposures_musescore": 4701,
+ "bracket_exposures_lilypond": 9097,
+ "control_token_files_written": 25091,
+ "sanity_missing_files": 0,
+ "sanity_eval_piece_hits": 0,
+ "sanity_out_of_vocabulary": 0
+}

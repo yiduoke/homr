@@ -1,0 +1,259 @@
+{
+ "beethoven": {
+  "train": {
+   "staffs": 2352,
+   "pieces": 75,
+   "notes_per_staff": {
+    "mean": 70.6,
+    "median": 68.5,
+    "p10": 51,
+    "p90": 93
+   },
+   "time_signature_tokens": {
+    "timeSignature_2/2": 5,
+    "timeSignature_3/4": 25,
+    "timeSignature_2/4": 22,
+    "timeSignature_4/4": 13,
+    "timeSignature_6/8": 11,
+    "timeSignature_3/8": 7,
+    "timeSignature_9/8": 3,
+    "timeSignature_7/4": 1,
+    "timeSignature_17/16": 1,
+    "timeSignature_5/4": 1,
+    "timeSignature_12/16": 2,
+    "timeSignature_9/16": 2
+   },
+   "verified_by": {
+    "bars+model_strong": 1695,
+    "model_only": 614,
+    "bars+model_medium": 43
+   }
+  },
+  "val": {
+   "staffs": 136,
+   "pieces": 7,
+   "notes_per_staff": {
+    "mean": 64.6,
+    "median": 63.0,
+    "p10": 50,
+    "p90": 80
+   },
+   "time_signature_tokens": {
+    "timeSignature_3/4": 6,
+    "timeSignature_2/4": 1,
+    "timeSignature_2/2": 1
+   },
+   "verified_by": {
+    "bars+model_strong": 103,
+    "model_only": 31,
+    "bars+model_medium": 2
+   }
+  },
+  "key_signatures": {
+   "keySignature_-4": 281,
+   "keySignature_-1": 273,
+   "keySignature_3": 82,
+   "keySignature_0": 334,
+   "keySignature_2": 216,
+   "keySignature_4": 185,
+   "keySignature_1": 369,
+   "keySignature_-3": 457,
+   "keySignature_-6": 17,
+   "keySignature_-5": 29,
+   "keySignature_-2": 199,
+   "keySignature_-7": 20,
+   "keySignature_6": 52
+  },
+  "quarantine": {
+   "kern:repeat_start_at_system_start": 29,
+   "_any": 263,
+   "trainer:ledger": 26,
+   "piece:suspect_alignment": 56,
+   "verify:bars_fail_model_weak": 28,
+   "verify:bars_ok_model_weak": 22,
+   "verify:bars_undetermined_model_weak": 8,
+   "verify:bars_fail_model_medium": 12,
+   "kern:KeyError": 5,
+   "kern:skip": 6,
+   "kern:octave_shift": 95,
+   "verify:bars_undetermined_model_medium": 11,
+   "kern:UnsupportedTimeSignatureError": 2
+  }
+ },
+ "chopin": {
+  "train": {
+   "staffs": 146,
+   "pieces": 10,
+   "notes_per_staff": {
+    "mean": 64.3,
+    "median": 63.5,
+    "p10": 46,
+    "p90": 83
+   },
+   "time_signature_tokens": {
+    "timeSignature_3/4": 10
+   },
+   "verified_by": {
+    "model_only": 32,
+    "bars+model_strong": 112,
+    "bars+model_medium": 2
+   }
+  },
+  "val": {
+   "staffs": 24,
+   "pieces": 1,
+   "notes_per_staff": {
+    "mean": 59.5,
+    "median": 59.0,
+    "p10": 49,
+    "p90": 70
+   },
+   "time_signature_tokens": {
+    "timeSignature_3/4": 1
+   },
+   "verified_by": {
+    "model_only": 3,
+    "bars+model_strong": 21
+   }
+  },
+  "key_signatures": {
+   "keySignature_3": 26,
+   "keySignature_4": 52,
+   "keySignature_0": 39,
+   "keySignature_-2": 11,
+   "keySignature_-5": 6,
+   "keySignature_2": 12,
+   "keySignature_1": 12,
+   "keySignature_5": 3,
+   "keySignature_-4": 11
+  },
+  "quarantine": {
+   "kern:repeat_start_at_system_start": 3,
+   "_any": 7,
+   "kern:octave_shift": 3,
+   "verify:bars_fail_model_medium": 1
+  }
+ },
+ "mozart": {
+  "train": {
+   "staffs": 982,
+   "pieces": 49,
+   "notes_per_staff": {
+    "mean": 71.5,
+    "median": 70.0,
+    "p10": 55,
+    "p90": 89
+   },
+   "time_signature_tokens": {
+    "timeSignature_common": 11,
+    "timeSignature_3/4": 14,
+    "timeSignature_2/4": 7,
+    "timeSignature_6/8": 4,
+    "timeSignature_3/8": 3,
+    "timeSignature_cut": 2
+   },
+   "verified_by": {
+    "bars+model_strong": 695,
+    "model_only": 283,
+    "bars+model_medium": 4
+   }
+  },
+  "val": {
+   "staffs": 70,
+   "pieces": 4,
+   "notes_per_staff": {
+    "mean": 71.5,
+    "median": 71.0,
+    "p10": 51,
+    "p90": 93
+   },
+   "time_signature_tokens": {
+    "timeSignature_2/4": 1,
+    "timeSignature_common": 1,
+    "timeSignature_4/4": 1
+   },
+   "verified_by": {
+    "bars+model_strong": 54,
+    "model_only": 15,
+    "bars+model_medium": 1
+   }
+  },
+  "key_signatures": {
+   "keySignature_0": 216,
+   "keySignature_-1": 181,
+   "keySignature_-4": 14,
+   "keySignature_-2": 189,
+   "keySignature_-3": 128,
+   "keySignature_1": 82,
+   "keySignature_2": 201,
+   "keySignature_3": 42
+  },
+  "quarantine": {
+   "kern:repeat_start_at_system_start": 37,
+   "_any": 71,
+   "trainer:ledger": 13,
+   "kern:KeyError": 2,
+   "verify:bars_undetermined_model_medium": 3,
+   "kern:ValueError": 1,
+   "verify:bars_fail_model_weak": 2,
+   "verify:bars_fail_model_medium": 7,
+   "kern:skip": 2,
+   "crop:not_one_grand_staff": 1,
+   "verify:bars_undetermined_model_weak": 3
+  }
+ },
+ "pieces": {
+  "ok": 147,
+  "suspect": 1
+ },
+ "pieces_quarantined": [
+  "beethoven-piano-sonatas/sonata02-4"
+ ],
+ "val_pieces": [
+  "beethoven-piano-sonatas/sonata01-3",
+  "beethoven-piano-sonatas/sonata02-2",
+  "beethoven-piano-sonatas/sonata03-3",
+  "beethoven-piano-sonatas/sonata09-2",
+  "beethoven-piano-sonatas/sonata10-1",
+  "beethoven-piano-sonatas/sonata14-1",
+  "beethoven-piano-sonatas/sonata15-3",
+  "chopin-mazurkas/mazurka24-2",
+  "mozart-piano-sonatas/sonata06-3k",
+  "mozart-piano-sonatas/sonata08-3",
+  "mozart-piano-sonatas/sonata14-2",
+  "mozart-piano-sonatas/sonata15-1"
+ ],
+ "script_sha256_16": {
+  "build_pairs.py": "a794ffb327f2731d",
+  "crop_bars.py": "d53c9c71482ca6c8",
+  "crop_lib.py": "3dc98b04f4dd7d6c",
+  "cut_pages.py": "6abfa90268c945b6",
+  "eye_montage.py": "60c219ac222083d0",
+  "image_stats.py": "487d01850a91fd2f",
+  "kern_systems.py": "6d43c2c35124622a",
+  "model_check.py": "3098ab3735bb1c61",
+  "stats.py": "9eb7dad50f91aa88"
+ },
+ "piece_level_status": {
+  "beethoven:count_mismatch": 3,
+  "beethoven:excluded_test": 13,
+  "beethoven:match": 83,
+  "beethoven:nonpiano_layout": 2,
+  "chopin:count_mismatch": 1,
+  "chopin:match": 11,
+  "chopin:no_markers": 40,
+  "mozart:count_mismatch": 2,
+  "mozart:excluded_test": 12,
+  "mozart:match": 54,
+  "mozart:nonpiano_layout": 1
+ },
+ "piece_status_note": "match = total system count of the homr detection equals the .krn line breaks and all systems are single grand staffs; excluded_test = composition in test_set_exclusions.txt",
+ "seeds": {
+  "validation_pieces": 20261118,
+  "eye_sample": 31,
+  "image_stats": 11
+ },
+ "lines_scan_train.txt": 3480,
+ "lines_scan_val.txt": 230,
+ "lines_scan_quarantine.txt": 341
+}

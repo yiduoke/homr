@@ -1,0 +1,5 @@
+asap files 4106 missing(dropped) 68 other-field diffs 0 notes 210895 mismatch notes 175 (0.083%) staffs with mismatch 119 (2.90%) first-bar (tie/carry from before the staff, not judged) 126 old-label ##/bb bug 587
+  old {'_': 128990, '#': 33975, 'b': 47784, 'N': 0, '##': 96, 'bb': 50}
+  new {'_': 183600, '#': 9076, 'b': 6696, 'N': 10936, '##': 446, 'bb': 141}
+  top mismatch kinds [('_->_(got 1)', 62), ('_->_(got -1)', 39), ('#->_(got 0)', 38), ('b->_(got 0)', 26), ('##->_(got 0)', 4), ('bb->_(got 0)', 2), ('#->_(got -1)', 2), ('#->_(got 2)', 1)]
+  BAD []

@@ -1,0 +1,3438 @@
+{
+ "n_staffs": 128439,
+ "with_start": 25909,
+ "with_mid": 5581,
+ "with_any": 29259,
+ "after_change": 9026,
+ "mid_or_after_change": 13154,
+ "by_set": {
+  "Lieder-main": {
+   "staffs": 11532,
+   "with_any": 1256,
+   "with_mid": 341,
+   "after_change": 155,
+   "scores": 1265,
+   "staff_space_median": 9.992509816171408
+  },
+  "asap": {
+   "staffs": 3913,
+   "with_any": 122,
+   "with_mid": 6,
+   "after_change": 4,
+   "scores": 119,
+   "staff_space_median": 11.75605184754752
+  },
+  "grandstaff": {
+   "staffs": 10579,
+   "with_any": 10546,
+   "with_mid": 45,
+   "after_change": 6335,
+   "scores": 7,
+   "staff_space_median": 0
+  },
+  "kern_scriabin": {
+   "staffs": 1317,
+   "with_any": 159,
+   "with_mid": 38,
+   "after_change": 22,
+   "scores": 144,
+   "staff_space_median": 11.63845223700121
+  },
+  "lilypond": {
+   "staffs": 24987,
+   "with_any": 3342,
+   "with_mid": 405,
+   "after_change": 2,
+   "scores": 2126,
+   "staff_space_median": 10.543796293855602
+  },
+  "musescore_octave": {
+   "staffs": 6598,
+   "with_any": 535,
+   "with_mid": 176,
+   "after_change": 110,
+   "scores": 566,
+   "staff_space_median": 9.992509816171408
+  },
+  "pdmx": {
+   "staffs": 36772,
+   "with_any": 5846,
+   "with_mid": 856,
+   "after_change": 257,
+   "scores": 10636,
+   "staff_space_median": 11.756012360607283
+  },
+  "pdmx_hard": {
+   "staffs": 32741,
+   "with_any": 7453,
+   "with_mid": 3714,
+   "after_change": 2141,
+   "scores": 4731,
+   "staff_space_median": 11.756012360607283
+  }
+ },
+ "meters": {
+  "4/4": {
+   "staffs": 7658,
+   "start": 6150,
+   "mid_to": 1699,
+   "scores": 4941,
+   "composers": 1971,
+   "ss_median": 11.76,
+   "ss_min": 5.88,
+   "ss_max": 17.05
+  },
+  "common": {
+   "staffs": 2117,
+   "start": 1898,
+   "mid_to": 234,
+   "scores": 977,
+   "composers": 398,
+   "ss_median": 10.7,
+   "ss_min": 5.72,
+   "ss_max": 19.28
+  },
+  "2/4": {
+   "staffs": 4745,
+   "start": 4055,
+   "mid_to": 782,
+   "scores": 1492,
+   "composers": 580,
+   "ss_median": 11.76,
+   "ss_min": 5.88,
+   "ss_max": 15.75
+  },
+  "3/4": {
+   "staffs": 7919,
+   "start": 5881,
+   "mid_to": 2262,
+   "scores": 2992,
+   "composers": 1087,
+   "ss_median": 11.76,
+   "ss_min": 4.16,
+   "ss_max": 37.85
+  },
+  "1/4": {
+   "staffs": 1044,
+   "start": 177,
+   "mid_to": 954,
+   "scores": 677,
+   "composers": 275,
+   "ss_median": 11.76,
+   "ss_min": 8.79,
+   "ss_max": 12.0
+  },
+  "3/8": {
+   "staffs": 1905,
+   "start": 1554,
+   "mid_to": 409,
+   "scores": 389,
+   "composers": 192,
+   "ss_median": 11.76,
+   "ss_min": 5.88,
+   "ss_max": 16.8
+  },
+  "5/4": {
+   "staffs": 249,
+   "start": 98,
+   "mid_to": 162,
+   "scores": 164,
+   "composers": 107,
+   "ss_median": 11.76,
+   "ss_min": 7.52,
+   "ss_max": 12.81
+  },
+  "2/2": {
+   "staffs": 1225,
+   "start": 1177,
+   "mid_to": 51,
+   "scores": 466,
+   "composers": 131,
+   "ss_median": 11.76,
+   "ss_min": 6.94,
+   "ss_max": 14.11
+  },
+  "6/4": {
+   "staffs": 443,
+   "start": 308,
+   "mid_to": 148,
+   "scores": 292,
+   "composers": 170,
+   "ss_median": 11.76,
+   "ss_min": 7.99,
+   "ss_max": 12.58
+  },
+  "6/8": {
+   "staffs": 2795,
+   "start": 2596,
+   "mid_to": 213,
+   "scores": 1471,
+   "composers": 542,
+   "ss_median": 11.76,
+   "ss_min": 6.23,
+   "ss_max": 17.05
+  },
+  "7/4": {
+   "staffs": 104,
+   "start": 31,
+   "mid_to": 73,
+   "scores": 89,
+   "composers": 60,
+   "ss_median": 11.76,
+   "ss_min": 11.44,
+   "ss_max": 12.0
+  },
+  "7/8": {
+   "staffs": 523,
+   "start": 137,
+   "mid_to": 413,
+   "scores": 407,
+   "composers": 180,
+   "ss_median": 11.76,
+   "ss_min": 8.79,
+   "ss_max": 12.0
+  },
+  "12/8": {
+   "staffs": 343,
+   "start": 266,
+   "mid_to": 81,
+   "scores": 203,
+   "composers": 113,
+   "ss_median": 11.76,
+   "ss_min": 6.86,
+   "ss_max": 13.73
+  },
+  "9/8": {
+   "staffs": 740,
+   "start": 464,
+   "mid_to": 300,
+   "scores": 482,
+   "composers": 210,
+   "ss_median": 11.76,
+   "ss_min": 6.35,
+   "ss_max": 12.0
+  },
+  "15/8": {
+   "staffs": 26,
+   "start": 13,
+   "mid_to": 14,
+   "scores": 26,
+   "composers": 21,
+   "ss_median": 11.76,
+   "ss_min": 11.64,
+   "ss_max": 12.0
+  },
+  "5/8": {
+   "staffs": 778,
+   "start": 146,
+   "mid_to": 676,
+   "scores": 449,
+   "composers": 219,
+   "ss_median": 11.76,
+   "ss_min": 8.7,
+   "ss_max": 12.0
+  },
+  "10/4": {
+   "staffs": 10,
+   "start": 9,
+   "mid_to": 1,
+   "scores": 9,
+   "composers": 7,
+   "ss_median": 11.88,
+   "ss_min": 11.76,
+   "ss_max": 12.7
+  },
+  "9/4": {
+   "staffs": 29,
+   "start": 15,
+   "mid_to": 16,
+   "scores": 18,
+   "composers": 13,
+   "ss_median": 11.76,
+   "ss_min": 8.79,
+   "ss_max": 12.0
+  },
+  "3/2": {
+   "staffs": 190,
+   "start": 133,
+   "mid_to": 62,
+   "scores": 123,
+   "composers": 71,
+   "ss_median": 11.64,
+   "ss_min": 7.29,
+   "ss_max": 13.17
+  },
+  "19/16": {
+   "staffs": 73,
+   "start": 39,
+   "mid_to": 34,
+   "scores": 68,
+   "composers": 52,
+   "ss_median": 11.76,
+   "ss_min": 11.76,
+   "ss_max": 12.0
+  },
+  "1/8": {
+   "staffs": 572,
+   "start": 57,
+   "mid_to": 558,
+   "scores": 374,
+   "composers": 185,
+   "ss_median": 11.76,
+   "ss_min": 8.79,
+   "ss_max": 12.0
+  },
+  "15/16": {
+   "staffs": 71,
+   "start": 24,
+   "mid_to": 49,
+   "scores": 64,
+   "composers": 43,
+   "ss_median": 11.76,
+   "ss_min": 10.47,
+   "ss_max": 12.0
+  },
+  "cut": {
+   "staffs": 368,
+   "start": 329,
+   "mid_to": 43,
+   "scores": 245,
+   "composers": 119,
+   "ss_median": 11.13,
+   "ss_min": 6.58,
+   "ss_max": 37.74
+  },
+  "13/16": {
+   "staffs": 103,
+   "start": 33,
+   "mid_to": 70,
+   "scores": 92,
+   "composers": 66,
+   "ss_median": 11.76,
+   "ss_min": 10.47,
+   "ss_max": 12.0
+  },
+  "17/16": {
+   "staffs": 138,
+   "start": 64,
+   "mid_to": 74,
+   "scores": 122,
+   "composers": 72,
+   "ss_median": 11.76,
+   "ss_min": 8.79,
+   "ss_max": 12.0
+  },
+  "4/8": {
+   "staffs": 58,
+   "start": 38,
+   "mid_to": 29,
+   "scores": 32,
+   "composers": 19,
+   "ss_median": 11.64,
+   "ss_min": 7.76,
+   "ss_max": 12.0
+  },
+  "4/2": {
+   "staffs": 64,
+   "start": 54,
+   "mid_to": 12,
+   "scores": 42,
+   "composers": 35,
+   "ss_median": 11.76,
+   "ss_min": 9.05,
+   "ss_max": 12.11
+  },
+  "13/8": {
+   "staffs": 58,
+   "start": 32,
+   "mid_to": 26,
+   "scores": 54,
+   "composers": 44,
+   "ss_median": 11.76,
+   "ss_min": 11.44,
+   "ss_max": 12.0
+  },
+  "5/16": {
+   "staffs": 41,
+   "start": 7,
+   "mid_to": 34,
+   "scores": 30,
+   "composers": 27,
+   "ss_median": 11.76,
+   "ss_min": 11.44,
+   "ss_max": 12.0
+  },
+  "8/4": {
+   "staffs": 79,
+   "start": 34,
+   "mid_to": 46,
+   "scores": 74,
+   "composers": 56,
+   "ss_median": 11.76,
+   "ss_min": 9.37,
+   "ss_max": 12.0
+  },
+  "7/16": {
+   "staffs": 19,
+   "start": 5,
+   "mid_to": 14,
+   "scores": 16,
+   "composers": 15,
+   "ss_median": 11.76,
+   "ss_min": 11.76,
+   "ss_max": 12.0
+  },
+  "11/8": {
+   "staffs": 31,
+   "start": 7,
+   "mid_to": 24,
+   "scores": 26,
+   "composers": 24,
+   "ss_median": 11.76,
+   "ss_min": 10.35,
+   "ss_max": 12.0
+  },
+  "11/16": {
+   "staffs": 93,
+   "start": 39,
+   "mid_to": 54,
+   "scores": 73,
+   "composers": 49,
+   "ss_median": 11.76,
+   "ss_min": 8.79,
+   "ss_max": 12.0
+  },
+  "12/16": {
+   "staffs": 21,
+   "start": 19,
+   "mid_to": 2,
+   "scores": 7,
+   "composers": 6,
+   "ss_median": 11.19,
+   "ss_min": 9.37,
+   "ss_max": 11.76
+  },
+  "9/16": {
+   "staffs": 44,
+   "start": 17,
+   "mid_to": 28,
+   "scores": 31,
+   "composers": 26,
+   "ss_median": 11.76,
+   "ss_min": 11.44,
+   "ss_max": 12.0
+  },
+  "2/8": {
+   "staffs": 11,
+   "start": 3,
+   "mid_to": 9,
+   "scores": 8,
+   "composers": 7,
+   "ss_median": 9.41,
+   "ss_min": 7.99,
+   "ss_max": 12.0
+  }
+ },
+ "pairs": {
+  "?->3/4": {
+   "staffs": 881,
+   "scores": 699,
+   "composers": 327,
+   "sets": {
+    "pdmx_hard": 569,
+    "pdmx": 142,
+    "Lieder-main": 51,
+    "musescore_octave": 21,
+    "lilypond": 98
+   }
+  },
+  "3/4->1/4": {
+   "staffs": 689,
+   "scores": 451,
+   "composers": 195,
+   "sets": {
+    "pdmx_hard": 639,
+    "pdmx": 45,
+    "lilypond": 5
+   }
+  },
+  "1/4->4/4": {
+   "staffs": 587,
+   "scores": 414,
+   "composers": 178,
+   "sets": {
+    "pdmx_hard": 536,
+    "pdmx": 42,
+    "musescore_octave": 1,
+    "lilypond": 8
+   }
+  },
+  "4/4->3/4": {
+   "staffs": 501,
+   "scores": 355,
+   "composers": 183,
+   "sets": {
+    "pdmx_hard": 439,
+    "pdmx": 47,
+    "lilypond": 8,
+    "Lieder-main": 4,
+    "musescore_octave": 3
+   }
+  },
+  "?->2/4": {
+   "staffs": 449,
+   "scores": 321,
+   "composers": 204,
+   "sets": {
+    "musescore_octave": 42,
+    "Lieder-main": 66,
+    "pdmx_hard": 136,
+    "pdmx": 133,
+    "lilypond": 67,
+    "kern_scriabin": 3,
+    "asap": 2
+   }
+  },
+  "5/8->1/8": {
+   "staffs": 390,
+   "scores": 241,
+   "composers": 137,
+   "sets": {
+    "pdmx_hard": 358,
+    "pdmx": 27,
+    "lilypond": 5
+   }
+  },
+  "?->5/8": {
+   "staffs": 343,
+   "scores": 275,
+   "composers": 152,
+   "sets": {
+    "pdmx_hard": 306,
+    "Lieder-main": 1,
+    "pdmx": 24,
+    "lilypond": 11,
+    "musescore_octave": 1
+   }
+  },
+  "1/8->3/4": {
+   "staffs": 289,
+   "scores": 202,
+   "composers": 114,
+   "sets": {
+    "pdmx_hard": 261,
+    "pdmx": 23,
+    "lilypond": 5
+   }
+  },
+  "?->4/4": {
+   "staffs": 239,
+   "scores": 194,
+   "composers": 137,
+   "sets": {
+    "pdmx": 100,
+    "kern_scriabin": 3,
+    "lilypond": 41,
+    "pdmx_hard": 75,
+    "musescore_octave": 10,
+    "Lieder-main": 10
+   }
+  },
+  "?->7/8": {
+   "staffs": 233,
+   "scores": 213,
+   "composers": 119,
+   "sets": {
+    "pdmx_hard": 222,
+    "lilypond": 5,
+    "pdmx": 6
+   }
+  },
+  "2/4->4/4": {
+   "staffs": 184,
+   "scores": 131,
+   "composers": 98,
+   "sets": {
+    "pdmx_hard": 68,
+    "pdmx": 60,
+    "Lieder-main": 9,
+    "musescore_octave": 12,
+    "grandstaff": 5,
+    "lilypond": 30
+   }
+  },
+  "?->9/8": {
+   "staffs": 177,
+   "scores": 158,
+   "composers": 96,
+   "sets": {
+    "pdmx_hard": 133,
+    "lilypond": 10,
+    "pdmx": 13,
+    "Lieder-main": 18,
+    "musescore_octave": 3
+   }
+  },
+  "9/8->4/4": {
+   "staffs": 159,
+   "scores": 146,
+   "composers": 77,
+   "sets": {
+    "pdmx_hard": 152,
+    "pdmx": 5,
+    "lilypond": 2
+   }
+  },
+  "3/4->5/8": {
+   "staffs": 153,
+   "scores": 120,
+   "composers": 83,
+   "sets": {
+    "pdmx_hard": 138,
+    "pdmx": 15
+   }
+  },
+  "3/4->2/4": {
+   "staffs": 140,
+   "scores": 90,
+   "composers": 64,
+   "sets": {
+    "pdmx": 40,
+    "pdmx_hard": 71,
+    "Lieder-main": 14,
+    "musescore_octave": 11,
+    "lilypond": 4
+   }
+  },
+  "?->common": {
+   "staffs": 128,
+   "scores": 87,
+   "composers": 54,
+   "sets": {
+    "lilypond": 36,
+    "pdmx_hard": 14,
+    "pdmx": 37,
+    "Lieder-main": 27,
+    "musescore_octave": 14
+   }
+  },
+  "?->6/8": {
+   "staffs": 124,
+   "scores": 95,
+   "composers": 65,
+   "sets": {
+    "lilypond": 20,
+    "pdmx": 42,
+    "kern_scriabin": 5,
+    "pdmx_hard": 23,
+    "Lieder-main": 23,
+    "musescore_octave": 9,
+    "asap": 2
+   }
+  },
+  "7/8->3/4": {
+   "staffs": 106,
+   "scores": 92,
+   "composers": 59,
+   "sets": {
+    "pdmx_hard": 102,
+    "pdmx": 4
+   }
+  },
+  "6/8->5/8": {
+   "staffs": 102,
+   "scores": 96,
+   "composers": 69,
+   "sets": {
+    "pdmx_hard": 92,
+    "kern_scriabin": 7,
+    "pdmx": 3
+   }
+  },
+  "7/8->1/8": {
+   "staffs": 102,
+   "scores": 77,
+   "composers": 51,
+   "sets": {
+    "pdmx_hard": 92,
+    "pdmx": 10
+   }
+  },
+  "3/4->3/8": {
+   "staffs": 101,
+   "scores": 69,
+   "composers": 45,
+   "sets": {
+    "pdmx_hard": 90,
+    "pdmx": 6,
+    "lilypond": 3,
+    "Lieder-main": 2
+   }
+  },
+  "3/8->4/4": {
+   "staffs": 94,
+   "scores": 68,
+   "composers": 48,
+   "sets": {
+    "pdmx_hard": 89,
+    "pdmx": 4,
+    "lilypond": 1
+   }
+  },
+  "7/8->1/4": {
+   "staffs": 93,
+   "scores": 88,
+   "composers": 56,
+   "sets": {
+    "pdmx_hard": 91,
+    "pdmx": 1,
+    "lilypond": 1
+   }
+  },
+  "1/4->3/4": {
+   "staffs": 93,
+   "scores": 65,
+   "composers": 48,
+   "sets": {
+    "pdmx_hard": 69,
+    "pdmx": 19,
+    "lilypond": 5
+   }
+  },
+  "4/4->7/8": {
+   "staffs": 93,
+   "scores": 80,
+   "composers": 61,
+   "sets": {
+    "pdmx_hard": 85,
+    "pdmx": 7,
+    "lilypond": 1
+   }
+  },
+  "2/4->1/4": {
+   "staffs": 92,
+   "scores": 61,
+   "composers": 45,
+   "sets": {
+    "pdmx": 16,
+    "pdmx_hard": 74,
+    "lilypond": 2
+   }
+  },
+  "?->5/4": {
+   "staffs": 89,
+   "scores": 74,
+   "composers": 55,
+   "sets": {
+    "pdmx_hard": 63,
+    "lilypond": 16,
+    "musescore_octave": 2,
+    "pdmx": 8
+   }
+  },
+  "?->3/8": {
+   "staffs": 82,
+   "scores": 65,
+   "composers": 49,
+   "sets": {
+    "pdmx_hard": 45,
+    "Lieder-main": 8,
+    "pdmx": 15,
+    "musescore_octave": 3,
+    "lilypond": 11
+   }
+  },
+  "5/8->3/8": {
+   "staffs": 81,
+   "scores": 57,
+   "composers": 41,
+   "sets": {
+    "pdmx_hard": 73,
+    "pdmx": 5,
+    "lilypond": 3
+   }
+  },
+  "3/4->4/4": {
+   "staffs": 80,
+   "scores": 57,
+   "composers": 46,
+   "sets": {
+    "pdmx_hard": 30,
+    "pdmx": 27,
+    "musescore_octave": 5,
+    "Lieder-main": 9,
+    "lilypond": 9
+   }
+  },
+  "2/4->3/4": {
+   "staffs": 77,
+   "scores": 54,
+   "composers": 26,
+   "sets": {
+    "Lieder-main": 25,
+    "pdmx_hard": 11,
+    "pdmx": 17,
+    "musescore_octave": 9,
+    "lilypond": 10,
+    "kern_scriabin": 2,
+    "asap": 1,
+    "grandstaff": 2
+   }
+  },
+  "1/8->4/4": {
+   "staffs": 74,
+   "scores": 61,
+   "composers": 45,
+   "sets": {
+    "pdmx_hard": 72,
+    "pdmx": 2
+   }
+  },
+  "5/4->4/4": {
+   "staffs": 70,
+   "scores": 56,
+   "composers": 39,
+   "sets": {
+    "pdmx_hard": 44,
+    "pdmx": 11,
+    "musescore_octave": 6,
+    "lilypond": 8,
+    "Lieder-main": 1
+   }
+  },
+  "2/4->3/8": {
+   "staffs": 68,
+   "scores": 15,
+   "composers": 13,
+   "sets": {
+    "pdmx_hard": 16,
+    "grandstaff": 7,
+    "musescore_octave": 20,
+    "Lieder-main": 23,
+    "pdmx": 2
+   }
+  },
+  "9/8->3/4": {
+   "staffs": 65,
+   "scores": 40,
+   "composers": 30,
+   "sets": {
+    "pdmx_hard": 60,
+    "lilypond": 3,
+    "pdmx": 2
+   }
+  },
+  "?->17/16": {
+   "staffs": 61,
+   "scores": 56,
+   "composers": 41,
+   "sets": {
+    "pdmx_hard": 59,
+    "lilypond": 2
+   }
+  },
+  "?->6/4": {
+   "staffs": 57,
+   "scores": 46,
+   "composers": 37,
+   "sets": {
+    "lilypond": 13,
+    "pdmx_hard": 33,
+    "Lieder-main": 4,
+    "musescore_octave": 1,
+    "pdmx": 6
+   }
+  },
+  "4/4->2/4": {
+   "staffs": 57,
+   "scores": 44,
+   "composers": 37,
+   "sets": {
+    "pdmx_hard": 35,
+    "Lieder-main": 2,
+    "pdmx": 15,
+    "lilypond": 4,
+    "musescore_octave": 1
+   }
+  },
+  "2/4->common": {
+   "staffs": 56,
+   "scores": 36,
+   "composers": 18,
+   "sets": {
+    "musescore_octave": 15,
+    "lilypond": 8,
+    "pdmx_hard": 12,
+    "Lieder-main": 16,
+    "pdmx": 5
+   }
+  },
+  "17/16->4/4": {
+   "staffs": 53,
+   "scores": 50,
+   "composers": 35,
+   "sets": {
+    "pdmx_hard": 53
+   }
+  },
+  "3/8->2/4": {
+   "staffs": 51,
+   "scores": 9,
+   "composers": 8,
+   "sets": {
+    "grandstaff": 4,
+    "musescore_octave": 18,
+    "pdmx_hard": 2,
+    "Lieder-main": 23,
+    "pdmx": 4
+   }
+  },
+  "3/8->3/4": {
+   "staffs": 47,
+   "scores": 33,
+   "composers": 30,
+   "sets": {
+    "pdmx_hard": 40,
+    "pdmx": 5,
+    "Lieder-main": 1,
+    "lilypond": 1
+   }
+  },
+  "13/16->3/4": {
+   "staffs": 46,
+   "scores": 45,
+   "composers": 42,
+   "sets": {
+    "pdmx_hard": 45,
+    "pdmx": 1
+   }
+  },
+  "4/4->9/8": {
+   "staffs": 46,
+   "scores": 42,
+   "composers": 35,
+   "sets": {
+    "pdmx_hard": 43,
+    "pdmx": 3
+   }
+  },
+  "?->7/4": {
+   "staffs": 45,
+   "scores": 44,
+   "composers": 30,
+   "sets": {
+    "pdmx_hard": 41,
+    "pdmx": 4
+   }
+  },
+  "?->12/8": {
+   "staffs": 45,
+   "scores": 34,
+   "composers": 22,
+   "sets": {
+    "lilypond": 15,
+    "pdmx": 10,
+    "musescore_octave": 6,
+    "Lieder-main": 2,
+    "pdmx_hard": 12
+   }
+  },
+  "?->3/2": {
+   "staffs": 45,
+   "scores": 26,
+   "composers": 19,
+   "sets": {
+    "pdmx": 21,
+    "lilypond": 8,
+    "Lieder-main": 9,
+    "pdmx_hard": 4,
+    "musescore_octave": 3
+   }
+  },
+  "?->13/16": {
+   "staffs": 45,
+   "scores": 43,
+   "composers": 38,
+   "sets": {
+    "pdmx_hard": 44,
+    "pdmx": 1
+   }
+  },
+  "3/4->7/8": {
+   "staffs": 41,
+   "scores": 36,
+   "composers": 30,
+   "sets": {
+    "pdmx_hard": 38,
+    "pdmx": 3
+   }
+  },
+  "?->11/16": {
+   "staffs": 37,
+   "scores": 33,
+   "composers": 28,
+   "sets": {
+    "pdmx_hard": 35,
+    "lilypond": 2
+   }
+  },
+  "4/4->5/8": {
+   "staffs": 33,
+   "scores": 27,
+   "composers": 23,
+   "sets": {
+    "pdmx_hard": 31,
+    "pdmx": 2
+   }
+  },
+  "?->cut": {
+   "staffs": 32,
+   "scores": 28,
+   "composers": 14,
+   "sets": {
+    "pdmx": 12,
+    "pdmx_hard": 7,
+    "lilypond": 11,
+    "Lieder-main": 1,
+    "musescore_octave": 1
+   }
+  },
+  "15/16->3/4": {
+   "staffs": 32,
+   "scores": 29,
+   "composers": 22,
+   "sets": {
+    "pdmx_hard": 32
+   }
+  },
+  "?->8/4": {
+   "staffs": 31,
+   "scores": 31,
+   "composers": 26,
+   "sets": {
+    "pdmx_hard": 29,
+    "pdmx": 1,
+    "lilypond": 1
+   }
+  },
+  "19/16->4/4": {
+   "staffs": 30,
+   "scores": 29,
+   "composers": 26,
+   "sets": {
+    "pdmx_hard": 29,
+    "pdmx": 1
+   }
+  },
+  "6/4->4/4": {
+   "staffs": 28,
+   "scores": 22,
+   "composers": 20,
+   "sets": {
+    "pdmx_hard": 22,
+    "Lieder-main": 1,
+    "lilypond": 2,
+    "musescore_octave": 1,
+    "pdmx": 2
+   }
+  },
+  "3/4->common": {
+   "staffs": 27,
+   "scores": 19,
+   "composers": 17,
+   "sets": {
+    "Lieder-main": 10,
+    "musescore_octave": 2,
+    "pdmx": 9,
+    "pdmx_hard": 6
+   }
+  },
+  "common->3/4": {
+   "staffs": 27,
+   "scores": 20,
+   "composers": 10,
+   "sets": {
+    "musescore_octave": 7,
+    "pdmx": 3,
+    "Lieder-main": 15,
+    "pdmx_hard": 2
+   }
+  },
+  "?->15/16": {
+   "staffs": 27,
+   "scores": 25,
+   "composers": 19,
+   "sets": {
+    "pdmx_hard": 27
+   }
+  },
+  "5/4->1/4": {
+   "staffs": 27,
+   "scores": 18,
+   "composers": 17,
+   "sets": {
+    "pdmx_hard": 26,
+    "pdmx": 1
+   }
+  },
+  "11/16->5/16": {
+   "staffs": 26,
+   "scores": 17,
+   "composers": 15,
+   "sets": {
+    "pdmx_hard": 26
+   }
+  },
+  "5/4->3/4": {
+   "staffs": 26,
+   "scores": 19,
+   "composers": 17,
+   "sets": {
+    "musescore_octave": 2,
+    "pdmx": 7,
+    "kern_scriabin": 2,
+    "pdmx_hard": 15
+   }
+  },
+  "5/16->4/4": {
+   "staffs": 25,
+   "scores": 21,
+   "composers": 20,
+   "sets": {
+    "pdmx_hard": 25
+   }
+  },
+  "4/4->5/4": {
+   "staffs": 24,
+   "scores": 19,
+   "composers": 19,
+   "sets": {
+    "pdmx_hard": 15,
+    "pdmx": 9
+   }
+  },
+  "9/8->6/8": {
+   "staffs": 24,
+   "scores": 16,
+   "composers": 13,
+   "sets": {
+    "Lieder-main": 13,
+    "pdmx_hard": 8,
+    "lilypond": 2,
+    "musescore_octave": 1
+   }
+  },
+  "3/8->9/8": {
+   "staffs": 23,
+   "scores": 20,
+   "composers": 13,
+   "sets": {
+    "pdmx_hard": 18,
+    "lilypond": 3,
+    "pdmx": 2
+   }
+  },
+  "?->2/2": {
+   "staffs": 23,
+   "scores": 16,
+   "composers": 13,
+   "sets": {
+    "pdmx": 12,
+    "asap": 1,
+    "Lieder-main": 7,
+    "pdmx_hard": 2,
+    "kern_scriabin": 1
+   }
+  },
+  "?->1/4": {
+   "staffs": 23,
+   "scores": 19,
+   "composers": 17,
+   "sets": {
+    "pdmx": 5,
+    "musescore_octave": 1,
+    "pdmx_hard": 13,
+    "lilypond": 4
+   }
+  },
+  "1/4->6/4": {
+   "staffs": 23,
+   "scores": 16,
+   "composers": 14,
+   "sets": {
+    "pdmx_hard": 22,
+    "pdmx": 1
+   }
+  },
+  "?->13/8": {
+   "staffs": 22,
+   "scores": 22,
+   "composers": 20,
+   "sets": {
+    "pdmx_hard": 21,
+    "pdmx": 1
+   }
+  },
+  "?->19/16": {
+   "staffs": 22,
+   "scores": 20,
+   "composers": 19,
+   "sets": {
+    "pdmx_hard": 21,
+    "pdmx": 1
+   }
+  },
+  "1/8->2/4": {
+   "staffs": 21,
+   "scores": 10,
+   "composers": 10,
+   "sets": {
+    "pdmx_hard": 20,
+    "pdmx": 1
+   }
+  },
+  "9/8->7/8": {
+   "staffs": 21,
+   "scores": 8,
+   "composers": 8,
+   "sets": {
+    "pdmx_hard": 8,
+    "pdmx": 13
+   }
+  },
+  "3/2->2/2": {
+   "staffs": 20,
+   "scores": 8,
+   "composers": 8,
+   "sets": {
+    "Lieder-main": 9,
+    "pdmx": 5,
+    "musescore_octave": 1,
+    "pdmx_hard": 5
+   }
+  },
+  "3/8->1/8": {
+   "staffs": 19,
+   "scores": 11,
+   "composers": 10,
+   "sets": {
+    "pdmx_hard": 18,
+    "pdmx": 1
+   }
+  },
+  "3/4->13/16": {
+   "staffs": 18,
+   "scores": 17,
+   "composers": 16,
+   "sets": {
+    "pdmx_hard": 18
+   }
+  },
+  "11/16->3/8": {
+   "staffs": 17,
+   "scores": 16,
+   "composers": 12,
+   "sets": {
+    "pdmx_hard": 17
+   }
+  },
+  "6/4->5/4": {
+   "staffs": 17,
+   "scores": 12,
+   "composers": 10,
+   "sets": {
+    "lilypond": 2,
+    "pdmx_hard": 12,
+    "kern_scriabin": 2,
+    "Lieder-main": 1
+   }
+  },
+  "?->11/8": {
+   "staffs": 16,
+   "scores": 16,
+   "composers": 16,
+   "sets": {
+    "pdmx_hard": 15,
+    "pdmx": 1
+   }
+  },
+  "common->2/4": {
+   "staffs": 16,
+   "scores": 6,
+   "composers": 3,
+   "sets": {
+    "lilypond": 2,
+    "Lieder-main": 8,
+    "musescore_octave": 5,
+    "pdmx": 1
+   }
+  },
+  "2/4->6/4": {
+   "staffs": 16,
+   "scores": 8,
+   "composers": 8,
+   "sets": {
+    "pdmx_hard": 15,
+    "lilypond": 1
+   }
+  },
+  "17/16->3/4": {
+   "staffs": 16,
+   "scores": 16,
+   "composers": 16,
+   "sets": {
+    "pdmx_hard": 16
+   }
+  },
+  "13/16->5/8": {
+   "staffs": 15,
+   "scores": 15,
+   "composers": 12,
+   "sets": {
+    "pdmx_hard": 13,
+    "pdmx": 2
+   }
+  },
+  "3/4->5/4": {
+   "staffs": 15,
+   "scores": 8,
+   "composers": 8,
+   "sets": {
+    "musescore_octave": 1,
+    "kern_scriabin": 4,
+    "pdmx_hard": 5,
+    "pdmx": 3,
+    "Lieder-main": 2
+   }
+  },
+  "?->9/16": {
+   "staffs": 15,
+   "scores": 13,
+   "composers": 13,
+   "sets": {
+    "pdmx_hard": 15
+   }
+  },
+  "3/8->6/8": {
+   "staffs": 14,
+   "scores": 11,
+   "composers": 10,
+   "sets": {
+    "lilypond": 5,
+    "pdmx": 3,
+    "pdmx_hard": 5,
+    "grandstaff": 1
+   }
+  },
+  "9/8->12/8": {
+   "staffs": 13,
+   "scores": 7,
+   "composers": 7,
+   "sets": {
+    "pdmx": 7,
+    "pdmx_hard": 4,
+    "Lieder-main": 2
+   }
+  },
+  "4/4->7/4": {
+   "staffs": 13,
+   "scores": 13,
+   "composers": 12,
+   "sets": {
+    "pdmx_hard": 12,
+    "grandstaff": 1
+   }
+  },
+  "4/4->4/4": {
+   "staffs": 13,
+   "scores": 10,
+   "composers": 9,
+   "sets": {
+    "lilypond": 3,
+    "pdmx_hard": 5,
+    "pdmx": 5
+   }
+  },
+  "5/8->2/4": {
+   "staffs": 12,
+   "scores": 9,
+   "composers": 9,
+   "sets": {
+    "pdmx_hard": 11,
+    "pdmx": 1
+   }
+  },
+  "3/4->15/16": {
+   "staffs": 12,
+   "scores": 11,
+   "composers": 10,
+   "sets": {
+    "pdmx_hard": 12
+   }
+  },
+  "5/8->4/8": {
+   "staffs": 11,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "kern_scriabin": 11
+   }
+  },
+  "6/8->9/8": {
+   "staffs": 11,
+   "scores": 7,
+   "composers": 6,
+   "sets": {
+    "Lieder-main": 7,
+    "pdmx_hard": 4
+   }
+  },
+  "12/8->9/8": {
+   "staffs": 11,
+   "scores": 9,
+   "composers": 8,
+   "sets": {
+    "pdmx": 2,
+    "pdmx_hard": 7,
+    "Lieder-main": 2
+   }
+  },
+  "7/4->6/4": {
+   "staffs": 11,
+   "scores": 11,
+   "composers": 10,
+   "sets": {
+    "pdmx_hard": 11
+   }
+  },
+  "?->1/8": {
+   "staffs": 11,
+   "scores": 11,
+   "composers": 10,
+   "sets": {
+    "pdmx_hard": 11
+   }
+  },
+  "7/8->9/8": {
+   "staffs": 11,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 11
+   }
+  },
+  "?->15/8": {
+   "staffs": 10,
+   "scores": 10,
+   "composers": 9,
+   "sets": {
+    "pdmx_hard": 10
+   }
+  },
+  "19/16->3/4": {
+   "staffs": 10,
+   "scores": 9,
+   "composers": 9,
+   "sets": {
+    "pdmx_hard": 10
+   }
+  },
+  "17/16->7/8": {
+   "staffs": 10,
+   "scores": 9,
+   "composers": 9,
+   "sets": {
+    "pdmx_hard": 10
+   }
+  },
+  "?->9/4": {
+   "staffs": 10,
+   "scores": 8,
+   "composers": 5,
+   "sets": {
+    "lilypond": 4,
+    "pdmx_hard": 3,
+    "Lieder-main": 3
+   }
+  },
+  "3/4->6/8": {
+   "staffs": 10,
+   "scores": 8,
+   "composers": 8,
+   "sets": {
+    "musescore_octave": 2,
+    "pdmx": 2,
+    "Lieder-main": 1,
+    "pdmx_hard": 5
+   }
+  },
+  "?->7/16": {
+   "staffs": 10,
+   "scores": 9,
+   "composers": 8,
+   "sets": {
+    "pdmx_hard": 10
+   }
+  },
+  "4/4->11/16": {
+   "staffs": 10,
+   "scores": 7,
+   "composers": 7,
+   "sets": {
+    "pdmx_hard": 10
+   }
+  },
+  "9/8->3/8": {
+   "staffs": 10,
+   "scores": 6,
+   "composers": 5,
+   "sets": {
+    "pdmx_hard": 10
+   }
+  },
+  "5/8->1/4": {
+   "staffs": 10,
+   "scores": 10,
+   "composers": 10,
+   "sets": {
+    "pdmx": 1,
+    "pdmx_hard": 8,
+    "lilypond": 1
+   }
+  },
+  "4/8->5/8": {
+   "staffs": 9,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "kern_scriabin": 9
+   }
+  },
+  "3/2->4/4": {
+   "staffs": 9,
+   "scores": 5,
+   "composers": 4,
+   "sets": {
+    "pdmx": 2,
+    "lilypond": 5,
+    "musescore_octave": 1,
+    "Lieder-main": 1
+   }
+  },
+  "6/4->3/4": {
+   "staffs": 9,
+   "scores": 7,
+   "composers": 7,
+   "sets": {
+    "kern_scriabin": 3,
+    "pdmx_hard": 4,
+    "pdmx": 2
+   }
+  },
+  "?->4/8": {
+   "staffs": 9,
+   "scores": 7,
+   "composers": 6,
+   "sets": {
+    "pdmx_hard": 3,
+    "kern_scriabin": 4,
+    "pdmx": 1,
+    "Lieder-main": 1
+   }
+  },
+  "17/16->1/8": {
+   "staffs": 9,
+   "scores": 8,
+   "composers": 8,
+   "sets": {
+    "pdmx_hard": 9
+   }
+  },
+  "4/4->17/16": {
+   "staffs": 9,
+   "scores": 8,
+   "composers": 8,
+   "sets": {
+    "pdmx_hard": 8,
+    "grandstaff": 1
+   }
+  },
+  "13/8->6/4": {
+   "staffs": 8,
+   "scores": 8,
+   "composers": 8,
+   "sets": {
+    "pdmx_hard": 8
+   }
+  },
+  "9/4->6/4": {
+   "staffs": 8,
+   "scores": 4,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 2,
+    "Lieder-main": 6
+   }
+  },
+  "7/4->1/4": {
+   "staffs": 8,
+   "scores": 4,
+   "composers": 4,
+   "sets": {
+    "pdmx_hard": 8
+   }
+  },
+  "6/8->3/4": {
+   "staffs": 8,
+   "scores": 5,
+   "composers": 3,
+   "sets": {
+    "pdmx": 2,
+    "pdmx_hard": 1,
+    "musescore_octave": 1,
+    "lilypond": 4
+   }
+  },
+  "9/16->2/4": {
+   "staffs": 8,
+   "scores": 6,
+   "composers": 5,
+   "sets": {
+    "pdmx_hard": 8
+   }
+  },
+  "7/8->3/8": {
+   "staffs": 8,
+   "scores": 5,
+   "composers": 5,
+   "sets": {
+    "pdmx_hard": 8
+   }
+  },
+  "6/8->3/8": {
+   "staffs": 7,
+   "scores": 6,
+   "composers": 5,
+   "sets": {
+    "lilypond": 3,
+    "Lieder-main": 1,
+    "pdmx_hard": 2,
+    "pdmx": 1
+   }
+  },
+  "7/4->4/4": {
+   "staffs": 7,
+   "scores": 7,
+   "composers": 6,
+   "sets": {
+    "pdmx_hard": 5,
+    "grandstaff": 1,
+    "pdmx": 1
+   }
+  },
+  "3/4->1/8": {
+   "staffs": 7,
+   "scores": 6,
+   "composers": 6,
+   "sets": {
+    "pdmx_hard": 4,
+    "pdmx": 3
+   }
+  },
+  "6/4->2/4": {
+   "staffs": 7,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 4,
+    "pdmx": 3
+   }
+  },
+  "4/8->3/8": {
+   "staffs": 7,
+   "scores": 4,
+   "composers": 4,
+   "sets": {
+    "pdmx": 3,
+    "Lieder-main": 2,
+    "pdmx_hard": 2
+   }
+  },
+  "5/8->3/4": {
+   "staffs": 7,
+   "scores": 7,
+   "composers": 6,
+   "sets": {
+    "pdmx_hard": 5,
+    "pdmx": 2
+   }
+  },
+  "3/2->cut": {
+   "staffs": 6,
+   "scores": 3,
+   "composers": 2,
+   "sets": {
+    "lilypond": 2,
+    "pdmx": 4
+   }
+  },
+  "common->4/4": {
+   "staffs": 6,
+   "scores": 5,
+   "composers": 5,
+   "sets": {
+    "pdmx": 3,
+    "grandstaff": 3
+   }
+  },
+  "6/8->2/4": {
+   "staffs": 6,
+   "scores": 4,
+   "composers": 4,
+   "sets": {
+    "pdmx_hard": 2,
+    "lilypond": 2,
+    "pdmx": 2
+   }
+  },
+  "11/16->1/8": {
+   "staffs": 6,
+   "scores": 6,
+   "composers": 4,
+   "sets": {
+    "pdmx_hard": 6
+   }
+  },
+  "5/8->6/8": {
+   "staffs": 6,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "kern_scriabin": 5,
+    "pdmx_hard": 1
+   }
+  },
+  "6/8->12/8": {
+   "staffs": 6,
+   "scores": 5,
+   "composers": 5,
+   "sets": {
+    "pdmx": 2,
+    "pdmx_hard": 3,
+    "asap": 1
+   }
+  },
+  "4/4->8/4": {
+   "staffs": 6,
+   "scores": 6,
+   "composers": 6,
+   "sets": {
+    "pdmx_hard": 6
+   }
+  },
+  "3/2->common": {
+   "staffs": 6,
+   "scores": 5,
+   "composers": 3,
+   "sets": {
+    "Lieder-main": 4,
+    "musescore_octave": 2
+   }
+  },
+  "3/4->6/4": {
+   "staffs": 6,
+   "scores": 4,
+   "composers": 4,
+   "sets": {
+    "kern_scriabin": 2,
+    "pdmx_hard": 3,
+    "pdmx": 1
+   }
+  },
+  "5/4->6/4": {
+   "staffs": 6,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 6
+   }
+  },
+  "15/16->5/8": {
+   "staffs": 6,
+   "scores": 6,
+   "composers": 4,
+   "sets": {
+    "pdmx_hard": 6
+   }
+  },
+  "1/8->7/8": {
+   "staffs": 6,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 2,
+    "pdmx": 4
+   }
+  },
+  "4/4->19/16": {
+   "staffs": 6,
+   "scores": 6,
+   "composers": 6,
+   "sets": {
+    "pdmx_hard": 6
+   }
+  },
+  "9/16->4/4": {
+   "staffs": 6,
+   "scores": 6,
+   "composers": 6,
+   "sets": {
+    "pdmx_hard": 6
+   }
+  },
+  "4/4->6/8": {
+   "staffs": 6,
+   "scores": 6,
+   "composers": 4,
+   "sets": {
+    "pdmx": 5,
+    "grandstaff": 1
+   }
+  },
+  "2/2->3/2": {
+   "staffs": 6,
+   "scores": 4,
+   "composers": 4,
+   "sets": {
+    "pdmx": 4,
+    "Lieder-main": 1,
+    "pdmx_hard": 1
+   }
+  },
+  "2/4->6/8": {
+   "staffs": 5,
+   "scores": 4,
+   "composers": 4,
+   "sets": {
+    "musescore_octave": 2,
+    "pdmx": 1,
+    "pdmx_hard": 2
+   }
+  },
+  "3/4->5/16": {
+   "staffs": 5,
+   "scores": 5,
+   "composers": 5,
+   "sets": {
+    "pdmx_hard": 5
+   }
+  },
+  "8/4->4/4": {
+   "staffs": 5,
+   "scores": 5,
+   "composers": 4,
+   "sets": {
+    "pdmx": 1,
+    "pdmx_hard": 3,
+    "lilypond": 1
+   }
+  },
+  "2/4->9/8": {
+   "staffs": 5,
+   "scores": 5,
+   "composers": 5,
+   "sets": {
+    "pdmx_hard": 5
+   }
+  },
+  "3/4->3/4": {
+   "staffs": 5,
+   "scores": 4,
+   "composers": 4,
+   "sets": {
+    "pdmx": 3,
+    "lilypond": 2
+   }
+  },
+  "1/4->8/4": {
+   "staffs": 5,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 5
+   }
+  },
+  "6/4->7/4": {
+   "staffs": 5,
+   "scores": 4,
+   "composers": 4,
+   "sets": {
+    "pdmx_hard": 5
+   }
+  },
+  "2/2->3/8": {
+   "staffs": 5,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "grandstaff": 5
+   }
+  },
+  "13/8->5/4": {
+   "staffs": 5,
+   "scores": 5,
+   "composers": 5,
+   "sets": {
+    "pdmx_hard": 4,
+    "pdmx": 1
+   }
+  },
+  "4/2->3/2": {
+   "staffs": 5,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 3,
+    "pdmx": 2
+   }
+  },
+  "9/8->5/4": {
+   "staffs": 5,
+   "scores": 5,
+   "composers": 4,
+   "sets": {
+    "pdmx": 1,
+    "pdmx_hard": 4
+   }
+  },
+  "11/8->4/4": {
+   "staffs": 5,
+   "scores": 5,
+   "composers": 5,
+   "sets": {
+    "pdmx_hard": 5
+   }
+  },
+  "9/16->3/8": {
+   "staffs": 5,
+   "scores": 5,
+   "composers": 4,
+   "sets": {
+    "pdmx_hard": 5
+   }
+  },
+  "6/8->4/4": {
+   "staffs": 5,
+   "scores": 4,
+   "composers": 4,
+   "sets": {
+    "pdmx_hard": 1,
+    "Lieder-main": 2,
+    "grandstaff": 1,
+    "pdmx": 1
+   }
+  },
+  "13/8->3/4": {
+   "staffs": 5,
+   "scores": 5,
+   "composers": 4,
+   "sets": {
+    "pdmx_hard": 5
+   }
+  },
+  "3/8->12/8": {
+   "staffs": 5,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "Lieder-main": 1,
+    "lilypond": 3,
+    "pdmx": 1
+   }
+  },
+  "7/8->4/4": {
+   "staffs": 5,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx": 4,
+    "pdmx_hard": 1
+   }
+  },
+  "3/2->4/2": {
+   "staffs": 5,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 5
+   }
+  },
+  "2/4->9/16": {
+   "staffs": 5,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx": 1,
+    "pdmx_hard": 4
+   }
+  },
+  "15/8->6/4": {
+   "staffs": 4,
+   "scores": 4,
+   "composers": 4,
+   "sets": {
+    "pdmx_hard": 4
+   }
+  },
+  "cut->3/2": {
+   "staffs": 4,
+   "scores": 4,
+   "composers": 3,
+   "sets": {
+    "lilypond": 2,
+    "pdmx_hard": 1,
+    "pdmx": 1
+   }
+  },
+  "7/16->3/8": {
+   "staffs": 4,
+   "scores": 4,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 4
+   }
+  },
+  "6/4->9/8": {
+   "staffs": 4,
+   "scores": 3,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 4
+   }
+  },
+  "common->common": {
+   "staffs": 4,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx": 2,
+    "lilypond": 2
+   }
+  },
+  "13/16->3/8": {
+   "staffs": 4,
+   "scores": 4,
+   "composers": 4,
+   "sets": {
+    "pdmx_hard": 4
+   }
+  },
+  "3/8->2/8": {
+   "staffs": 4,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx": 3,
+    "Lieder-main": 1
+   }
+  },
+  "3/4->9/16": {
+   "staffs": 4,
+   "scores": 4,
+   "composers": 4,
+   "sets": {
+    "pdmx_hard": 4
+   }
+  },
+  "13/16->2/4": {
+   "staffs": 4,
+   "scores": 4,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 4
+   }
+  },
+  "7/8->13/16": {
+   "staffs": 4,
+   "scores": 4,
+   "composers": 4,
+   "sets": {
+    "pdmx_hard": 4
+   }
+  },
+  "6/8->1/8": {
+   "staffs": 4,
+   "scores": 4,
+   "composers": 4,
+   "sets": {
+    "pdmx_hard": 3,
+    "pdmx": 1
+   }
+  },
+  "3/8->4/8": {
+   "staffs": 4,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx": 3,
+    "Lieder-main": 1
+   }
+  },
+  "17/16->5/8": {
+   "staffs": 4,
+   "scores": 4,
+   "composers": 4,
+   "sets": {
+    "pdmx_hard": 4
+   }
+  },
+  "2/4->2/2": {
+   "staffs": 4,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "grandstaff": 1,
+    "lilypond": 2,
+    "pdmx_hard": 1
+   }
+  },
+  "9/8->1/4": {
+   "staffs": 4,
+   "scores": 4,
+   "composers": 4,
+   "sets": {
+    "pdmx_hard": 4
+   }
+  },
+  "?->4/2": {
+   "staffs": 4,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "Lieder-main": 2,
+    "pdmx_hard": 2
+   }
+  },
+  "11/8->1/8": {
+   "staffs": 4,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 4
+   }
+  },
+  "3/4->9/8": {
+   "staffs": 4,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "grandstaff": 4
+   }
+  },
+  "4/4->15/8": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 3
+   }
+  },
+  "3/8->6/4": {
+   "staffs": 3,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 3
+   }
+  },
+  "3/4->7/16": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 3
+   }
+  },
+  "4/4->1/4": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 2,
+    "pdmx": 1
+   }
+  },
+  "7/4->3/4": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 2,
+    "pdmx": 1
+   }
+  },
+  "2/8->3/8": {
+   "staffs": 3,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 3
+   }
+  },
+  "4/4->12/8": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "lilypond": 1,
+    "pdmx_hard": 2
+   }
+  },
+  "4/4->common": {
+   "staffs": 3,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 3
+   }
+  },
+  "common->6/8": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "Lieder-main": 1,
+    "pdmx": 2
+   }
+  },
+  "3/4->7/4": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 1,
+    "pdmx": 2
+   }
+  },
+  "12/8->6/8": {
+   "staffs": 3,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx": 1,
+    "pdmx_hard": 2
+   }
+  },
+  "3/4->4/8": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx": 1,
+    "pdmx_hard": 1,
+    "Lieder-main": 1
+   }
+  },
+  "13/8->11/8": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 3
+   }
+  },
+  "7/8->common": {
+   "staffs": 3,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "Lieder-main": 3
+   }
+  },
+  "13/8->4/4": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 3
+   }
+  },
+  "5/8->4/4": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 3
+   }
+  },
+  "7/16->1/8": {
+   "staffs": 3,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 3
+   }
+  },
+  "2/4->2/4": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx": 3
+   }
+  },
+  "3/4->12/8": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 3
+   }
+  },
+  "11/8->3/4": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx": 1,
+    "pdmx_hard": 2
+   }
+  },
+  "1/4->9/8": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 3
+   }
+  },
+  "5/4->6/8": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 2,
+    "pdmx": 1
+   }
+  },
+  "?->2/8": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 2,
+   "sets": {
+    "musescore_octave": 2,
+    "pdmx_hard": 1
+   }
+  },
+  "6/8->7/8": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 3
+   }
+  },
+  "13/16->1/4": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 2,
+    "pdmx": 1
+   }
+  },
+  "11/16->4/4": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 3
+   }
+  },
+  "15/16->1/8": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 3,
+   "sets": {
+    "pdmx_hard": 3
+   }
+  },
+  "9/8->19/16": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 3
+   }
+  },
+  "1/8->6/8": {
+   "staffs": 3,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 3
+   }
+  },
+  "7/8->5/8": {
+   "staffs": 3,
+   "scores": 3,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 3
+   }
+  },
+  "9/8->5/8": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "1/8->6/4": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "2/4->cut": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx": 2
+   }
+  },
+  "2/2->12/8": {
+   "staffs": 2,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "grandstaff": 2
+   }
+  },
+  "3/4->cut": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx": 1,
+    "pdmx_hard": 1
+   }
+  },
+  "2/2->4/2": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 1,
+    "Lieder-main": 1
+   }
+  },
+  "9/8->11/16": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "19/16->5/8": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "4/4->3/8": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "15/16->13/16": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "15/16->4/4": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "3/8->5/8": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx": 1,
+    "pdmx_hard": 1
+   }
+  },
+  "1/4->6/8": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "9/4->5/4": {
+   "staffs": 2,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "9/8->15/16": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "12/16->6/8": {
+   "staffs": 2,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "grandstaff": 2
+   }
+  },
+  "19/16->7/8": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "17/16->15/16": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "4/4->2/2": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "kern_scriabin": 1,
+    "pdmx_hard": 1
+   }
+  },
+  "7/8->6/8": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "7/8->15/16": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "6/4->common": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "6/8->7/4": {
+   "staffs": 2,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "grandstaff": 2
+   }
+  },
+  "9/8->17/16": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "3/8->3/8": {
+   "staffs": 2,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 2
+   }
+  },
+  "6/8->6/8": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx": 2
+   }
+  },
+  "3/8->7/8": {
+   "staffs": 2,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "10/4->8/4": {
+   "staffs": 2,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 2
+   }
+  },
+  "6/4->11/8": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "5/4->9/8": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "2/4->8/4": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 1,
+    "pdmx": 1
+   }
+  },
+  "9/4->4/4": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "5/16->3/4": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 1,
+    "pdmx": 1
+   }
+  },
+  "6/4->9/4": {
+   "staffs": 2,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "Lieder-main": 2
+   }
+  },
+  "7/4->2/4": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "12/8->3/8": {
+   "staffs": 2,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "grandstaff": 2
+   }
+  },
+  "7/8->2/4": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "2/4->5/4": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "2/4->5/8": {
+   "staffs": 2,
+   "scores": 2,
+   "composers": 2,
+   "sets": {
+    "pdmx_hard": 2
+   }
+  },
+  "10/4->9/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "6/8->15/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "3/4->13/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "?->10/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "5/4->2/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 1
+   }
+  },
+  "?->12/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "lilypond": 1
+   }
+  },
+  "13/16->9/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "6/4->15/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "3/8->15/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "13/8->9/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "8/4->7/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "11/16->3/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "7/4->13/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "5/8->9/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "2/4->12/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "common->2/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "Lieder-main": 1
+   }
+  },
+  "12/16->4/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "4/4->9/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "17/16->19/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "17/16->7/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "7/4->9/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "4/4->11/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "cut->3/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 1
+   }
+  },
+  "15/16->5/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "2/4->7/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "6/4->13/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "5/8->9/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "3/2->3/2": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 1
+   }
+  },
+  "4/8->6/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "kern_scriabin": 1
+   }
+  },
+  "13/16->15/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "9/8->7/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "2/8->common": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "musescore_octave": 1
+   }
+  },
+  "7/8->9/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "12/8->3/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 1
+   }
+  },
+  "6/8->9/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "2/4->11/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "12/8->2/2": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "grandstaff": 1
+   }
+  },
+  "13/16->7/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "5/4->19/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "6/8->4/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "kern_scriabin": 1
+   }
+  },
+  "11/16->2/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "6/8->6/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 1
+   }
+  },
+  "6/4->12/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 1
+   }
+  },
+  "3/8->1/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "4/4->15/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "4/2->4/2": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 1
+   }
+  },
+  "1/8->common": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "lilypond": 1
+   }
+  },
+  "7/8->5/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "5/4->common": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "musescore_octave": 1
+   }
+  },
+  "7/8->11/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "9/8->6/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "1/4->7/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "12/8->11/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "2/2->3/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "2/4->7/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 1
+   }
+  },
+  "4/2->2/2": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "3/8->19/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "12/8->4/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "11/8->5/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 1
+   }
+  },
+  "5/8->6/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "12/8->12/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "5/4->5/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "3/2->6/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 1
+   }
+  },
+  "4/4->6/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "3/4->11/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "7/16->5/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 1
+   }
+  },
+  "6/8->11/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "4/8->4/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 1
+   }
+  },
+  "19/16->9/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "4/2->7/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "6/8->13/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "15/16->2/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "13/16->6/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "11/8->9/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "15/8->6/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "1/4->17/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "9/8->2/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "17/16->5/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "grandstaff": 1
+   }
+  },
+  "5/4->12/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "grandstaff": 1
+   }
+  },
+  "17/16->13/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "9/8->11/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "17/16->11/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "15/16->3/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "17/16->1/4": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "common->12/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 1
+   }
+  },
+  "3/8->common": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "4/4->3/2": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "Lieder-main": 1
+   }
+  },
+  "3/8->17/16": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  },
+  "cut->cut": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx": 1
+   }
+  },
+  "4/8->2/8": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "Lieder-main": 1
+   }
+  },
+  "5/8->common": {
+   "staffs": 1,
+   "scores": 1,
+   "composers": 1,
+   "sets": {
+    "pdmx_hard": 1
+   }
+  }
+ },
+ "ss_all": {
+  "n": 117860,
+  "median": 11.72,
+  "p5": 8.79,
+  "p95": 12.0
+ },
+ "n_missing_tokens": 0
+}

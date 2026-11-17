@@ -1,0 +1,5 @@
+pdmx_hard files 20938 missing(dropped) 86 other-field diffs 0 notes 1357909 mismatch notes 712 (0.052%) staffs with mismatch 451 (2.15%) first-bar (tie/carry from before the staff, not judged) 387 old-label ##/bb bug 1159
+  old {'_': 884298, '#': 166939, 'b': 306185, 'N': 0, '##': 330, 'bb': 157}
+  new {'_': 1271456, '#': 31130, 'b': 21454, 'N': 32710, '##': 877, 'bb': 282}
+  top mismatch kinds [('b->_(got 0)', 228), ('#->_(got 0)', 192), ('_->_(got 1)', 148), ('_->_(got -1)', 110), ('##->_(got 0)', 12), ('b->_(got 1)', 7), ('#->_(got -1)', 5), ('##->_(got 1)', 5)]
+  BAD []

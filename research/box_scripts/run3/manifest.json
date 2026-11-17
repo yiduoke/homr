@@ -1,0 +1,439 @@
+{
+ "built": "2026-11-17T07:00:56Z",
+ "counts": {
+  "control_train": 107759,
+  "control_val": 3950,
+  "added_train_staffs": {
+   "pdmx_hard": 19909,
+   "asap": 3754,
+   "kern_scriabin": 1216
+  },
+  "added_train_lines_in_cand_train": {
+   "pdmx_hard": 19909,
+   "asap": 3754,
+   "kern_scriabin (x2)": 2432
+  },
+  "held_out_hard": {
+   "pdmx_hard": 1029,
+   "asap": 352,
+   "kern_scriabin": 101
+  },
+  "cand_train": 133854,
+  "cand_val": 5432,
+  "cand_val_hard": 1482,
+  "cand_train_nooct": 132415,
+  "added_train_staffs_nooct": {
+   "pdmx_hard": 18663,
+   "asap": 3561,
+   "kern_scriabin": 1216
+  },
+  "added_staffs_with_octave_bracket": {
+   "pdmx_hard": 1309,
+   "asap": 205,
+   "kern_scriabin": 0
+  },
+  "scores_or_pieces": {
+   "hard_pdmx_train_scores": 2287,
+   "hard_pdmx_val_scores": 72,
+   "asap_val_pieces": 7,
+   "asap_train_pieces": 112,
+   "scriabin_val_pieces": 9,
+   "scriabin_train_pieces": 135
+  },
+  "dropped": {
+   "pdmx_hard": {
+    "relabel failed (train)": 86
+   },
+   "asap": {
+    "relabel failed (train)": 68
+   },
+   "kern_scriabin": {
+    "relabel failed (train)": 2
+   }
+  }
+ },
+ "seeds": {
+  "selection (select_candidates.py)": 20261117,
+  "list shuffle (build_cand_lists.py)": 20261118,
+  "val_hard shuffle": 20261119,
+  "verification sample (make_view.py)": 11
+ },
+ "selection": {
+  "target_total": 21000,
+  "hold": {
+   "hard": 1000,
+   "asap": 300,
+   "scriabin": 100
+  },
+  "max_score_staffs": 100,
+  "min_density": 15.0,
+  "rare_quota": 400,
+  "common_meters": [
+   "none",
+   "timeSignature_2/4",
+   "timeSignature_3/4",
+   "timeSignature_4/4",
+   "timeSignature_6/8",
+   "timeSignature_common",
+   "timeSignature_cut"
+  ],
+  "median_density": 58.308167141500476,
+  "pool_scores": 6268,
+  "eligible_scores": 6213,
+  "chosen_scores": 2359,
+  "heldout_hard_scores": [
+   "QmcSsGcy3FVPvp7YAC4ekiLiWwPyAZP5ywBw44ELxievHK",
+   "QmUxvrRW5JfgTkrVEehxcNL4E5iud3a3XVmE82KTNvoyik",
+   "QmXfzWmqovDVnyQf3osYGd7GLYVLu3fj9FA2uGEWZ6qExe",
+   "QmQg1jhUx32gKYVPGZRPbFB4qAfvyJFRVdPoFEuyjxvMcy",
+   "QmVMeLiS8WiJGTtv6wn8qFkosipQUPXKFY4ki3EKujWcFA",
+   "QmcaDXS87AwL6fJDGE6WUPXTeHzrc1R1KzNZhWtUree4sd",
+   "QmV9SynxK7Vrtic8hK8XxCoLXyNYrLfmfGvtfFubVCDg37",
+   "QmSAxykaM2UVgSufLz5b7wo19AscoHBRVKY6vR38sPUu6M",
+   "QmTDds3PPdKWB2dyoRW8kaoqNy4vxrqqTtmUNsQto5oigz",
+   "QmfWKK52FYkwJnp4djw6nxkNU7oNhvJcytQHMpvM52ysaL",
+   "QmY5bNfFWS6e7bLJ7zAqqcA6w51bFD2fyCA6DsJfBoD7nk",
+   "QmRcRZ5d5gLEa7TCegiymu4VjD1zyViKVQHj4aNyFff8m8",
+   "QmZ2GxAyK1zdanCvMNxmiGiHQdEdGN4qusFce6p3KnzdnP",
+   "Qme88a7Fvz73EWc6i6ba61XjfTNxj1cJPeZBRsh1EGqVrC",
+   "QmUmv3WU3DWjbc28shFzi6RvheRGRfnXffmn3kmP4xaRA8",
+   "QmZrLPLumFX8Wi3Rd82BnBQHZcB5zAP1xyN1foHLCvLC5t",
+   "QmRtUEqysv7Cc53bJ4qr29ytb7aVibgywkLXfwzdVUcs36",
+   "QmdQiuZWRPkB3FtHCXv5vosyMVTs5zGDAsSjS9czsNJB8w",
+   "QmXBrzrXoiK2TeDiRtaUdpmVhxtNgq3eYorHu5Y1juwzPS",
+   "QmTnUxvqfUb2ivCEVd8mf73n5L6RwfBweJGaJ2RNLM6GEc",
+   "QmV8ThZBVqf14f9Vd5QmhMmAU2e52Shb7bJhKYnEYW27Xb",
+   "QmSAfxciGkG5afjQ7wm4kb4UBGhQq3fLtEWiz1rfnZALmg",
+   "QmPiRHTyQQpVY1vATt7J8vTGMRdxv5JpsaAdZS4bLGgenv",
+   "QmNz5Uso8vZXeD2g1kZmcWNndRqa2xb5A8mLKxxUQAJjfY",
+   "QmW3YQV2KfPNYR1ZSEPx5qj1B3iNbsX2kqfmXPUDkyh4se",
+   "QmckhLZy84DjCkLqk9vk5eFCa2Fybb54Y4oRLjWWG25gDV",
+   "QmeBFLgjmmdaydgswu3tRJhMx91HwqCni9rE28tc3zHRzJ",
+   "QmZBW7Famm1JyviKDqhDbfDXyhTQ92Nb5ugHZNbVTgcDNf",
+   "QmTbESyJWVVcuhG68EQV36jeEGwoQJqHZUXZtxyStmYQF3",
+   "QmYqT1YEyRYutXpXNH2yM8Nx3TheDm7Y42ErZ14CFfLCWn",
+   "QmVUEU7WsE7SSAYjktNuz8DyZCW2f9epujNFTzR55w9nsn",
+   "QmX6KUcJYCXNryTvQsJ6SCFYDVWSBxWBh4Rs7TQxPfgZVY",
+   "QmZgGNCtr1ErP6BVrfdTS9f9Z54yMboxDqQjtAwyFFPEgt",
+   "QmPNp81KnNMWDstUfsP11Ne95GGZ1gWMRWNGhtx5y1QJf2",
+   "QmNpix7sEJSnvKNmtU49g66X5kgerjFpmmU4nNHGKJenus",
+   "QmPM9scUezn1AgcpcXUp6PKUFxa5RrfcKEz6pRk8PyjFtS",
+   "QmT6d5fLfmnTZGhwX1ojG1DFJR5eRbGiWNYWQ6hSFk4Z32",
+   "QmPndEqDFKBURK1VuDTdhuvSBPAWDJV4WUSGaKCbP2nSGx",
+   "QmcmBZNR1VjSRsnqURzVYYPBH67iFbBTHCUAvrhPYZ8qL7",
+   "QmP4vpVJeVbS1dPCXrbgKAB5Gs6tMcQydzVwikexVLrpqi",
+   "QmTHREC16EwECG585iJ7gepbaYYy3fvRxxLzyUnMCW4kJV",
+   "QmdV1hVAHAFtVq4JvwWtYAQYeyq9hCwTWK3yAoDiiKDxas",
+   "QmcQoygH7hjNEjjC1zEwfc6AZm9tAGMrb2wbxLiCphymsP",
+   "QmRmtC2jScfFwM1wA6Ec2qZaW154XWedsPocpFjAURubTG",
+   "QmeFKwVkJ7ZC15ohw3pkCoH2ycJxycwXEf11ek3bKkzmwf",
+   "QmbWhYRPux1RcQo4smQvKFinUE6DoPYXmg9Qy4U5qpy1Ue",
+   "QmUu2oJNt9Jyke1UufkCj9nsMzZe3xZESEGmJWxuEonUSf",
+   "QmPRUHWboC1u7bx1XmAHMnWKxbnBHitFB2AcjGbGBksRBd",
+   "QmNpoQSwoYHftRqv8kgf8T7yVET7fQb4CgfXqDH8gtjUMv",
+   "QmUHDv3EX9mYNGfKuhXkVLJqrCJCFxLSHfTxYxMVg9JXpr",
+   "Qme7HSpVSGhYVHb4ZwMmvYU1kTDiaHSoXzTwzxHr59J9ek",
+   "QmfFuahcxoyj9Dkt1heKgWUBhBo1ZTVE3RNSsCT9scQ1G9",
+   "QmcyP6kLSZ8Ea5CLkziSCcgiaMxnEBcJVy2E84Q7C8ySCY",
+   "QmQk8E8THxu9w52VULJ8H8AYDbMNzjkzS8Nqv8v97qiSyV",
+   "QmNpKpq82DUBdAwPxBR1iK4gK7p5jZDPDaJH1aU3fAiWsH",
+   "QmZXuA57Ux57iSHcTsvrqfPedeCRC4JzucC4BQWxVxyBQa",
+   "QmeSM6nNmzk86M9vKzWA3ijjc4ScH3FdNxFkXY74Xt2CbV",
+   "QmUgezY29GQmR377Hj9wgUVZ17jAC94tGRQVrHjortivx7",
+   "QmdX2d439eHfY8zqai3JWGQGZxLv1fSAdQij9QRqcfWyj3",
+   "QmSE7Z3WwDGTi6Fui1As7sLUgM5kzbAAe36m4uSBfk8rw3",
+   "QmWH36qDeDF4mAxQeCztz6RzxnvuxMs4Q4YVZEto62i8kg",
+   "QmWmaqEYhRB3yHDsdaXy4F8MYU7bte5PVuZe15YscYAUzZ",
+   "QmcxbNTnYDeK6vJ3DUFQqAUMVC7ugbkkE61r5r9v4Em2p6",
+   "QmTHyuFBxvLeKXnSwZWNVV8ED4hzhhUPG3WJrbZZyofkEY",
+   "QmbUycWM5YgjNtn7EA2HZFFH8AWfPEvtuhNE3pSY2uAzyu",
+   "QmVPMsi6iiAeqRAya8zJEckKb8d2z2Wi3jG7HoHGq6T3tH",
+   "QmcKexcuM2EC8FJBXgcaEAyiy9dPvSwKNutgufvZ7LSgTy",
+   "QmaJaAH9mhVW4xJaJMEZADmCEw1gQc2XnnhZj68aaxwJtm",
+   "QmfCvM9AZHXGWDMRF31cFFG7qprqSPLWKjxmPyLr1ShsXd",
+   "QmUacB9K4GnNfj656JLmBCUVSsdneXGkXFVFtJfKhkKPw5",
+   "QmYgsFvr1949s3eBZq6d6rnv2fudsxCt9eoUkNEYxQKyCi",
+   "QmPD9XEmWbaL97wNe4EKfPSQtrk6jDbqHCzNKZr8CcXQN4"
+  ],
+  "asap_heldout_pieces": [
+   "Beethoven_Piano_Sonatas_27-2",
+   "Schubert_Impromptu_op_90_D_899_2",
+   "Bach_Prelude_bwv_885",
+   "Chopin_Sonata_2_2nd",
+   "Liszt_Transcendental_Etudes_3",
+   "Schubert_Moment_musical_no_3",
+   "Beethoven_Piano_Sonatas_17-1"
+  ],
+  "scriabin_heldout_pieces": [
+   "scriabin-op15_no01",
+   "scriabin-op11_no10",
+   "scriabin-op48_no02",
+   "scriabin-op42_no04",
+   "scriabin-op42_no06",
+   "scriabin-op11_no18",
+   "scriabin-op17_no05",
+   "scriabin-op6_no02",
+   "scriabin-op3_no10"
+  ],
+  "meters_selected_scores": {
+   "timeSignature_4/4": 1364,
+   "timeSignature_13/8": 52,
+   "timeSignature_9/8": 242,
+   "timeSignature_5/8": 302,
+   "timeSignature_3/8": 179,
+   "timeSignature_2/8": 2,
+   "timeSignature_12/16": 3,
+   "timeSignature_2/4": 229,
+   "timeSignature_6/8": 429,
+   "timeSignature_common": 121,
+   "timeSignature_3/4": 917,
+   "timeSignature_15/16": 63,
+   "timeSignature_5/4": 71,
+   "timeSignature_6/4": 107,
+   "timeSignature_11/16": 70,
+   "timeSignature_9/4": 12,
+   "timeSignature_10/4": 5,
+   "timeSignature_12/8": 69,
+   "timeSignature_1/4": 430,
+   "timeSignature_7/4": 75,
+   "timeSignature_8/4": 64,
+   "timeSignature_4/8": 12,
+   "timeSignature_1/8": 262,
+   "timeSignature_9/16": 29,
+   "timeSignature_7/16": 14,
+   "timeSignature_13/16": 86,
+   "timeSignature_7/8": 288,
+   "timeSignature_4/2": 17,
+   "timeSignature_3/2": 19,
+   "timeSignature_2/2": 25,
+   "timeSignature_cut": 28,
+   "timeSignature_11/8": 23,
+   "timeSignature_19/16": 67,
+   "timeSignature_5/16": 29,
+   "timeSignature_15/8": 24,
+   "timeSignature_17/16": 112,
+   "none": 43
+  },
+  "meters_selected_staffs": {
+   "timeSignature_4/4": 10935,
+   "timeSignature_13/8": 240,
+   "timeSignature_9/8": 1341,
+   "timeSignature_5/8": 1444,
+   "timeSignature_3/8": 1334,
+   "timeSignature_2/8": 29,
+   "timeSignature_12/16": 84,
+   "timeSignature_2/4": 3374,
+   "timeSignature_6/8": 2676,
+   "timeSignature_common": 2776,
+   "timeSignature_3/4": 6285,
+   "timeSignature_15/16": 364,
+   "timeSignature_5/4": 777,
+   "timeSignature_6/4": 1058,
+   "timeSignature_11/16": 312,
+   "timeSignature_9/4": 165,
+   "timeSignature_10/4": 21,
+   "timeSignature_12/8": 754,
+   "timeSignature_1/4": 1915,
+   "timeSignature_7/4": 503,
+   "timeSignature_8/4": 404,
+   "timeSignature_4/8": 118,
+   "timeSignature_1/8": 1005,
+   "timeSignature_9/16": 214,
+   "timeSignature_7/16": 48,
+   "timeSignature_13/16": 406,
+   "timeSignature_7/8": 1456,
+   "timeSignature_4/2": 248,
+   "timeSignature_3/2": 447,
+   "timeSignature_2/2": 478,
+   "timeSignature_cut": 759,
+   "timeSignature_11/8": 206,
+   "timeSignature_19/16": 310,
+   "timeSignature_5/16": 169,
+   "timeSignature_15/8": 156,
+   "timeSignature_17/16": 454,
+   "none": 453
+  },
+  "meters_train_staffs": {
+   "timeSignature_4/4": 10531,
+   "timeSignature_13/8": 240,
+   "timeSignature_9/8": 1304,
+   "timeSignature_5/8": 1401,
+   "timeSignature_3/8": 1297,
+   "timeSignature_2/8": 29,
+   "timeSignature_12/16": 84,
+   "timeSignature_2/4": 3082,
+   "timeSignature_6/8": 2586,
+   "timeSignature_common": 2488,
+   "timeSignature_3/4": 5920,
+   "timeSignature_15/16": 353,
+   "timeSignature_5/4": 771,
+   "timeSignature_6/4": 1053,
+   "timeSignature_11/16": 296,
+   "timeSignature_9/4": 165,
+   "timeSignature_10/4": 21,
+   "timeSignature_12/8": 748,
+   "timeSignature_1/4": 1849,
+   "timeSignature_7/4": 486,
+   "timeSignature_8/4": 399,
+   "timeSignature_4/8": 118,
+   "timeSignature_1/8": 966,
+   "timeSignature_9/16": 209,
+   "timeSignature_7/16": 48,
+   "timeSignature_13/16": 406,
+   "timeSignature_7/8": 1429,
+   "timeSignature_4/2": 242,
+   "timeSignature_3/2": 399,
+   "timeSignature_2/2": 430,
+   "timeSignature_cut": 728,
+   "timeSignature_11/8": 201,
+   "timeSignature_19/16": 305,
+   "timeSignature_5/16": 162,
+   "timeSignature_15/8": 156,
+   "timeSignature_17/16": 431,
+   "none": 409
+  },
+  "meter_note": "a score counts for every meter token occurring in it (also meter changes)"
+ },
+ "indexes_used": {
+  "grandstaff": {
+   "path": "/workspace/homr566/datasets_meter/grandstaff/index_excl_v2.txt",
+   "lines": 40458,
+   "sha256": "87e43ae1c0ffdec22956f78f8eb3838cd67a33d6e2cd898a3fcaeb555da1b8b9"
+  },
+  "Lieder-main": {
+   "path": "/workspace/homr566/datasets_meter/Lieder-main/index_excl_v2.txt",
+   "lines": 43027,
+   "sha256": "42ce7137715be452f280196bdbef74d03729f924f4fa79f8c5f561e3fcc5e967"
+  },
+  "pdmx": {
+   "path": "/workspace/homr566/datasets_meter/pdmx/index_excl_v2.txt",
+   "lines": 139159,
+   "sha256": "7339b708e3840071f47c752e07f1595a14336feceb76f63500a6190b58f00310"
+  },
+  "pdmx/hard": {
+   "path": "/workspace/homr566/datasets_meter/pdmx/hard/index_excl_v2.txt",
+   "lines": 89096,
+   "sha256": "f4f9c717cb09c1dff058eb27a9d77994f69ad08ae42b04c5f690546b70e4219a"
+  },
+  "asap": {
+   "path": "/workspace/homr566/datasets_meter/asap/index_excl_v2.txt",
+   "lines": 4241,
+   "sha256": "463f73d7454fe4058f751f54b017b5819e794f2792f618fc526f87d1ea4fd7b1"
+  },
+  "kern_scriabin": {
+   "path": "/workspace/homr566/datasets_meter/kern_scriabin/index_excl_v2.txt",
+   "lines": 1602,
+   "sha256": "a78aed63b5dea2918ad4817a58413ab73d1b21d865cef7fd8fc8c50ebd4d58a4"
+  }
+ },
+ "control_lists": {
+  "run2_train_excl.txt": {
+   "lines": 107759,
+   "sha256": "8e3a9afbdeb3a4ee94ec58c9f206f88af9f303ec38b6fa5582f1a22170119eac"
+  },
+  "run2_val_excl.txt": {
+   "lines": 3950,
+   "sha256": "e8d206738f7d0805a788e63312ccbe65c84b84237d0a0874669bb018c135c000"
+  },
+  "holdout_real_excl.txt": {
+   "lines": 1237,
+   "sha256": "25ac92d1b08247b8212d4cddd52dc71b53224ab257124511e66d1e54c621bee7"
+  },
+  "holdout_inserted_excl.txt": {
+   "lines": 2981,
+   "sha256": "7f70d5437cb74011ce53a802e1f46ed4e3c3d4c12ba5f9303c4cf182cf038587"
+  }
+ },
+ "exclusion": {
+  "exclude_ids.txt": "535ae35635c7480a43852e9cd4f731bed760f5de18137960ab8e1f15926c30a2",
+  "exclude_hashes_v2.txt": "abee5c32e17bdb8b12d2ca821d1928105b6a0cd9e21780392f1014e50ec0a20d",
+  "note": "hard PDMX / ASAP / Scriabin come only from the index_excl_v2 files; selected keys checked against exclude_hashes_v2.txt"
+ },
+ "filters_applied_to_added_staffs": [
+  "relabel_run3.py status ok (exact match of every non-lift field to the run-1 file)",
+  "token vocabulary check (check_token_lines)",
+  "sequence <= max_seq_len-2 and ledger lines <= 5 (data_loader._filter_valid_samples)",
+  "Scriabin Verovio crops of part >= 1 dropped (image shows more staves than the label)",
+  "hard PDMX: score with > 100 pool staffs or mean notes/staff < 15.0 not eligible"
+ ],
+ "scripts_sha256": {
+  "analyze_crops.py": "275ef2e23a1bd0f3c8e56308818df005a2a5eb07888c99bc9c5ba92d7d8cf220",
+  "analyze_img.py": "963b29647400a01ec7d85b109ec757ff4d5dfd0c52c24101dcced8863e0551f0",
+  "build_cand_lists.py": "618ca5a62f4f3b5243978fd49c20238724a51a83cd8ac447cfdde4abe73222c9",
+  "check_lists.py": "4e35c6c5e52ca0973acdb5bab40ab9e8a5da445968e0a1e3bc4905c78567bbde",
+  "clef_changes.py": "f89138a2634ce0df46df53762550646ab47ea7f7cb0b0243c20c56b85bf9e1cb",
+  "dump_mism.py": "80ee78b27972193b15e6454c1e6a398d11621166ecf9420c71e0eb96e201fa05",
+  "explore1.py": "3813ca4506f48ea9bc870aaff1a59cb4261b04bee21bbd4cef1e56744b7ac041",
+  "explore2.py": "e022d0fc36cf8ee53c106f73fcb3d20ff6e47537133405053be5af4a44ea7df4",
+  "export_ms.py": "e18480a6d61bb611ab542e575c8414f70743df7f2c5451a00aab909934051e2a",
+  "finish_manifest.py": "58846390fcf7366f6fd6fca756d54100198eda8e1d5704bca1b309036045e65e",
+  "image_stats3.py": "1f46ba8f3e8b094db4e91bbec217f3379fed42f14dd71b1a7f1120014f6cec40",
+  "make_view.py": "d46243c11578f34c5206732e04e7d974f275f887e9721e2a8168a16c6562ecc1",
+  "relabel_run3.py": "a4b32943b8ecc4abc22a4687df615d5627569eaebfb776373e35cbbe5fb75a92",
+  "select_candidates.py": "4e71054f028e1b2d4e4ba6d675ea1d001a3ea964d9c42a86db5f7fa33ec2d7b6",
+  "staff_stats3.py": "f0035a9cd7c818cc495b77d01f51deea94516aaccbe05beb7a4586b4f6f8d9c6",
+  "valid_staffs.py": "89da40c0c1bd1bf3a639b116545c2c642c4f2715ea909ddc31ce8884081b468a",
+  "verify_run3.py": "9c3633916f64dd87036afcd061ab3cfc2f987f9959d485b48e75dd8e38afc760",
+  "view_flagged.py": "e14afb1ba561da0ac6ec7b4d5100ad4a5d34d3e8b4601d0d90111e56bd33fed1"
+ },
+ "box_state": {
+  "homr_acc (parser, vocabulary)": "afae0e3",
+  "homr566 (datasets, MuseScore export code)": "cd95322 (dirty)"
+ },
+ "label_source": {
+  "pdmx_hard": "MuseScore export datasets/pdmx/hard/rendered_scores (as run 2)",
+  "asap": "MuseScore export re-made from r6_extra/asap_mxl by export_ms.py into run3/ms_export/asap (original deleted)",
+  "kern_scriabin": "MuseScore export re-made from r6_extra/kern_mxl (music21 conversion of the kern) into run3/ms_export/kern_scriabin; NOT Verovio MEI"
+ },
+ "lists": {
+  "cand_train.txt": "control train (run2_train_excl) + added train staffs + Scriabin x2, shuffled",
+  "cand_train_nooct.txt": "same, without added staffs that contain an octaveShift line (the control's original sets have none)",
+  "cand_val.txt": "control val (run2_val_excl) + cand_val_hard",
+  "cand_val_hard.txt": "held-out hard PDMX, ASAP, Scriabin (by score / piece)"
+ },
+ "pre_filter_and_relabel": {
+  "pdmx_hard": {
+   "index_excl_v2_staffs": 89096,
+   "pass_training_filters": 81948,
+   "removed_by_filters": 7148,
+   "filters": "valid_staffs.py: vocabulary check, sequence <= max_seq_len-2, <= 5 ledger lines",
+   "relabel_status_of_selected": {
+    "ok": 20938,
+    "no_match": 86
+   }
+  },
+  "asap": {
+   "index_excl_v2_staffs": 4241,
+   "pass_training_filters": 4174,
+   "removed_by_filters": 67,
+   "filters": "valid_staffs.py: vocabulary check, sequence <= max_seq_len-2, <= 5 ledger lines",
+   "relabel_status_of_selected": {
+    "ok": 4106,
+    "no_match": 65,
+    "differs_other_field": 3
+   }
+  },
+  "kern_scriabin": {
+   "index_excl_v2_staffs": 1602,
+   "pass_training_filters": 1319,
+   "removed_by_filters": 283,
+   "filters": "valid_staffs.py: vocabulary check, sequence <= max_seq_len-2, <= 5 ledger lines, Scriabin Verovio part >= 1 left out",
+   "relabel_status_of_selected": {
+    "ok": 1317,
+    "differs_other_field": 2
+   }
+  }
+ },
+ "label_checks": {
+  "pdmx_hard": "pdmx_hard files 20938 missing(dropped) 86 other-field diffs 0 notes 1357909 mismatch notes 712 (0.052%) staffs with mismatch 451 (2.15%) first-bar (tie/carry from before the staff, not judged) 387 old-label ##/bb bug 1159",
+  "asap": "asap files 4106 missing(dropped) 68 other-field diffs 0 notes 210895 mismatch notes 175 (0.083%) staffs with mismatch 119 (2.90%) first-bar (tie/carry from before the staff, not judged) 126 old-label ##/bb bug 587",
+  "kern_scriabin": "kern_scriabin files 1317 missing(dropped) 2 other-field diffs 0 notes 78426 mismatch notes 264 (0.337%) staffs with mismatch 91 (6.91%) first-bar (tie/carry from before the staff, not judged) 92 old-label ##/bb bug 834",
+  "control_hard_run2_sample_4000": "see status/verify_control_hard.json: 0.047% notes, 1.55% staffs (same checker, run-2 labels)"
+ },
+ "audit_files": [
+  "audit_crops.txt",
+  "audit_images.txt",
+  "status/verify_*.txt",
+  "view/ (montages)"
+ ]
+}

@@ -1,0 +1,5 @@
+kern_scriabin files 1317 missing(dropped) 2 other-field diffs 0 notes 78426 mismatch notes 264 (0.337%) staffs with mismatch 91 (6.91%) first-bar (tie/carry from before the staff, not judged) 92 old-label ##/bb bug 834
+  old {'_': 37445, '#': 19794, 'b': 20914, 'N': 0, '##': 154, 'bb': 119}
+  new {'_': 63393, '#': 3881, 'b': 4844, 'N': 5474, '##': 518, 'bb': 316}
+  top mismatch kinds [('b->_(got 0)', 154), ('#->_(got 0)', 39), ('_->_(got 1)', 35), ('bb->_(got 0)', 14), ('_->_(got -1)', 9), ('##->_(got 0)', 8), ('bb->_(got -1)', 4), ('b->_(got 1)', 1)]
+  BAD []

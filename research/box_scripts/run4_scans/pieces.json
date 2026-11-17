@@ -1,0 +1,1334 @@
+[
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata01-1",
+  "status": "ok",
+  "n_systems": 29,
+  "bar_match_frac": 0.923,
+  "model_pairs": 28,
+  "model_strong": 28
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata01-2",
+  "status": "ok",
+  "n_systems": 20,
+  "bar_match_frac": 1.0,
+  "model_pairs": 20,
+  "model_strong": 20
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata01-3",
+  "status": "ok",
+  "n_systems": 9,
+  "bar_match_frac": 1.0,
+  "model_pairs": 8,
+  "model_strong": 8
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata01-4",
+  "status": "ok",
+  "n_systems": 41,
+  "bar_match_frac": 0.744,
+  "model_pairs": 41,
+  "model_strong": 40
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata02-1",
+  "status": "ok",
+  "n_systems": 48,
+  "bar_match_frac": 0.872,
+  "model_pairs": 47,
+  "model_strong": 47
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata02-2",
+  "status": "ok",
+  "n_systems": 18,
+  "bar_match_frac": 0.692,
+  "model_pairs": 18,
+  "model_strong": 18
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata02-3",
+  "status": "ok",
+  "n_systems": 10,
+  "bar_match_frac": 0.714,
+  "model_pairs": 9,
+  "model_strong": 9
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata02-4",
+  "status": "suspect",
+  "n_systems": 56,
+  "bar_match_frac": 0.509,
+  "model_pairs": 56,
+  "model_strong": 20
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata03-1",
+  "status": "ok",
+  "n_systems": 54,
+  "bar_match_frac": 0.795,
+  "model_pairs": 54,
+  "model_strong": 51
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata03-2",
+  "status": "ok",
+  "n_systems": 23,
+  "bar_match_frac": 0.905,
+  "model_pairs": 23,
+  "model_strong": 23
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata03-3",
+  "status": "ok",
+  "n_systems": 18,
+  "bar_match_frac": 0.933,
+  "model_pairs": 17,
+  "model_strong": 14
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata03-4",
+  "status": "ok",
+  "n_systems": 56,
+  "bar_match_frac": 0.917,
+  "model_pairs": 56,
+  "model_strong": 56
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata04-1",
+  "status": "ok",
+  "n_systems": 59,
+  "bar_match_frac": 0.804,
+  "model_pairs": 59,
+  "model_strong": 59
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata04-2",
+  "status": "ok",
+  "n_systems": 18,
+  "bar_match_frac": 0.833,
+  "model_pairs": 18,
+  "model_strong": 17
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata04-3",
+  "status": "ok",
+  "n_systems": 24,
+  "bar_match_frac": 0.9,
+  "model_pairs": 22,
+  "model_strong": 22
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata04-4",
+  "status": "ok",
+  "n_systems": 48,
+  "bar_match_frac": 1.0,
+  "model_pairs": 46,
+  "model_strong": 45
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata05-1",
+  "status": "ok",
+  "n_systems": 37,
+  "bar_match_frac": 0.833,
+  "model_pairs": 37,
+  "model_strong": 37
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata05-2",
+  "status": "ok",
+  "n_systems": 25,
+  "bar_match_frac": 0.882,
+  "model_pairs": 22,
+  "model_strong": 22
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata05-3",
+  "status": "ok",
+  "n_systems": 29,
+  "bar_match_frac": 0.923,
+  "model_pairs": 27,
+  "model_strong": 27
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata06-1",
+  "status": "ok",
+  "n_systems": 41,
+  "bar_match_frac": 1.0,
+  "model_pairs": 40,
+  "model_strong": 39
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata06-2",
+  "status": "ok",
+  "n_systems": 22,
+  "bar_match_frac": 0.765,
+  "model_pairs": 21,
+  "model_strong": 21
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata06-3",
+  "status": "ok",
+  "n_systems": 23,
+  "bar_match_frac": 0.952,
+  "model_pairs": 22,
+  "model_strong": 21
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata07-1",
+  "status": "ok",
+  "n_systems": 54,
+  "bar_match_frac": 0.904,
+  "model_pairs": 53,
+  "model_strong": 53
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata07-2",
+  "status": "ok",
+  "n_systems": 27,
+  "bar_match_frac": 0.833,
+  "model_pairs": 25,
+  "model_strong": 25
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata07-3",
+  "status": "ok",
+  "n_systems": 12,
+  "bar_match_frac": 1.0,
+  "model_pairs": 12,
+  "model_strong": 12
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata07-4",
+  "status": "ok",
+  "n_systems": 30,
+  "bar_match_frac": 0.962,
+  "model_pairs": 28,
+  "model_strong": 28
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata09-1",
+  "status": "ok",
+  "n_systems": 33,
+  "bar_match_frac": 1.0,
+  "model_pairs": 33,
+  "model_strong": 33
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata09-2",
+  "status": "ok",
+  "n_systems": 21,
+  "bar_match_frac": 0.762,
+  "model_pairs": 21,
+  "model_strong": 21
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata09-3",
+  "status": "ok",
+  "n_systems": 30,
+  "bar_match_frac": 1.0,
+  "model_pairs": 30,
+  "model_strong": 30
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata10-1",
+  "status": "ok",
+  "n_systems": 44,
+  "bar_match_frac": 1.0,
+  "model_pairs": 44,
+  "model_strong": 44
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata10-2",
+  "status": "ok",
+  "n_systems": 22,
+  "bar_match_frac": 0.895,
+  "model_pairs": 21,
+  "model_strong": 19
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata10-3",
+  "status": "ok",
+  "n_systems": 40,
+  "bar_match_frac": 0.906,
+  "model_pairs": 40,
+  "model_strong": 40
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata11-1",
+  "status": "ok",
+  "n_systems": 54,
+  "bar_match_frac": 0.804,
+  "model_pairs": 53,
+  "model_strong": 48
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata11-2",
+  "status": "ok",
+  "n_systems": 28,
+  "bar_match_frac": 0.889,
+  "model_pairs": 28,
+  "model_strong": 27
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata11-3",
+  "status": "ok",
+  "n_systems": 12,
+  "bar_match_frac": 1.0,
+  "model_pairs": 11,
+  "model_strong": 10
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata11-4",
+  "status": "ok",
+  "n_systems": 50,
+  "bar_match_frac": 0.868,
+  "model_pairs": 50,
+  "model_strong": 50
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata12-1",
+  "status": "ok",
+  "n_systems": 48,
+  "bar_match_frac": 0.808,
+  "model_pairs": 47,
+  "model_strong": 46
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata12-2",
+  "status": "ok",
+  "n_systems": 12,
+  "bar_match_frac": 0.9,
+  "model_pairs": 11,
+  "model_strong": 11
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata12-3",
+  "status": "ok",
+  "n_systems": 18,
+  "bar_match_frac": 0.588,
+  "model_pairs": 18,
+  "model_strong": 15
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata12-4",
+  "status": "ok",
+  "n_systems": 30,
+  "bar_match_frac": 0.966,
+  "model_pairs": 30,
+  "model_strong": 30
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata13-1",
+  "status": "ok",
+  "n_systems": 22,
+  "bar_match_frac": 0.882,
+  "model_pairs": 21,
+  "model_strong": 18
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata13-2",
+  "status": "ok",
+  "n_systems": 15,
+  "bar_match_frac": 1.0,
+  "model_pairs": 14,
+  "model_strong": 11
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata13-3",
+  "status": "ok",
+  "n_systems": 7,
+  "bar_match_frac": 0.6,
+  "model_pairs": 6,
+  "model_strong": 5
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata13-4",
+  "status": "ok",
+  "n_systems": 53,
+  "bar_match_frac": 0.976,
+  "model_pairs": 53,
+  "model_strong": 52
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata14-1",
+  "status": "ok",
+  "n_systems": 17,
+  "bar_match_frac": 0.938,
+  "model_pairs": 17,
+  "model_strong": 17
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata14-2",
+  "status": "ok",
+  "n_systems": 6,
+  "bar_match_frac": 1.0,
+  "model_pairs": 6,
+  "model_strong": 6
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata14-3",
+  "status": "ok",
+  "n_systems": 60,
+  "bar_match_frac": 0.889,
+  "model_pairs": 59,
+  "model_strong": 54
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata15-1",
+  "status": "ok",
+  "n_systems": 64,
+  "bar_match_frac": 0.878,
+  "model_pairs": 64,
+  "model_strong": 63
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata15-2",
+  "status": "ok",
+  "n_systems": 26,
+  "bar_match_frac": 0.923,
+  "model_pairs": 24,
+  "model_strong": 21
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata15-3",
+  "status": "ok",
+  "n_systems": 12,
+  "bar_match_frac": 1.0,
+  "model_pairs": 12,
+  "model_strong": 12
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata15-4",
+  "status": "ok",
+  "n_systems": 42,
+  "bar_match_frac": 0.967,
+  "model_pairs": 42,
+  "model_strong": 42
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata16-1",
+  "status": "ok",
+  "n_systems": 50,
+  "bar_match_frac": 0.809,
+  "model_pairs": 50,
+  "model_strong": 50
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata16-2",
+  "status": "ok",
+  "n_systems": 51,
+  "bar_match_frac": 0.897,
+  "model_pairs": 50,
+  "model_strong": 46
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata16-3",
+  "status": "ok",
+  "n_systems": 63,
+  "bar_match_frac": 0.849,
+  "model_pairs": 63,
+  "model_strong": 62
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata17-2",
+  "status": "ok",
+  "n_systems": 28,
+  "bar_match_frac": 0.792,
+  "model_pairs": 28,
+  "model_strong": 28
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata17-3",
+  "status": "ok",
+  "n_systems": 66,
+  "bar_match_frac": 0.778,
+  "model_pairs": 66,
+  "model_strong": 53
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata18-1",
+  "status": "ok",
+  "n_systems": 49,
+  "bar_match_frac": 1.0,
+  "model_pairs": 49,
+  "model_strong": 49
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata18-2",
+  "status": "ok",
+  "n_systems": 33,
+  "bar_match_frac": 0.781,
+  "model_pairs": 33,
+  "model_strong": 32
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata18-3",
+  "status": "ok",
+  "n_systems": 10,
+  "bar_match_frac": 1.0,
+  "model_pairs": 8,
+  "model_strong": 4
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata18-4",
+  "status": "ok",
+  "n_systems": 48,
+  "bar_match_frac": 0.886,
+  "model_pairs": 48,
+  "model_strong": 48
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata19-1",
+  "status": "ok",
+  "n_systems": 20,
+  "bar_match_frac": 0.938,
+  "model_pairs": 20,
+  "model_strong": 19
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata19-2",
+  "status": "ok",
+  "n_systems": 30,
+  "bar_match_frac": 0.923,
+  "model_pairs": 30,
+  "model_strong": 30
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata20-1",
+  "status": "ok",
+  "n_systems": 28,
+  "bar_match_frac": 0.769,
+  "model_pairs": 27,
+  "model_strong": 27
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata20-2",
+  "status": "ok",
+  "n_systems": 21,
+  "bar_match_frac": 0.941,
+  "model_pairs": 20,
+  "model_strong": 20
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata22-1",
+  "status": "ok",
+  "n_systems": 36,
+  "bar_match_frac": 0.688,
+  "model_pairs": 36,
+  "model_strong": 36
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata22-2",
+  "status": "ok",
+  "n_systems": 36,
+  "bar_match_frac": 0.933,
+  "model_pairs": 35,
+  "model_strong": 32
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata24-1",
+  "status": "ok",
+  "n_systems": 30,
+  "bar_match_frac": 1.0,
+  "model_pairs": 25,
+  "model_strong": 22
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata24-2",
+  "status": "ok",
+  "n_systems": 32,
+  "bar_match_frac": 0.963,
+  "model_pairs": 29,
+  "model_strong": 29
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata25-1",
+  "status": "ok",
+  "n_systems": 34,
+  "bar_match_frac": 0.966,
+  "model_pairs": 32,
+  "model_strong": 30
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata25-2",
+  "status": "ok",
+  "n_systems": 10,
+  "bar_match_frac": 1.0,
+  "model_pairs": 10,
+  "model_strong": 10
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata26-2",
+  "status": "ok",
+  "n_systems": 12,
+  "bar_match_frac": 0.7,
+  "model_pairs": 11,
+  "model_strong": 11
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata26-3",
+  "status": "ok",
+  "n_systems": 48,
+  "bar_match_frac": 0.867,
+  "model_pairs": 27,
+  "model_strong": 26
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata27-1",
+  "status": "ok",
+  "n_systems": 40,
+  "bar_match_frac": 0.667,
+  "model_pairs": 31,
+  "model_strong": 31
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata27-2",
+  "status": "ok",
+  "n_systems": 56,
+  "bar_match_frac": 0.9,
+  "model_pairs": 54,
+  "model_strong": 54
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata28-1",
+  "status": "ok",
+  "n_systems": 18,
+  "bar_match_frac": 0.769,
+  "model_pairs": 13,
+  "model_strong": 13
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata28-2",
+  "status": "ok",
+  "n_systems": 22,
+  "bar_match_frac": 1.0,
+  "model_pairs": 16,
+  "model_strong": 14
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata28-3",
+  "status": "ok",
+  "n_systems": 8,
+  "bar_match_frac": 1.0,
+  "model_pairs": 8,
+  "model_strong": 8
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata28-4",
+  "status": "ok",
+  "n_systems": 56,
+  "bar_match_frac": 0.841,
+  "model_pairs": 46,
+  "model_strong": 45
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata31-1",
+  "status": "ok",
+  "n_systems": 36,
+  "bar_match_frac": 0.962,
+  "model_pairs": 27,
+  "model_strong": 26
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata31-2",
+  "status": "ok",
+  "n_systems": 17,
+  "bar_match_frac": 0.688,
+  "model_pairs": 16,
+  "model_strong": 15
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata31-3",
+  "status": "ok",
+  "n_systems": 48,
+  "bar_match_frac": 0.872,
+  "model_pairs": 46,
+  "model_strong": 39
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata32-1",
+  "status": "ok",
+  "n_systems": 48,
+  "bar_match_frac": 1.0,
+  "model_pairs": 32,
+  "model_strong": 31
+ },
+ {
+  "repo": "beethoven-piano-sonatas",
+  "piece": "sonata32-2",
+  "status": "ok",
+  "n_systems": 70,
+  "bar_match_frac": 0.923,
+  "model_pairs": 65,
+  "model_strong": 61
+ },
+ {
+  "repo": "chopin-mazurkas",
+  "piece": "mazurka06-1",
+  "status": "ok",
+  "n_systems": 16,
+  "bar_match_frac": 0.778,
+  "model_pairs": 13,
+  "model_strong": 13
+ },
+ {
+  "repo": "chopin-mazurkas",
+  "piece": "mazurka06-2",
+  "status": "ok",
+  "n_systems": 12,
+  "bar_match_frac": 0.909,
+  "model_pairs": 11,
+  "model_strong": 11
+ },
+ {
+  "repo": "chopin-mazurkas",
+  "piece": "mazurka06-3",
+  "status": "ok",
+  "n_systems": 18,
+  "bar_match_frac": 0.875,
+  "model_pairs": 17,
+  "model_strong": 17
+ },
+ {
+  "repo": "chopin-mazurkas",
+  "piece": "mazurka07-2",
+  "status": "ok",
+  "n_systems": 12,
+  "bar_match_frac": 1.0,
+  "model_pairs": 12,
+  "model_strong": 10
+ },
+ {
+  "repo": "chopin-mazurkas",
+  "piece": "mazurka24-1",
+  "status": "ok",
+  "n_systems": 12,
+  "bar_match_frac": 0.909,
+  "model_pairs": 12,
+  "model_strong": 11
+ },
+ {
+  "repo": "chopin-mazurkas",
+  "piece": "mazurka24-2",
+  "status": "ok",
+  "n_systems": 24,
+  "bar_match_frac": 1.0,
+  "model_pairs": 24,
+  "model_strong": 24
+ },
+ {
+  "repo": "chopin-mazurkas",
+  "piece": "mazurka30-2",
+  "status": "ok",
+  "n_systems": 12,
+  "bar_match_frac": 1.0,
+  "model_pairs": 12,
+  "model_strong": 12
+ },
+ {
+  "repo": "chopin-mazurkas",
+  "piece": "mazurka41-1",
+  "status": "ok",
+  "n_systems": 24,
+  "bar_match_frac": 0.909,
+  "model_pairs": 24,
+  "model_strong": 24
+ },
+ {
+  "repo": "chopin-mazurkas",
+  "piece": "mazurka41-2",
+  "status": "ok",
+  "n_systems": 12,
+  "bar_match_frac": 1.0,
+  "model_pairs": 12,
+  "model_strong": 12
+ },
+ {
+  "repo": "chopin-mazurkas",
+  "piece": "mazurka59-1",
+  "status": "ok",
+  "n_systems": 24,
+  "bar_match_frac": 0.941,
+  "model_pairs": 23,
+  "model_strong": 23
+ },
+ {
+  "repo": "chopin-mazurkas",
+  "piece": "mazurka63-2",
+  "status": "ok",
+  "n_systems": 11,
+  "bar_match_frac": 1.0,
+  "model_pairs": 11,
+  "model_strong": 11
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata01-1",
+  "status": "ok",
+  "n_systems": 29,
+  "bar_match_frac": 0.931,
+  "model_pairs": 29,
+  "model_strong": 29
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata01-2",
+  "status": "ok",
+  "n_systems": 15,
+  "bar_match_frac": 1.0,
+  "model_pairs": 15,
+  "model_strong": 15
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata01-3",
+  "status": "ok",
+  "n_systems": 22,
+  "bar_match_frac": 1.0,
+  "model_pairs": 21,
+  "model_strong": 21
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata02-1",
+  "status": "ok",
+  "n_systems": 27,
+  "bar_match_frac": 0.88,
+  "model_pairs": 27,
+  "model_strong": 27
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata02-2",
+  "status": "ok",
+  "n_systems": 12,
+  "bar_match_frac": 0.9,
+  "model_pairs": 11,
+  "model_strong": 11
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata02-3",
+  "status": "ok",
+  "n_systems": 22,
+  "bar_match_frac": 0.474,
+  "model_pairs": 21,
+  "model_strong": 21
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata03-1",
+  "status": "ok",
+  "n_systems": 27,
+  "bar_match_frac": 1.0,
+  "model_pairs": 26,
+  "model_strong": 26
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata03-2",
+  "status": "ok",
+  "n_systems": 14,
+  "bar_match_frac": 1.0,
+  "model_pairs": 14,
+  "model_strong": 14
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata03-3",
+  "status": "ok",
+  "n_systems": 28,
+  "bar_match_frac": 0.857,
+  "model_pairs": 28,
+  "model_strong": 28
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata04-1",
+  "status": "ok",
+  "n_systems": 13,
+  "bar_match_frac": 0.889,
+  "model_pairs": 12,
+  "model_strong": 12
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata04-2",
+  "status": "ok",
+  "n_systems": 13,
+  "bar_match_frac": 1.0,
+  "model_pairs": 13,
+  "model_strong": 12
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata04-3",
+  "status": "ok",
+  "n_systems": 14,
+  "bar_match_frac": 0.636,
+  "model_pairs": 14,
+  "model_strong": 13
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata05-1",
+  "status": "ok",
+  "n_systems": 22,
+  "bar_match_frac": 0.895,
+  "model_pairs": 22,
+  "model_strong": 22
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata05-2",
+  "status": "ok",
+  "n_systems": 17,
+  "bar_match_frac": 0.714,
+  "model_pairs": 15,
+  "model_strong": 12
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata05-3",
+  "status": "ok",
+  "n_systems": 28,
+  "bar_match_frac": 0.852,
+  "model_pairs": 28,
+  "model_strong": 25
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata06-1",
+  "status": "ok",
+  "n_systems": 34,
+  "bar_match_frac": 0.903,
+  "model_pairs": 33,
+  "model_strong": 33
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata06-2",
+  "status": "ok",
+  "n_systems": 21,
+  "bar_match_frac": 0.923,
+  "model_pairs": 21,
+  "model_strong": 21
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata06-3a",
+  "status": "ok",
+  "n_systems": 3,
+  "bar_match_frac": 1.0,
+  "model_pairs": 3,
+  "model_strong": 3
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata06-3b",
+  "status": "ok",
+  "n_systems": 4,
+  "bar_match_frac": 0.5,
+  "model_pairs": 2,
+  "model_strong": 1
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata06-3c",
+  "status": "ok",
+  "n_systems": 4,
+  "bar_match_frac": 1.0,
+  "model_pairs": 2,
+  "model_strong": 2
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata06-3d",
+  "status": "ok",
+  "n_systems": 6,
+  "bar_match_frac": 1.0,
+  "model_pairs": 4,
+  "model_strong": 4
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata06-3e",
+  "status": "ok",
+  "n_systems": 6,
+  "bar_match_frac": 1.0,
+  "model_pairs": 4,
+  "model_strong": 4
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata06-3f",
+  "status": "ok",
+  "n_systems": 3,
+  "bar_match_frac": 1.0,
+  "model_pairs": 2,
+  "model_strong": 2
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata06-3g",
+  "status": "ok",
+  "n_systems": 5,
+  "bar_match_frac": 1.0,
+  "model_pairs": 3,
+  "model_strong": 3
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata06-3h",
+  "status": "ok",
+  "n_systems": 4,
+  "bar_match_frac": 0.5,
+  "model_pairs": 3,
+  "model_strong": 2
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata06-3i",
+  "status": "ok",
+  "n_systems": 4,
+  "bar_match_frac": 0.667,
+  "model_pairs": 3,
+  "model_strong": 2
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata06-3j",
+  "status": "ok",
+  "n_systems": 3,
+  "bar_match_frac": 0.667,
+  "model_pairs": 3,
+  "model_strong": 2
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata06-3k",
+  "status": "ok",
+  "n_systems": 4,
+  "bar_match_frac": 1.0,
+  "model_pairs": 3,
+  "model_strong": 3
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata06-3m",
+  "status": "ok",
+  "n_systems": 7,
+  "bar_match_frac": 0.857,
+  "model_pairs": 7,
+  "model_strong": 7
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata08-1",
+  "status": "ok",
+  "n_systems": 36,
+  "bar_match_frac": 0.833,
+  "model_pairs": 34,
+  "model_strong": 34
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata08-2",
+  "status": "ok",
+  "n_systems": 29,
+  "bar_match_frac": 0.476,
+  "model_pairs": 29,
+  "model_strong": 29
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata08-3",
+  "status": "ok",
+  "n_systems": 28,
+  "bar_match_frac": 0.808,
+  "model_pairs": 26,
+  "model_strong": 24
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata09-1",
+  "status": "ok",
+  "n_systems": 27,
+  "bar_match_frac": 0.92,
+  "model_pairs": 27,
+  "model_strong": 27
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata09-2",
+  "status": "ok",
+  "n_systems": 15,
+  "bar_match_frac": 1.0,
+  "model_pairs": 15,
+  "model_strong": 15
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata09-3",
+  "status": "ok",
+  "n_systems": 50,
+  "bar_match_frac": 0.846,
+  "model_pairs": 50,
+  "model_strong": 50
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata10-1",
+  "status": "ok",
+  "n_systems": 33,
+  "bar_match_frac": 0.815,
+  "model_pairs": 32,
+  "model_strong": 32
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata10-2",
+  "status": "ok",
+  "n_systems": 13,
+  "bar_match_frac": 0.9,
+  "model_pairs": 11,
+  "model_strong": 11
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata10-3",
+  "status": "ok",
+  "n_systems": 33,
+  "bar_match_frac": 0.87,
+  "model_pairs": 32,
+  "model_strong": 32
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata12-1",
+  "status": "ok",
+  "n_systems": 33,
+  "bar_match_frac": 0.913,
+  "model_pairs": 32,
+  "model_strong": 32
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata12-3",
+  "status": "ok",
+  "n_systems": 50,
+  "bar_match_frac": 0.92,
+  "model_pairs": 50,
+  "model_strong": 50
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata13-1",
+  "status": "ok",
+  "n_systems": 38,
+  "bar_match_frac": 0.743,
+  "model_pairs": 36,
+  "model_strong": 35
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata13-2",
+  "status": "ok",
+  "n_systems": 18,
+  "bar_match_frac": 0.538,
+  "model_pairs": 17,
+  "model_strong": 16
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata13-3",
+  "status": "ok",
+  "n_systems": 42,
+  "bar_match_frac": 0.632,
+  "model_pairs": 42,
+  "model_strong": 41
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata14-1",
+  "status": "ok",
+  "n_systems": 30,
+  "bar_match_frac": 0.957,
+  "model_pairs": 29,
+  "model_strong": 29
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata14-2",
+  "status": "ok",
+  "n_systems": 24,
+  "bar_match_frac": 0.882,
+  "model_pairs": 24,
+  "model_strong": 24
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata15-1",
+  "status": "ok",
+  "n_systems": 20,
+  "bar_match_frac": 1.0,
+  "model_pairs": 19,
+  "model_strong": 19
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata15-2",
+  "status": "ok",
+  "n_systems": 21,
+  "bar_match_frac": 0.882,
+  "model_pairs": 20,
+  "model_strong": 20
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata15-3",
+  "status": "ok",
+  "n_systems": 14,
+  "bar_match_frac": 0.875,
+  "model_pairs": 14,
+  "model_strong": 13
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata16-1",
+  "status": "ok",
+  "n_systems": 34,
+  "bar_match_frac": 0.885,
+  "model_pairs": 33,
+  "model_strong": 33
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata16-2",
+  "status": "ok",
+  "n_systems": 17,
+  "bar_match_frac": 0.929,
+  "model_pairs": 14,
+  "model_strong": 13
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata16-3",
+  "status": "ok",
+  "n_systems": 24,
+  "bar_match_frac": 1.0,
+  "model_pairs": 22,
+  "model_strong": 22
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata17-1",
+  "status": "ok",
+  "n_systems": 30,
+  "bar_match_frac": 0.96,
+  "model_pairs": 30,
+  "model_strong": 30
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata17-2",
+  "status": "ok",
+  "n_systems": 20,
+  "bar_match_frac": 1.0,
+  "model_pairs": 20,
+  "model_strong": 19
+ },
+ {
+  "repo": "mozart-piano-sonatas",
+  "piece": "sonata17-3",
+  "status": "ok",
+  "n_systems": 33,
+  "bar_match_frac": 0.964,
+  "model_pairs": 33,
+  "model_strong": 33
+ }
+]
