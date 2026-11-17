@@ -529,3 +529,16 @@ staff-sensitive pitch 90.2 / +onset 75.5 / full 73.6; pooled pitch 91.9 / 76.9 /
 harder data 90.1-90.4 / 91.8-92.1; run B 86.0 / 88.2 is not re-merged (only its final files are local). Petrushka remains provisional (staff-sensitive 58.3 is per-staff aligned, pooled 79.2 jointly).
 Tables: `out/testset/POOLED-table-2026-11-17-after-merger.md`, `CORRECTED-table-2026-11-17-after-merger.md`. Limits: lost bars sit mid-page and cannot be placed by the merger;
 the Schott scans still lack the grand staff (pairing handled separately; the reverted heuristic reached 84.6 / 81.6 / 93.5 on Sonata / Etude 5 / Etude 10).
+
+
+## R7. Input-resolution experiment, prepared 2:35 pm, LAUNCHED 2:55 pm Pacific 2026-11-17 (spec `res_experiment_spec.md`)
+
+Question: finer grid (384x1920 canvas, 24x120 tokens) vs 256x1280 (16x80) from released run2s7, same list (`run2_train_excl_v3`, 6,716
+updates, batch 16x2, lr 2e-5 cosine, seeds 7/11). Code: yiduoke/homr-local branch `resolution` (worktree `run/res_wt`, e0fc61b, from `integration`):
+`HOMR_INPUT_SCALE` (default 1, bit-identical), `HOMR_MODEL_NAME`, positional embeddings resampled at warm start, ONNX context length from config.
+Stored training images are ~1290 px wide (canvas 1:1), so arm B upsamples ~1.5x on the fly (no new detail; true re-render not possible: PDMX SVGs deleted,
+LilyPond/GrandStaff raster only, disk). Arm A = existing run3_ctrl_s7/s11. Smoke on vast-homr4: B fits batch 16x2 (17.8 GiB worst case), 0.68 s GPU step vs 0.36 s,
+0.72 s with real data; est. 1.6-2.1 h and ~$0.55 per B run. Result: none yet. Box: `/workspace/homr_res`, logs `/workspace/homr_res/logs`.
+
+
+**R7 update (3:05 pm Pacific).** Owner approved option 1 (arm B only, seeds 7 and 11, lr 2e-5, 6,716 updates; controls reused). Running in tmux `res` on vast-homr4 since 2:55 pm; first result expected about 4:45-5:00 pm, second about 6:45-7:00 pm. The advisor's evaluation plan: same held-out crops A vs B (B on the enlarged pixels), then B on native-detail crops from higher-dpi scans; paired seeds, pooled pitch per piece, pieces at 97, dense-bar recall, end-to-end timing, learning curves; a null result applies to this recipe and the stored rasters. Schott diagnosis and the merger fix are in `PROGRESS.md` (3:05 pm block).

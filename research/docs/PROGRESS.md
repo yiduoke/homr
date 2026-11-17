@@ -984,6 +984,43 @@ On rendered page 8 of Hungarian Rhapsody No. 6, the released model’s output re
 
 **Open reference and render checks.** Alongside the resolution experiment, trace the octave brackets in *Winter Wind* m. 20 and Schubert D. 899 No. 4 m. 64 across the scan, reference XML, render and model output. Scriabin’s extra rendered staff has already been fixed. Correct verified source or engraving errors, document genuine edition differences, and rescore every affected checkpoint on the same reference version. [Correction procedure](https://github.com/yiduoke/homr-research/blob/main/eval_run1/scan_render_audit.md#render-and-reference-xml-corrections)
 
+## Status 2026-11-17, 3:05 pm Pacific: Schott cause found, merger fixed, resolution runs launched, scan pairs started
+
+- **Process rules from the owner today:** no fallbacks or heuristics in the model pipeline (find the cause); large code edits and
+  long tasks go to subagents so the main chat stays free for talking.
+- **Why the Schott scans fail (diagnosis, not a fix).** homr's staff-pairing model sees a narrow crop of the left edge of each pair.
+  The Schott pages print a thin, almost straight brace with a short point and *no separate vertical connecting line*; the working
+  scans (Waldstein, Paganini, Chopin) have a curved brace and a line (line across the gap: 3 % of rows on Schott vs 74 %).
+  Ruled out: a split brace (the Schott brace is nearly continuous, hole 4.4 rows vs 2.2 on Waldstein; filling it flipped 1 of 5).
+  Drawing a line beside the brace flipped 3 of 5 pairs (7 of 13 in the advisor's test of all printed systems on the opening pages);
+  swapping in only the Chopin brace strip flipped all 13, swapping the clef strip flipped none. So the line is part of the cause and
+  the brace drawing is the rest. Fix plan: train the pairing model on independent real piano scans with this brace style (and
+  two-staff vocal/instrumental systems as negatives); keep the three Liszt scans held out. Not started.
+- **Merger bug (second, downstream error), fixed.** music21 names both hands' parts 'Voice' (same id), so `merge_pages.py` poured
+  them into one part and counted both hands' bars. Parts are now keyed by occurrence ('Voice', 'Voice#2'), and a subagent added
+  per-page padding of the shorter hand with rests (the recogniser itself loses bars inside some page outputs: Sonata pages 2/7/12/15,
+  Etude 5 six pages, Etude 10 pages 81/85). After the merger fix only the three Schott scans and rendered Petrushka change.
+  Corrected Schott pooled pitch: Sonata 81.5, Etude 5 77.8, Etude 10 79.8 (was about 50); mean over 28 scans, released model:
+  pooled 91.9, staff-sensitive 90.2, 5 scans at 97 pooled (details: D12 and the 2:15 pm block above).
+- **Resolution experiment launched** (advisor's option 1, approved by the owner): arm B 384x1920 (24x120 tokens) from run2s7,
+  seeds 7 and 11, lr 2e-5, 6,716 updates, controls run3_ctrl_s7 / s11 reused as arm A. Started 2:55 pm Pacific (22:55 UTC) in tmux
+  `res` on vast-homr4 (`/workspace/homr_res/training/chain_resolution.sh`, log `/workspace/logs/res/status.log`), about 1.6-2.1 h
+  each (seed 7 about 4:45-5:00 pm, seed 11 about 6:45-7:00 pm), about $1.10. Caveat from R7: the stored training images are about
+  1290 px wide, so arm B upsamples about 1.5x; this tests the finer token grid, not extra pixels. Evaluation plan from the advisor:
+  A vs B on identical crops, then B on native-detail 384x1920 crops from higher-dpi scans; paired results per seed, pieces at 97,
+  dense-bar recall, end-to-end timing, learning curves (is B still improving at the cutoff?). An evaluation-harness subagent is
+  building the tooling (`eval_run1/RESOLUTION_EVAL.md` when done). A null result applies to this recipe and these rasters.
+- **Real virtuoso scan pairs (pilot) started.** Note: the ASAP scores are already in training as MuseScore-rendered staffs (3,754
+  ASAP staffs in the harder-data runs), so new pairs test real printed pages, not new music; candidates are flagged 'already in
+  rendered training: yes/no'. A subagent picks 24-30 public-domain pieces (excluding all test compositions), writes
+  `scan_pairs_candidates.md`, and downloads the IMSLP PDFs into `~/Downloads/imslp_virtuoso_batch/` (owner authorised downloads and
+  IMSLP's disclaimer click-through; CAPTCHAs, logins and payments are left to the owner). Expected size about 1,500-3,000 pairs before
+  verification, a pilot; scale by more ASAP pieces and several editions per piece if it helps.
+- **Artifact** (listening room, version 39): scores of the 27 real-scan rows refreshed with the visible-note scorer, experiment
+  paragraph rewritten; still to do: label the eight typeset-PDF rows (not scans) and show the Schott rows and pooled numbers.
+- **Repos:** fork branches `integration` (scorer fix, loop guard, tests; fallback reverted) and `research` (this folder) are pushed;
+  `homr-research` stays the private store for references, outputs and scans; `research/docs/` is the copy to edit.
+
 ## Status 2026-11-17, 2:15 pm Pacific: page merger fixed, hands lined up per page, new baseline
 
 - **What was wrong.** For the three Schott Liszt scans (Sonata, Etudes 5 and 10) the staff pairing model reads no grand staff, so every
@@ -1014,7 +1051,7 @@ On rendered page 8 of Hungarian Rhapsody No. 6, the released model’s output re
 - **Still open:** Schott staff pairing (handled separately, as a layout task); mid-page bar loss in one hand; audio and artifact rows for
   the three Schott scans need the `_am` outputs; run B Schott rows.
 
-## Status 2026-11-17, 6:30 pm Pacific: Schott Liszt layout bug fixed
+## Status 2026-11-17, about 2:35 pm Pacific (label corrected; first written as 6:30 pm): Schott Liszt trial fix, REVERTED
 
 - **Cause.** The staff relation model (a small CNN on the left margin of each pair of staves) said "same system"
   for every pair of the three Schott Liszt scans and never "grand staff" (Etude 5: 0 of 81 pairs, Etude 10
@@ -1022,7 +1059,7 @@ On rendered page 8 of Hungarian Rhapsody No. 6, the released model’s output re
   "grand staff" for every pair and never "same system". So the hands were read as separate systems and
   chained: about twice the bars. The reference was right. Why the model misses this print is not understood
   (thin brace, tight staves, or a look absent from its PDMX training data); not investigated further.
-- **Fix** (`integration` branch, `homr/staff_relations.py`, commit c9940d0, 5 tests): if the model finds no
+- **REVERTED at the owner's request ("no fallbacks, investigate why"; commits 27b6a2b, d27058a). Kept as a diagnostic only.** Trial fix (`integration` branch, `homr/staff_relations.py`, commit c9940d0, 5 tests): if the model finds no
   grand staff on a page and every system with several staffs has exactly two, the pairs are grand staffs;
   `HOMR_NO_SAME_SYSTEM_GRAND=1` switches it off (choir on two staves). Only these three pieces have such
   pages in the released-model logs of the 28 scans; elsewhere the model finds grand staffs so it never runs.
@@ -1031,7 +1068,7 @@ On rendered page 8 of Hungarian Rhapsody No. 6, the released model’s output re
   604 -> 271 of 305, pitch 48.8 -> 84.6, +onset 37.3 -> 75.5. Still to do: the other 25 scans are unchanged
   but the full 28 table and the artifact rows for these three need these outputs (audio too).
 
-## Status 2026-11-17, 5:00 pm Pacific: pooled scoring, Scriabin reference fixed, loop guard checked
+## Status 2026-11-17, about 2:05 pm Pacific (label corrected; first written as 5:00 pm): pooled scoring, Scriabin reference fixed, loop guard checked
 
 - **Scriabin's weak score was a reference artefact.** The reference has a stray second part (47 notes in 8
   bars), so the scorer saw 3 staves against our 2 and aligned per staff. Scored against the reference
@@ -1060,7 +1097,7 @@ On rendered page 8 of Hungarian Rhapsody No. 6, the released model’s output re
   (256x1280 / 16x80 vs 384x1920 / 24x120, both from run2s7, same data, seeds, steps; positional embeddings
   adapted) and IMSLP/ASAP virtuoso scan pairs prepared while it runs.
 
-## Status 2026-11-17, 2:30 pm Pacific: corrected table, metric caveat, loop guard works
+## Status 2026-11-17, about 1:45 pm Pacific (label corrected; first written as 2:30 pm): corrected table, metric caveat, loop guard works
 
 - **Full corrected table** (28 pieces, released rendered and scan, run B, both controls, both harder-data
   runs, pitch with pitch+onset in brackets): `out/testset/CORRECTED-table-2026-11-17.md`. Scan means,
