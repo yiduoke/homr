@@ -5,7 +5,7 @@ comes next. Written for people and coding agents picking up the work. Upstream i
 liebharc/homr; its own docs (README.md, Training.md, IDEAS_FOR_CONTRIBUTORS.md,
 AGENTS.md) still apply.
 
-Last updated: 2026-11-17.
+Last updated: 2026-11-17 (2:15 pm Pacific).
 
 Related documents: [PAPER_NOTES.md](PAPER_NOTES.md) (the paper's story, final numbers only);
 [EXPERIMENTS.md](https://github.com/yiduoke/homr-research/blob/main/EXPERIMENTS.md) in the private research repo
@@ -983,6 +983,53 @@ All 29 pairs were inspected visually, with 28 scored. At fixed bar alignment, al
 On rendered page 8 of Hungarian Rhapsody No. 6, the released model’s output repeats G5 414 times in succession. One output bar accounts for 578 of 902 unmatched predictions. Replay that crop with the existing loop guard. Keep Schott staff pairing as a layout task. Test a finer CNN spatial grid as a separate, matched training run. Local handoff and page images are in the [29-pair visual audit](https://github.com/yiduoke/homr-research/blob/main/eval_run1/scan_render_audit.md).
 
 **Open reference and render checks.** Alongside the resolution experiment, trace the octave brackets in *Winter Wind* m. 20 and Schubert D. 899 No. 4 m. 64 across the scan, reference XML, render and model output. Scriabin’s extra rendered staff has already been fixed. Correct verified source or engraving errors, document genuine edition differences, and rescore every affected checkpoint on the same reference version. [Correction procedure](https://github.com/yiduoke/homr-research/blob/main/eval_run1/scan_render_audit.md#render-and-reference-xml-corrections)
+
+## Status 2026-11-17, 2:15 pm Pacific: page merger fixed, hands lined up per page, new baseline
+
+- **What was wrong.** For the three Schott Liszt scans (Sonata, Etudes 5 and 10) the staff pairing model reads no grand staff, so every
+  page output has two single-staff parts that homr both names `Voice`. `merge_pages.py` keyed parts by that name and poured both hands
+  into one part (about twice the bars). Fix 1 (commit cd3b639): the n-th same-named part of a page continues the n-th such part, so
+  there are two parts again. Fix 2 (this entry): the part with fewer bars on a page gets rests for the missing bars at the end of that
+  page, so both hands have the same bars per page. Pairing is untouched: no fallback rule, the earlier two-staff heuristic stays reverted
+  (the `schottfix` numbers in the 6:30 pm block below are therefore not part of this baseline).
+- **Where the hands diverge (evidence).** Aligning each hand's bars to the reference, both hands cover the same reference bars on every
+  page; the difference is bars lost inside a page output by one hand: Sonata p. 2, 7, 12, 15 (1, 1, 2, 4 bars; p. 15 loses reference
+  bars 292-296 in the right hand), Etude 5 six pages (7 bars), Etude 10 p. 81 and p. 85 (4 and 2 bars). The page outputs lose them,
+  mostly mid-page, so the merger cannot place them; padding at the page end keeps the damage inside the page. Without padding the hands
+  point to the same reference bar in only 1.4 % (Sonata), 4.9 % (Etude 5), 39 % (Etude 10) of the output bars; with it 85 %, 72 %, 76 %
+  (`eval_run1/hand_sync.py`; the rest are bars shifted inside a page, at most 5).
+- **Other pieces unchanged.** The new merger gives the same parts, bars and notes as before on the other 26 scan sets (of 29)
+  and 28 of 29 rendered sets; only rendered Petrushka changes (10 padded bars, scores 73.3 / 56.8 both before and after).
+- **Baseline after the merger (released weights, visible notes, 28 scans).** Staff-sensitive pitch 90.2 (was 87.2), pitch+onset 75.5,
+  fully right 73.6; pooled pitch 91.9 (was 89.3), +onset 76.9, full 74.9; scans at 97: 4 staff-sensitive, 5 pooled (unchanged).
+  Bars equal to the reference on 14 of 28 scans. Worst: Petrushka 58.3 staff-sensitive; without Petrushka liszt-te-5 77.8 pooled.
+  Schott pitch: Sonata 48.8 -> 81.0, Etude 5 53.3 -> 77.0, Etude 10 52.3 -> 79.1 (pooled 81.5, 77.8, 79.8). The 84.6 / 82.6 / 86.0 from the
+  merge fix alone came from aligning each hand to the reference on its own and are not comparable (they hide the drift).
+  Other checkpoints (pitch staff-sensitive / pooled): control s7 89.7 / 91.5, control s11 89.9 / 91.6, harder data s7 90.1 / 91.8, s11 90.4 / 92.1;
+  run B 86.0 / 88.2 is **not re-merged** (only its final files are local, the Schott rows keep the doubled bars).
+- **Petrushka is provisional.** Staff-sensitive 58.3 is staff-ignored with per-staff bar alignment (reference 3 staves, ours 2); pooled
+  79.2 uses one joint alignment. Do not quote 79.2 until the bar alignment is checked.
+- **Tables** (older ones kept): `out/testset/POOLED-table-2026-11-17-after-merger.md`, `CORRECTED-table-2026-11-17-after-merger.md`;
+  scripts `eval_run1/remerge_after_merger.sh`, `score_after_merger.py`, `after_merger_tables.py`, `hand_sync.py`. Details: EXPERIMENTS.md D12.
+- **Still open:** Schott staff pairing (handled separately, as a layout task); mid-page bar loss in one hand; audio and artifact rows for
+  the three Schott scans need the `_am` outputs; run B Schott rows.
+
+## Status 2026-11-17, 6:30 pm Pacific: Schott Liszt layout bug fixed
+
+- **Cause.** The staff relation model (a small CNN on the left margin of each pair of staves) said "same system"
+  for every pair of the three Schott Liszt scans and never "grand staff" (Etude 5: 0 of 81 pairs, Etude 10
+  0 of 86, Sonata 1 of 138), although the pages are ordinary braced grand staffs. On working scans it says
+  "grand staff" for every pair and never "same system". So the hands were read as separate systems and
+  chained: about twice the bars. The reference was right. Why the model misses this print is not understood
+  (thin brace, tight staves, or a look absent from its PDMX training data); not investigated further.
+- **Fix** (`integration` branch, `homr/staff_relations.py`, commit c9940d0, 5 tests): if the model finds no
+  grand staff on a page and every system with several staffs has exactly two, the pairs are grand staffs;
+  `HOMR_NO_SAME_SYSTEM_GRAND=1` switches it off (choir on two staves). Only these three pieces have such
+  pages in the released-model logs of the 28 scans; elsewhere the model finds grand staffs so it never runs.
+- **Result (released weights, tag `schottfix`, staff-sensitive):** Etude 5 bars 261 -> 132 of 134, pitch 53.3 ->
+  81.6, +onset 43.5 -> 68.6; Etude 10 358 -> 182 of 182, pitch 52.3 -> 93.5, +onset 17.7 -> 55.5; Sonata
+  604 -> 271 of 305, pitch 48.8 -> 84.6, +onset 37.3 -> 75.5. Still to do: the other 25 scans are unchanged
+  but the full 28 table and the artifact rows for these three need these outputs (audio too).
 
 ## Status 2026-11-17, 5:00 pm Pacific: pooled scoring, Scriabin reference fixed, loop guard checked
 

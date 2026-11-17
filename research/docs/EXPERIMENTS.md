@@ -508,3 +508,24 @@ Pooled-staff pitch inventory (a pitch counts on either staff, `staff_agnostic` b
 released model loops on rendered Hungarian Rhapsody 6 (bar 87: 608 notes, 484 G5); the loop guard removes 509 notes on that
 page and gives no false trigger on Prokofiev Toccata (0 of 11 pages). Tables: `out/testset/POOLED-table-2026-11-17.md`,
 `CORRECTED-table-2026-11-17.md`. Petrushka's pooled score (79.2) rests on a different bar alignment and is unverified.
+
+
+## D12. Page merger after the Schott fix: hands lined up per page (2026-11-17)
+
+Three scans (Liszt Sonata, Transcendental Etudes 5 and 10) come out of homr as two single-staff parts per page, both named `Voice`, because the staff
+pairing model does not read the Schott brace as a grand staff. `merge_pages.py` joined them by name and so poured both hands into one part (604, 261
+and 358 bars for references of 305, 134 and 182). Commit cd3b639 keeps the n-th same-named part of a page separate (two parts of 298/306, 132/129, 176/182 bars).
+Aligning each hand to the reference shows that both hands cover the same reference bars on every page and that a hand differs only by bars lost inside a
+page output (Sonata p. 2, 7, 12, 15: 1, 1, 2, 4 bars; right hand loses reference bars 292-296 on p. 15; Etude 5: 7 bars on six pages; Etude 10: p. 81, 85: 4, 2).
+`merge_pages.py` now gives the part with fewer bars on a page rests for the missing bars at the end of that page (only for same-named simultaneous parts), so both
+hands have the same bars per page (306, 134, 182 bars; reference 305, 134, 182). The two hands then point to the same reference bar in 85 / 72 / 76 % of the output bars
+(without padding 1.4 / 4.9 / 39 %; `eval_run1/hand_sync.py`). Same parts, bars and notes as before on the other 26 scan sets (of 29) and 28 of 29 rendered sets; rendered Petrushka gets 10 padded
+bars and keeps its score (73.3 / 56.8). Pairing is untouched and no heuristic was added (the two-staff rule was reverted).
+
+Rescored from the saved page outputs of the released model and of both controls and both harder-data runs (no inference, visible notes, `eval_run1/remerge_after_merger.sh`,
+`score_after_merger.py`, `after_merger_tables.py`). Released model, pitch staff-sensitive / pooled: Sonata 81.0 / 81.5 (was 48.8), Etude 5 77.0 / 77.8 (53.3), Etude 10 79.1 / 79.8 (52.3).
+The per-staff alignment of the unpadded parts gave 84.6 / 82.6 / 86.0 because each hand is aligned on its own; those figures hide the drift and are not used. Means over 28 scans, released:
+staff-sensitive pitch 90.2 / +onset 75.5 / full 73.6; pooled pitch 91.9 / 76.9 / 74.9; scans at 97: 4 and 5; bars equal to the reference on 14 of 28. Controls 89.7-89.9 / 91.5-91.6,
+harder data 90.1-90.4 / 91.8-92.1; run B 86.0 / 88.2 is not re-merged (only its final files are local). Petrushka remains provisional (staff-sensitive 58.3 is per-staff aligned, pooled 79.2 jointly).
+Tables: `out/testset/POOLED-table-2026-11-17-after-merger.md`, `CORRECTED-table-2026-11-17-after-merger.md`. Limits: lost bars sit mid-page and cannot be placed by the merger;
+the Schott scans still lack the grand staff (pairing handled separately; the reverted heuristic reached 84.6 / 81.6 / 93.5 on Sonata / Etude 5 / Etude 10).

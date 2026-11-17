@@ -12,17 +12,30 @@ import re
 PAGES = os.environ.get("HOMR_PAGES", "run/pages150")
 OUT = os.environ.get("HOMR_OUT", "run/pathetique_homr")
 TRUST_PAGE_TIME = os.environ.get("HOMR_TRUST_PAGE_TIME") == "1"
-from music21 import converter, duration, note, spanner, stream, tie
+from music21 import converter, duration, meter, note, spanner, stream, tie
 from music21 import pitch as m21pitch
 
 pages = sorted((f for f in glob.glob(f"{PAGES}/page-*.musicxml") if "_teaser" not in f),
                key=lambda p: int(re.search(r"page-(\d+)", os.path.basename(p)).group(1)))
+
+def insert_rest(container, at: float, length: float) -> None:
+    """Fill `length` quarters with rests MusicXML can actually spell.
+
+    A gap like 2.5 quarters has no single note value, so music21 refuses to export
+    it; splitAtDurations breaks it into the tied components an engraver would write.
+    """
+    filler = note.Rest(quarterLength=length)
+    for piece in filler.splitAtDurations():
+        container.insert(at, piece)
+        at += float(piece.quarterLength)
+
 
 merged = stream.Score()
 part_streams: dict[str, stream.Part] = {}
 in_effect: dict[str, str] = {}
 dropped = 0
 spanners = 0
+padded_bars = 0
 
 for page_idx, path in enumerate(pages):
     score = converter.parse(path, forceSource=True)
@@ -45,6 +58,9 @@ for page_idx, path in enumerate(pages):
     # key and be poured into one part, counting the measures of both. The n-th part of a
     # page with a given name continues the n-th such part of the pages before it.
     seen_on_page: dict[str, int] = {}
+    # (target part, bars it received from this page, offset where they end), per page
+    # part name; used below to line the simultaneous parts of a page up again.
+    page_groups: dict[str, list[tuple[stream.Part, int, float]]] = {}
     for part in score.parts:
         seen_on_page[part.id] = seen_on_page.get(part.id, 0) + 1
         key = part.id if seen_on_page[part.id] == 1 else f"{part.id}#{seen_on_page[part.id]}"
@@ -80,9 +96,31 @@ for page_idx, path in enumerate(pages):
         for sp in part.getElementsByClass(spanner.Spanner):
             target.insert(0, sp)
             spanners += 1
+        page_groups.setdefault(part.id, []).append((target, len(measures), float(target.highestTime)))
+
+    # Parts of the same name on one page are the staves of one system block read as
+    # separate parts (homr did not join them as a grand staff), so they hold the same
+    # bars. Where a page output lost bars of one of them (Schott Sonata p. 15: five bars
+    # of the right hand), the shorter part gets rests for the missing bars at the end of
+    # the page. Otherwise its next page would start early and the two hands would drift
+    # apart for the rest of the piece. The lost bars cannot be located within the page.
+    for group in page_groups.values():
+        if len(group) < 2:
+            continue
+        most = max(count for _, count, _ in group)
+        for target, count, end in group:
+            if count == most:
+                continue
+            bar = float(meter.TimeSignature(in_effect[target.id]).barDuration.quarterLength) if in_effect.get(target.id) else 4.0
+            for _ in range(most - count):
+                filler = stream.Measure()
+                insert_rest(filler, 0.0, bar)
+                target.insert(end, filler)
+                end += bar
+                padded_bars += 1
     print(f"{path.split('/')[-1]}: appended at offset {min(offsets.values()):.1f}")
 
-print(f"\ndropped {dropped} redundant time signatures, carried {spanners} spanners")
+print(f"\ndropped {dropped} redundant time signatures, carried {spanners} spanners, padded {padded_bars} lost bars of simultaneous parts")
 
 # A part which covers only a few pages is an ossia or a small extra staff (e.g.
 # Mazeppa's "Piano a 7 octaves"): an alternative to the main staves, not more music to
@@ -98,18 +136,6 @@ if os.environ.get("HOMR_KEEP_MINOR_PARTS") != "1" and len(part_streams) > 1:
 for part in merged.parts:
     for i, m in enumerate(part.getElementsByClass("Measure"), start=1):
         m.number = i
-
-
-def insert_rest(container, at: float, length: float) -> None:
-    """Fill `length` quarters with rests MusicXML can actually spell.
-
-    A gap like 2.5 quarters has no single note value, so music21 refuses to export
-    it; splitAtDurations breaks it into the tied components an engraver would write.
-    """
-    filler = note.Rest(quarterLength=length)
-    for piece in filler.splitAtDurations():
-        container.insert(at, piece)
-        at += float(piece.quarterLength)
 
 
 def same_sounding(a, b) -> bool:
