@@ -670,6 +670,22 @@ changes on two runs. Mazeppa stays ~1 point below 566 in both runs.
   3; odd meters (5/8, 7/8, 11/16) grouping comes from the beams, fallback the bar total. 3/4 and
   6/8 have the same bar length but different beats, which is why run 1 reads the full time signature.
   Wikipedia (Tuplet): septuplets are usually 7:4 (7:6 in compound), sometimes 7:8; usage is inconsistent.
+- **Professor's review of run 3 (2026-11-16, agrees: harder-data pitch run first, tuplets after).**
+  Design: control = continue training the released model on the existing mixture; candidate = same
+  checkpoint with the harder material added; same budget, two seeds each; vocabulary, cropping,
+  decoding and accidental interpretation unchanged. Details: (1) report pitch precision and recall
+  separately (omissions vs additions); octaves stay in the primary metric, octave-free scores are
+  diagnostic only; keep reporting onset and duration F1 so a pitch gain can't hide worse rhythm.
+  (2) Verify the actual training crops contain the troublesome cases (dense chords, ledger lines,
+  rapid runs, cross-staff writing, several voices) and that their labels are right under the current
+  meter and printed-accidental formats. (3) Keep enough ordinary material (the control run showed the
+  recipe can damage familiar repertoire); choose mixture and checkpoint on separate development
+  pieces, then evaluate the held-out set (to do: split the ~50 test pieces into about 12 development
+  and the rest held-out). (4) Establish the corrected layout baseline first so a recovered page isn't
+  read as a training gain; add a safeguard so the four-staff merge doesn't fire on SATB/quartet systems
+  before merging it generally. Octave round stays deferred; no architecture changes until this
+  experiment answers something. If harder data helps broadly, expand it; if not, look at image
+  resolution, capacity or decoding. Immediate deliverable: a verified mixture and a controlled run.
 - **Petrushka reference** (Claude transcription, unchecked, `run/out/testset/stravinsky-petrushka/`):
   first look full-match F1 ours 38.8 / 566 46.2, but not like-for-like; the reference has 3 staves per
   system, our output 2 (the layout merge handles only four-staff systems). Open question: 3-staff fix.
