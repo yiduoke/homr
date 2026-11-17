@@ -703,6 +703,11 @@ changes on two runs. Mazeppa stays ~1 point below 566 in both runs.
   4/4; 1/8 137; 5/8 196; 7/8 213; 11/16, 13/16, 15/16 under 12 each. Rare meters are nearly absent from training;
   next: oversample rendered rare meters (own run or part of run 3, question to the professor), check accuracy vs glyph
   size on the meter test set, consider a small separate meter reader. Upstream reads only the denominator.
+- **Target (owner, 2026-11-17):** no paper until pitch is 97% or better on every piece (95% is the floor; 90% is "one wrong note in
+  ten" and not acceptable). Today: mean pitch 85.3 over the 28 real scans (simple pieces 97-99, dense virtuoso 80-92, Liszt Schott
+  pieces far lower because of layout). Plan consequence: after run 3 (control vs harder data) decide whether data alone can get there;
+  if gains are modest, the next levers are input resolution, model capacity and decoding (the professor's fallback), then the meter,
+  tuplet and real-scan arms. Report pitch per piece against the 97% line from now on.
 - **Petrushka reference** (Claude transcription, unchecked, `run/out/testset/stravinsky-petrushka/`):
   first look full-match F1 ours 38.8 / 566 46.2, but not like-for-like; the reference has 3 staves per
   system, our output 2 (the layout merge handles only four-staff systems). Open question: 3-staff fix.
