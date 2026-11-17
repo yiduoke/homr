@@ -81,3 +81,10 @@ def test_a_staff_with_fewer_measures_is_padded() -> None:
     assert [s.rhythm for s in merged].count("barline") == 2
     second_bar = [s for s in merged if s.position == "upper2"]
     assert len(second_bar) == 2
+
+
+def test_opt_out_keeps_four_staffs_separate(monkeypatch) -> None:  # type: ignore
+    staffs = _four_staffs()
+    assert is_piano_system(staffs)
+    monkeypatch.setenv("HOMR_NO_PIANO_MERGE", "1")
+    assert not is_piano_system(staffs)

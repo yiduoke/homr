@@ -10,6 +10,7 @@ each group starts.
 """
 
 import copy
+import os
 from collections import Counter
 from dataclasses import dataclass, field
 from fractions import Fraction
@@ -44,6 +45,10 @@ def is_piano_system(staffs: list[list[EncodedSymbol]], piano_on_page: bool = Fal
     Four staffs with treble, treble, bass and bass clef and no multi-measure rests. If the page
     shows piano otherwise, e.g. as a grand staff, the third staff can also start in the treble clef.
     """
+    if os.environ.get("HOMR_NO_PIANO_MERGE") == "1":
+        # Opt out for scores whose four staffs are not one piano, e.g. a choir or a quartet
+        # written G G F F
+        return False
     if len(staffs) != STAFFS_PER_SYSTEM:
         return False
     clefs = [_first_clef(staff) for staff in staffs]
