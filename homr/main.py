@@ -26,6 +26,7 @@ from homr.bounding_boxes import (
     create_rotated_bounding_boxes,
 )
 from homr.debug import Debug
+from homr.hires_page import load_hires_page
 from homr.model import InputPredictions, MultiStaff, Note, Staff
 from homr.music_xml_generator import TimeSignatureMemory, XmlGeneratorArguments, generate_xml
 from homr.noise_filtering import filter_predictions
@@ -240,6 +241,7 @@ def recognize_page(image_path: str, config: ProcessingConfig) -> RecognizedPage:
             selected_staff=config.selected_staff,
             config=transformer_config,
             page_to_input_image=to_input_image,
+            hires=load_hires_page(image_path, image.shape, to_input_image),
         )
 
         if not config.read_staff_positions:

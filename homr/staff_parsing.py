@@ -10,6 +10,7 @@ import numpy as np
 
 from homr import constants
 from homr.debug import Debug
+from homr.hires_page import HiresPage
 from homr.image_utils import crop_image_and_return_new_top
 from homr.model import MultiStaff, Staff
 from homr.octave_bracket_rows import find_dashed_line_rows, find_top_of_content
@@ -21,7 +22,7 @@ from homr.staff_dewarping import StaffDewarping, dewarp_staff_image
 from homr.staff_parsing_tromr import finish_parse_staff_tromr, start_parse_staff_tromr
 from homr.staff_regions import StaffRegions
 from homr.system_repair import _layout
-from homr.transformer.configs import Config, default_config
+from homr.transformer.configs import BASE_HEIGHT, BASE_WIDTH, Config, default_config
 from homr.transformer.vocabulary import EncodedSymbol, remove_duplicated_symbols
 from homr.triplet_restoration import restore_unmarked_triplets
 from homr.type_definitions import NDArray
@@ -30,11 +31,32 @@ tr_omr_max_height = default_config.max_height
 tr_omr_max_width = default_config.max_width
 
 
+def enlarge_base_crop() -> bool:
+    """
+    HOMR_ENLARGE_BASE_CROP=1 (only with HOMR_INPUT_SCALE other than 1): the staff is cut and
+    laid out for the canvas of the released resolution and the finished canvas is then enlarged
+    to the one of the model, so a model with a finer grid sees exactly the pixels of the
+    released model, only interpolated, like the training images which are enlarged on the fly.
+    """
+    return os.environ.get("HOMR_ENLARGE_BASE_CROP") == "1" and default_config.input_scale != 1
+
+
+def _crop_canvas() -> tuple[int, int]:
+    """Height and width of the canvas which the staff crop is laid out on."""
+    if enlarge_base_crop():
+        return BASE_HEIGHT, BASE_WIDTH
+    return tr_omr_max_height, tr_omr_max_width
+
+
 def get_tr_omr_canvas_size(
-    image_shape: tuple[int, ...], margin_top: int = 0, margin_bottom: int = 0
+    image_shape: tuple[int, ...],
+    margin_top: int = 0,
+    margin_bottom: int = 0,
+    canvas: tuple[int, int] | None = None,
 ) -> NDArray:
-    tr_omr_max_height_with_margin = tr_omr_max_height - margin_top - margin_bottom
-    tr_omr_ratio = float(tr_omr_max_height_with_margin) / tr_omr_max_width
+    canvas_height, canvas_width = canvas or (tr_omr_max_height, tr_omr_max_width)
+    tr_omr_max_height_with_margin = canvas_height - margin_top - margin_bottom
+    tr_omr_ratio = float(tr_omr_max_height_with_margin) / canvas_width
     height, width = image_shape[:2]
 
     # Calculate the new size such that it fits exactly into the
@@ -49,37 +71,48 @@ def get_tr_omr_canvas_size(
         ]
     else:
         # The width is the limiting factor.
-        new_shape = [tr_omr_max_width, int(height / width * tr_omr_max_width)]
+        new_shape = [canvas_width, int(height / width * canvas_width)]
     return np.array(new_shape)
 
 
-def _canvas_y_offset(resized_height: int, margin_top: int = 0, margin_bottom: int = 0) -> int:
-    tr_omr_max_height_with_margin = tr_omr_max_height - margin_top - margin_bottom
+def _canvas_y_offset(
+    resized_height: int,
+    margin_top: int = 0,
+    margin_bottom: int = 0,
+    canvas: tuple[int, int] | None = None,
+) -> int:
+    canvas_height = (canvas or (tr_omr_max_height, tr_omr_max_width))[0]
+    tr_omr_max_height_with_margin = canvas_height - margin_top - margin_bottom
     return (tr_omr_max_height_with_margin - resized_height) // 2 + margin_top
 
 
 def center_image_on_canvas(
-    image: NDArray, canvas_size: NDArray, margin_top: int = 0, margin_bottom: int = 0
+    image: NDArray,
+    canvas_size: NDArray,
+    margin_top: int = 0,
+    margin_bottom: int = 0,
+    canvas: tuple[int, int] | None = None,
 ) -> NDArray:
+    canvas_height, canvas_width = canvas or (tr_omr_max_height, tr_omr_max_width)
     is_grayscale = image.ndim == 2 or (image.ndim == 3 and image.shape[2] == 1)
 
     resized = cv2.resize(image, canvas_size)  # type: ignore
 
     if is_grayscale:
         new_image = np.full(
-            (tr_omr_max_height, tr_omr_max_width),
+            (canvas_height, canvas_width),
             255,
             dtype=np.uint8,
         )
     else:
         new_image = np.full(
-            (tr_omr_max_height, tr_omr_max_width, 3),
+            (canvas_height, canvas_width, 3),
             255,
             dtype=np.uint8,
         )
 
     x_offset = 0
-    y_offset = _canvas_y_offset(resized.shape[0], margin_top, margin_bottom)
+    y_offset = _canvas_y_offset(resized.shape[0], margin_top, margin_bottom, canvas)
 
     new_image[
         y_offset : y_offset + resized.shape[0],
@@ -185,23 +218,43 @@ def _include_octave_brackets(
 
 
 def prepare_staff_image(
-    debug: Debug, index: int, staff: Staff, staff_image: NDArray, regions: StaffRegions
+    debug: Debug,
+    index: int,
+    staff: Staff,
+    staff_image: NDArray,
+    regions: StaffRegions,
+    hires: HiresPage | None = None,
 ) -> tuple[NDArray, Staff, PointMapping]:
     """
     Returns the staff image for the transformer, the staff in the coordinates of that image
     and a mapping from the coordinates of that image back to the coordinates of the page.
+
+    The crop rectangle and the layout on the canvas are always derived from the page image
+    and its staff coordinates. With hires (HOMR_HIRES_DIR) the pixels are cut from a render
+    of the same page at a higher resolution, the rectangle scaled to it. With
+    HOMR_ENLARGE_BASE_CROP the crop is laid out on the canvas of the released resolution and
+    enlarged to the one of the model at the end.
     """
+    canvas = _crop_canvas()
     region = _calculate_region(staff, regions, staff_image)
     image_dimensions = get_tr_omr_canvas_size(
-        (int(region[3] - region[1]), int(region[2] - region[0]))
+        (int(region[3] - region[1]), int(region[2] - region[0])), canvas=canvas
     )
-    scaling_factor = image_dimensions[1] / (region[3] - region[1])
     page_shape = staff_image.shape
+    if hires is not None:
+        scale_x, scale_y = hires.scale_x, hires.scale_y
+        region = region * np.array([scale_x, scale_y, scale_x, scale_y])
+        staff = staff.transform_coordinates(lambda point: (point[0] * scale_x, point[1] * scale_y))
+        staff_image = hires.image
+    scaling_factor = image_dimensions[1] / (region[3] - region[1])
+    source_shape = staff_image.shape
     staff_image = cv2.resize(
         staff_image,
         (int(staff_image.shape[1] * scaling_factor), int(staff_image.shape[0] * scaling_factor)),
     )
-    undo_scaling = undo_resize(page_shape, staff_image.shape)
+    undo_scaling = chain(
+        undo_resize(source_shape, staff_image.shape), undo_resize(page_shape, source_shape)
+    )
     region = np.round(region * scaling_factor)
     eprint("Dewarping staff", index)
     region_step1 = np.array(region) + np.array([-10, -50, 10, 50])
@@ -220,10 +273,16 @@ def prepare_staff_image(
 
     staff_image = remove_black_contours_at_edges_of_image(staff_image, staff.average_unit_size)
     before_canvas_shape = staff_image.shape
-    staff_image = center_image_on_canvas(staff_image, image_dimensions)
+    staff_image = center_image_on_canvas(staff_image, image_dimensions, canvas=canvas)
     canvas_content_shape = (int(image_dimensions[1]), int(image_dimensions[0]))
+    undo_enlarging = identity
+    if canvas != (tr_omr_max_height, tr_omr_max_width):
+        enlarged = cv2.resize(staff_image, (tr_omr_max_width, tr_omr_max_height))
+        undo_enlarging = undo_resize(staff_image.shape, enlarged.shape)
+        staff_image = enlarged
     to_page = chain(
-        undo_crop(0, -_canvas_y_offset(canvas_content_shape[0])),
+        undo_enlarging,
+        undo_crop(0, -_canvas_y_offset(canvas_content_shape[0], canvas=canvas)),
         undo_resize(before_canvas_shape, canvas_content_shape),
         undo_crop2,
         dewarp.undewarp_point,
@@ -302,9 +361,10 @@ def start_parse_staff_image(
     regions: StaffRegions,
     config: Config,
     page_to_input_image: PointMapping = identity,
+    hires: HiresPage | None = None,
 ) -> StartedStaff:
     staff_image, transformed_staff, staff_to_page = prepare_staff_image(
-        debug, index, staff, image, regions=regions
+        debug, index, staff, image, regions=regions, hires=hires
     )
     eprint("Running TrOmr inference on staff image", index)
     future = start_parse_staff_tromr(transformed_staff, staff_image, config)
@@ -350,9 +410,10 @@ def parse_staff_image(
     regions: StaffRegions,
     config: Config,
     page_to_input_image: PointMapping = identity,
+    hires: HiresPage | None = None,
 ) -> list[EncodedSymbol]:
     started = start_parse_staff_image(
-        debug, index, staff, image, regions, config, page_to_input_image
+        debug, index, staff, image, regions, config, page_to_input_image, hires
     )
     return finish_parse_staff_image(started)
 
@@ -431,6 +492,7 @@ def _read_piano_systems(
     page_to_input_image: PointMapping,
     merged_systems: dict[int, list[EncodedSymbol]],
     read_staffs: dict[int, list[EncodedSymbol]],
+    hires: HiresPage | None = None,
 ) -> int:
     """
     Reads the systems of four single staffs. If their clefs are those of a piano system the
@@ -450,7 +512,7 @@ def _read_piano_systems(
         for staff in row.staffs:
             started_row.append(
                 start_parse_staff_image(
-                    debug, index, staff, image, regions, config, page_to_input_image
+                    debug, index, staff, image, regions, config, page_to_input_image, hires
                 )
             )
             index += 1
@@ -483,13 +545,15 @@ def parse_staffs(
     config: Config,
     selected_staff: int = -1,
     page_to_input_image: PointMapping = identity,
+    hires: HiresPage | None = None,
 ) -> list[list[EncodedSymbol]]:
     """
     Dewarps each staff and then runs it through an algorithm which extracts
     the rhythm and pitch information.
 
     page_to_input_image maps the coordinates of image back to the image the user provided,
-    it's used to fill EncodedSymbol.image_coordinates.
+    it's used to fill EncodedSymbol.image_coordinates. hires is an optional render of the
+    page at a higher resolution to cut the staff images from (HOMR_HIRES_DIR).
     """
     regions = StaffRegions(staffs)
     index = 0
@@ -499,7 +563,15 @@ def parse_staffs(
     read_staffs: dict[int, list[EncodedSymbol]] = {}
     if selected_staff < 0:
         index = _read_piano_systems(
-            debug, staffs, image, regions, config, page_to_input_image, merged_systems, read_staffs
+            debug,
+            staffs,
+            image,
+            regions,
+            config,
+            page_to_input_image,
+            merged_systems,
+            read_staffs,
+            hires,
         )
         staffs = [
             _stand_in_for_piano_system(row) if row_index in merged_systems else row
@@ -551,7 +623,7 @@ def parse_staffs(
                     (staff_index, voice),
                     i,
                     start_parse_staff_image(
-                        debug, i, staff, image, regions, config, page_to_input_image
+                        debug, i, staff, image, regions, config, page_to_input_image, hires
                     ),
                 )
             )
