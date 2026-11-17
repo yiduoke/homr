@@ -5,7 +5,7 @@ comes next. Written for people and coding agents picking up the work. Upstream i
 liebharc/homr; its own docs (README.md, Training.md, IDEAS_FOR_CONTRIBUTORS.md,
 AGENTS.md) still apply.
 
-Last updated: 2026-11-17 (2:15 pm Pacific).
+Last updated: 2026-11-17 (3:45 pm Pacific).
 
 Related documents: [PAPER_NOTES.md](PAPER_NOTES.md) (the paper's story, final numbers only);
 [EXPERIMENTS.md](https://github.com/yiduoke/homr-research/blob/main/EXPERIMENTS.md) in the private research repo
@@ -983,6 +983,12 @@ All 29 pairs were inspected visually, with 28 scored. At fixed bar alignment, al
 On rendered page 8 of Hungarian Rhapsody No. 6, the released model’s output repeats G5 414 times in succession. One output bar accounts for 578 of 902 unmatched predictions. Replay that crop with the existing loop guard. Keep Schott staff pairing as a layout task. Test a finer CNN spatial grid as a separate, matched training run. Local handoff and page images are in the [29-pair visual audit](https://github.com/yiduoke/homr-research/blob/main/eval_run1/scan_render_audit.md).
 
 **Open reference and render checks.** Alongside the resolution experiment, trace the octave brackets in *Winter Wind* m. 20 and Schubert D. 899 No. 4 m. 64 across the scan, reference XML, render and model output. Scriabin’s extra rendered staff has already been fixed. Correct verified source or engraving errors, document genuine edition differences, and rescore every affected checkpoint on the same reference version. [Correction procedure](https://github.com/yiduoke/homr-research/blob/main/eval_run1/scan_render_audit.md#render-and-reference-xml-corrections)
+
+## Status 2026-11-17, 3:45 pm Pacific: octave-bracket checks (Winter Wind m. 20, Schubert D. 899/4 m. 64)
+
+- Chopin Op. 25/11 bars 19-20: print, reference and render agree (8va from bar 19 note 17 to bar 20 note 12); the released model ends the bracket after bar 19 note 20 and writes 16 notes an octave low. Model error, reference unchanged.
+- Schubert D. 899/4: the print has an 8va over the right hand of bars 57-64 and 231-236; the ASAP reference has no octave-shift and written pitches, so it is an octave low there. Edition copy `reference-edition.musicxml` written (original kept), all 9 saved tags rescored: released 96.7 -> 99.2 pitch, 566 96.1 -> 98.6, run B 96.3 -> 98.8. Test-set means move 0.1 (released pooled 91.9 -> 92.0, scans at 97+: 5 -> 6 pooled). New tables with suffix `-after-merger-octave-edition`.
+- Cheap inventory of octave-shift directions in all 29 references and the released outputs: `run/octave_checks/shift_inventory.md`; suspects for the same reference defect: Hammerklavier, Kreisleriana (shifts in output only), orphan stops in Wanderer, Rhapsody 6, Pour le piano, Petrushka. Details: `run/octave_checks/REPORT.md`, EXPERIMENTS D15.
 
 ## Status 2026-11-17, 3:05 pm Pacific: Schott cause found, merger fixed, resolution runs launched, scan pairs started
 
