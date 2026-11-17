@@ -650,6 +650,30 @@ changes on two runs. Mazeppa stays ~1 point below 566 in both runs.
   scans in `run/scores/testset/` (Shostakovich Op. 87 in `private/`: non-PD in US/EU/Canada, not
   redistributed). Every test piece must be added to all training exclusion lists before the next run.
 
+**Decisions of 2026-11-16 (afternoon, with the owner)**:
+- **Next training order: pitch first, then tuplets.** Run 3 = harder data (hard PDMX, ASAP, Scriabin;
+  all test pieces excluded) on top of the released model, measured on pitch over the ~50-piece test set.
+  Run 4 = printed tuplet numbers. Reason: a wrong pitch is the more jarring error for a pianist, even
+  though timing costs more full-match F1 (Islamey pitch 87.2 vs full 54.3). Octave-bracket extent is a
+  separate, smaller round, kept out of run 3 so the effect of the data is visible alone. Pitch
+  F1 with octave errors ignored (old 9 pieces, released model, pre-layout): pooled 89.6 -> 91.0
+  (only errors under missed 8va brackets) or 91.4 (all octave errors); only La Campanella gains much
+  (85.2 -> 91.2). Dense pieces stay at 82-92 pitch F1: the gap is dropped and invented notes.
+- **Merge plan (owner's fork only, nothing upstream):** wait for the ASAP batch (released model,
+  worktree acc_wt), merge `layout` into `accidentals-run2`, rerun the new pieces with the layout
+  code (regression check on ~30 real scans), then merge `accidentals-run2` into the fork's `main`.
+- **Tuplet ratio procedure (run 3/4 code):** the model emits the printed number, the written note
+  values (flags) and group start/end; code lists candidate ratios (3: 3:2; 5: 5:4 or 5:6; 7: 7:4,
+  7:6, 7:8), keeps the one that makes the group fill the beat grid and the bar, and breaks ties with
+  the default (largest power of 2 below n in simple meter, 3-based in compound). Beat size from the
+  meter: simple (2/4, 3/4, 4/4, 2/2) beat splits in 2; compound (top 6, 9, 12 over 8 or 16) beat holds
+  3; odd meters (5/8, 7/8, 11/16) grouping comes from the beams, fallback the bar total. 3/4 and
+  6/8 have the same bar length but different beats, which is why run 1 reads the full time signature.
+  Wikipedia (Tuplet): septuplets are usually 7:4 (7:6 in compound), sometimes 7:8; usage is inconsistent.
+- **Petrushka reference** (Claude transcription, unchecked, `run/out/testset/stravinsky-petrushka/`):
+  first look full-match F1 ours 38.8 / 566 46.2, but not like-for-like; the reference has 3 staves per
+  system, our output 2 (the layout merge handles only four-staff systems). Open question: 3-staff fix.
+
 **Run 3 plan: printed tuplet numbers (agreed with the owner 2026-11-16)**. Today a tuplet is
 only its resulting duration (`note_12` = triplet eighth); the printed number is not in the
 labels, so the model ignores it (Pathetique 6 and 7). Same principle as run 2: the model reads
