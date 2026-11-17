@@ -984,6 +984,35 @@ On rendered page 8 of Hungarian Rhapsody No. 6, the released model’s output re
 
 **Open reference and render checks.** Alongside the resolution experiment, trace the octave brackets in *Winter Wind* m. 20 and Schubert D. 899 No. 4 m. 64 across the scan, reference XML, render and model output. Scriabin’s extra rendered staff has already been fixed. Correct verified source or engraving errors, document genuine edition differences, and rescore every affected checkpoint on the same reference version. [Correction procedure](https://github.com/yiduoke/homr-research/blob/main/eval_run1/scan_render_audit.md#render-and-reference-xml-corrections)
 
+## Status 2026-11-17, 5:00 pm Pacific: pooled scoring, Scriabin reference fixed, loop guard checked
+
+- **Scriabin's weak score was a reference artefact.** The reference has a stray second part (47 notes in 8
+  bars), so the scorer saw 3 staves against our 2 and aligned per staff. Scored against the reference
+  without it (original kept as `scriabin-sonata-5-reference-original.musicxml`): released scan 69.6 -> 89.1
+  pitch, rendered 71.1 -> 95.7. Scan means (released): staff-sensitive 86.5 -> 87.2, rendered 94.3 -> 95.2.
+  Scriabin is no longer a weakest piece; the dropped notes are 0.55 % of its reference.
+- **Pooled pitch (pitch counted on either staff, advisor's request; `eval_run1/rescore_pooled.py`,
+  `pooled_table.py`, table `out/testset/POOLED-table-2026-11-17.md`).** Waldstein 94.2 -> 99.5 (confirms the
+  advisor: the running figure sits on the other staff). Mean over 28 scans: released 87.2 staff-sensitive ->
+  89.3 pooled, 4 -> 5 scans at 97 (Bach fugue, Bach Italian Concerto, Bach prelude, Appassionata, Waldstein);
+  run B 86.0 -> 88.2; harder-data 87.2 -> 89.3 (6-7 scans at 97). Rendered 95.2 -> 95.3, 15 of 28 at 97.
+  Pooled +onset 74.9, full 73.0 (released). Open: Petrushka jumps 58.3 -> 79.2 because the pooled run
+  aligns bars differently (reference 3 staves, ours 2); not trusted until the alignment is checked, and
+  the advisor's 88.9 pooled mean differs from my 89.3 (probably this piece). Hammerklavier +7.1 (staff
+  allocation, bar 385), Schott Liszt +3.6 to +5.1 (still about twice the bars).
+- **Released model loops on a clean render.** Rendered Hungarian Rhapsody 6, bar 87: 608 notes, 484 of them G5
+  (the advisor counts 414 G5). My earlier "the released model never loops" held only for the real scans.
+  Replay of rendered page 8 with the released weights: guard off max bar 615 notes, 684 on the page; guard on
+  106 and 175 (509 extra notes removed). The loop runs to the 608-step limit, so nothing legitimate follows it
+  in that staff; the guard loses no notes the unguarded decode had beyond the first 24 loop symbols.
+  Prokofiev Toccata with the guard on (11 pages): 0 triggers, largest bar 60 notes: no false triggers.
+- **Plan from the advisor (7 steps).** Done: step 1 (pooled and visible-note scores for every checkpoint, no
+  inference), part of 2 (Scriabin reference), part of 3 (loop replay, Prokofiev check). Next: Waldstein bar 145
+  and Hammerklavier bar 385 (staff allocation), Winter Wind bar 20 and Schubert D. 899 No. 4 bar 64 (octave
+  bracket ends) against the print; the Schott staff-pairing fix; then the matched resolution experiment
+  (256x1280 / 16x80 vs 384x1920 / 24x120, both from run2s7, same data, seeds, steps; positional embeddings
+  adapted) and IMSLP/ASAP virtuoso scan pairs prepared while it runs.
+
 ## Status 2026-11-17, 2:30 pm Pacific: corrected table, metric caveat, loop guard works
 
 - **Full corrected table** (28 pieces, released rendered and scan, run B, both controls, both harder-data

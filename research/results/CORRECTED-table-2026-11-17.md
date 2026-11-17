@@ -1,6 +1,6 @@
-# Corrected test-set table (visible-note scorer), 2026-11-17
+# Corrected test-set table (visible-note scorer, Scriabin reference fixed), 2026-11-17
 
-Pitch F1 % (pitch inventory: right pitches per aligned bar, timing ignored), with pitch+onset in brackets. Hidden notes (`print-object="no"`, invisible noteheads) are not counted. Control runs include the unguarded decoder-loop bars (Debussy, Hungarian Rhapsody 6). Rendered = pages engraved from the reference, released weights, layout1 code. Schott Liszt scans: sonata, Etudes 5 and 10 (staff pairing bug, about twice the bars). Petrushka is scored staff-ignored.
+Staff-sensitive pitch F1 % (pitch inventory: right pitches per aligned bar, timing ignored), with pitch+onset in brackets. Hidden notes (`print-object="no"`, invisible noteheads) are not counted. Scriabin is scored against its reference without the stray 47-note second part (original kept as `*-reference-original.musicxml`). Control runs include the unguarded decoder-loop bars (Debussy, Hungarian Rhapsody 6). Rendered = pages engraved from the reference, released weights, layout1 code (Hungarian Rhapsody 6 rendered contains a decoder loop). Schott Liszt scans: sonata, Etudes 5 and 10 (staff pairing bug, about twice the bars). Petrushka is scored staff-ignored. Pooled-staff scores: `POOLED-table-2026-11-17.md`.
 
 | piece | rendered (released) | scan released | scan run B | scan control s7 | scan control s11 | scan harder-data s7 | scan harder-data s11 |
 |---|---|---|---|---|---|---|---|
@@ -30,8 +30,6 @@ Pitch F1 % (pitch inventory: right pitches per aligned bar, timing ignored), wit
 | schubert-wanderer-3-4 | 98.5 (96.1) | 94.9 (93.5) | 94.7 (92.3) | 94.8 (93.2) | 94.9 (93.7) | 94.9 (93.7) | 94.9 (93.6) |
 | schumann-kreisleriana-1 | 97.5 (80.5) | 95.8 (71.4) | 94.9 (65.3) | 95.5 (70.5) | 96.7 (72.0) | 96.3 (73.0) | 96.5 (72.5) |
 | schumann-toccata | 98.3 (90.1) | 91.2 (82.5) | 91.4 (82.3) | 90.4 (80.5) | 91.8 (82.4) | 91.2 (82.1) | 91.6 (82.6) |
-| scriabin-sonata-5 | 71.1 (55.2) | 69.6 (56.1) | 69.5 (56.8) | 70.7 (57.1) | 69.7 (55.8) | 71.1 (57.8) | 71.2 (57.3) |
+| scriabin-sonata-5 | 95.7 (75.4) | 89.1 (73.2) | 88.9 (74.0) | 90.1 (74.1) | 89.5 (72.9) | 90.6 (74.7) | 90.8 (74.3) |
 | stravinsky-petrushka | 73.3 (56.7) | 58.3 (43.1) | 56.3 (41.7) | 58.1 (43.4) | 58.3 (43.5) | 58.3 (44.0) | 58.2 (43.5) |
-| **mean** | 94.3 (82.1) | 86.5 (72.7) | 85.3 (72.3) | 86.1 (72.5) | 86.3 (72.8) | 86.5 (72.7) | 86.5 (72.8) |
-
-Means over all 28 pieces (every column has 28).
+| **mean** | 95.2 (82.8) | 87.2 (73.3) | 86.0 (73.0) | 86.8 (73.1) | 87.0 (73.4) | 87.2 (73.3) | 87.2 (73.4) |

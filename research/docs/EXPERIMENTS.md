@@ -498,3 +498,13 @@ Released weights, layout1, visible notes. We inspected matched passages in 23 pi
 The released model also repeats on **rendered** Hungarian Rhapsody No. 6. Page 8, fourth output bar, has 414 consecutive G5s. That bar accounts for 578 of the piece’s 902 unmatched predictions. The existing guard’s effect on this render is unmeasured. The proposed resolution experiment compares a finer spatial grid with fixed data and decoder. [Passages, images and scoring method](eval_run1/scan_render_audit.md)
 
 The scan outputs for *Winter Wind* m. 20 and Schubert D. 899 No. 4 m. 64 disagree with the reference in sounding octave even after staff pooling. The rendered outputs match all 33 and 14 reference pitches, respectively. Verify the printed bracket endpoints against the XML and render before attributing those discrepancies to recognition. Correct and rescore any verified reference errors, with the edition and benchmark version recorded. [Render and reference XML checks](eval_run1/scan_render_audit.md#render-and-reference-xml-corrections)
+
+
+## D11. Pooled pitch, Scriabin reference, loop replay (2026-11-17, evening)
+
+Pooled-staff pitch inventory (a pitch counts on either staff, `staff_agnostic` block of the scorer) lifts the released model from
+87.2 to 89.3 over the 28 scans and the scans at 97 from 4 to 5; Waldstein 94.2 -> 99.5. Scriabin was mis-scored all along
+(stray 47-note second part in the reference): 69.6 -> 89.1 scan, 71.1 -> 95.7 rendered after dropping it (original kept). The
+released model loops on rendered Hungarian Rhapsody 6 (bar 87: 608 notes, 484 G5); the loop guard removes 509 notes on that
+page and gives no false trigger on Prokofiev Toccata (0 of 11 pages). Tables: `out/testset/POOLED-table-2026-11-17.md`,
+`CORRECTED-table-2026-11-17.md`. Petrushka's pooled score (79.2) rests on a different bar alignment and is unverified.

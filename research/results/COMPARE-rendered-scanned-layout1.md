@@ -2,10 +2,6 @@
 
 F1 in %. Rendered = pages engraved from the reference; scan = the real edition.
 
-The companion audit links the pages inspected for all 29 pairs and gives pooled-staff pitch F1 for the 28 scored pieces. It also traces most of the Hungarian Rhapsody No. 6 render’s extra predictions to one bar. [Visual audit](../../eval_run1/scan_render_audit.md)
-
-The table uses the corrected Scriabin render. The *Winter Wind* m. 20 and Schubert Impromptu m. 64 octave spans are pending source verification. [Render and reference XML checks](../../eval_run1/scan_render_audit.md#render-and-reference-xml-corrections)
-
 | piece | rendered pitch | scan pitch | gap | rendered +onset | scan +onset |
 |---|---|---|---|---|---|
 | bach-fugue-873 | 99.9 | 99.6 | +0.4 | 95.6 | 94.5 |
@@ -34,8 +30,8 @@ The table uses the corrected Scriabin render. The *Winter Wind* m. 20 and Schube
 | schubert-wanderer-3-4 | 98.5 | 94.9 | +3.6 | 96.1 | 93.5 |
 | schumann-kreisleriana-1 | 97.5 | 95.8 | +1.7 | 80.5 | 71.4 |
 | schumann-toccata | 98.3 | 91.2 | +7.1 | 90.1 | 82.5 |
-| scriabin-sonata-5 | 71.1 | 69.6 | +1.5 | 55.2 | 56.1 |
+| scriabin-sonata-5 | 95.7 | 89.1 | +6.6 | 75.4 | 73.2 |
 | stravinsky-petrushka | 73.3 | 58.3 | +15.1 | 56.7 | 43.1 |
 
-**Mean over 28 pieces**: rendered pitch 94.3, scan pitch 86.5; rendered +onset 82.1, scan +onset 72.7
+**Mean over 28 pieces**: rendered pitch 95.2, scan pitch 87.2; rendered +onset 82.8, scan +onset 73.3
 Rendered pieces at or above 97 pitch: 15 of 28.
