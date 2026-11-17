@@ -691,6 +691,14 @@ changes on two runs. Mazeppa stays ~1 point below 566 in both runs.
   repeated notes in long beamed runs are dropped and the bar padded with rests (Prokofiev opening: audible pauses);
   sextuplets read as sixteenths (Polonaise bar 20); Schott Liszt pages fail staff pairing (hands become alternating
   bars). To do: fix Liszt pairing (code), keep these four as before/after examples for run 3 (pitch) and the tuplet run.
+- **References corrected after a scan check (2026-11-16 evening, EXPERIMENTS T1 correction):** Ravel's third staff was
+  an empty phantom, Rhapsody 6's reference carried two ossia mini-staves (now left out); both rescored with the normal
+  scorer. Means over 29 scans: ours 85.3 / 70.9 / 69.1 vs upstream 82.5 / 67.3 / 65.5, ahead on 24 of 29. Petrushka
+  really has 2, 3 and 4 staves per system; it stays scored staff-ignored and 3-staff systems are a layout to-do.
+- **Meter audit (box vast-homr4, 233,018 training staffs):** 4/8 has 86 time-signature examples (0.12%) vs 12,271 for
+  4/4; 1/8 137; 5/8 196; 7/8 213; 11/16, 13/16, 15/16 under 12 each. Rare meters are nearly absent from training;
+  next: oversample rendered rare meters (own run or part of run 3, question to the professor), check accuracy vs glyph
+  size on the meter test set, consider a small separate meter reader. Upstream reads only the denominator.
 - **Petrushka reference** (Claude transcription, unchecked, `run/out/testset/stravinsky-petrushka/`):
   first look full-match F1 ours 38.8 / 566 46.2, but not like-for-like; the reference has 3 staves per
   system, our output 2 (the layout merge handles only four-staff systems). Open question: 3-staff fix.
