@@ -695,6 +695,10 @@ changes on two runs. Mazeppa stays ~1 point below 566 in both runs.
   an empty phantom, Rhapsody 6's reference carried two ossia mini-staves (now left out); both rescored with the normal
   scorer. Means over 29 scans: ours 85.3 / 70.9 / 69.1 vs upstream 82.5 / 67.3 / 65.5, ahead on 24 of 29. Petrushka
   really has 2, 3 and 4 staves per system; it stays scored staff-ignored and 3-staff systems are a layout to-do.
+- **Meter checks (professor, EXPERIMENTS M1):** Alborada's 12/8, 5/8, 7/8 are raw decoder tokens chosen at only 18-23%
+  with a flat distribution over 6/8, 9/8, 12/8, 5/8, 7/8 (clear cases: 3/4 84%, 3/8 70%); Reflets' printed 4/8 is below
+  2% (top: common 33%, 4/4 18%), not a close second, so suspect the small glyph as well as the prior. Cheap fix without
+  training: low-confidence meters fall back to the top candidate that fills the bars, or the carried meter.
 - **Meter audit (box vast-homr4, 233,018 training staffs):** 4/8 has 86 time-signature examples (0.12%) vs 12,271 for
   4/4; 1/8 137; 5/8 196; 7/8 213; 11/16, 13/16, 15/16 under 12 each. Rare meters are nearly absent from training;
   next: oversample rendered rare meters (own run or part of run 3, question to the professor), check accuracy vs glyph
