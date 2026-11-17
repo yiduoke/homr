@@ -703,6 +703,9 @@ changes on two runs. Mazeppa stays ~1 point below 566 in both runs.
   4/4; 1/8 137; 5/8 196; 7/8 213; 11/16, 13/16, 15/16 under 12 each. Rare meters are nearly absent from training;
   next: oversample rendered rare meters (own run or part of run 3, question to the professor), check accuracy vs glyph
   size on the meter test set, consider a small separate meter reader. Upstream reads only the denominator.
+- **First read of run 3 (2026-11-17, EXPERIMENTS D5):** harder rendered data barely moves real scans (pitch 85.3 candidate vs 84.8 control vs 85.3
+  baseline, seed 7); the released model already reads held-out hard rendered staffs at 0.998 precision and recall. Priority shifts to the scan domain
+  (real-scan pairs, stronger scan-like augmentation), layout and meter reading; run B should lead with scans, not with more virtuosity.
 - **Target (owner, 2026-11-17):** no paper until pitch is 97% or better on every piece (95% is the floor; 90% is "one wrong note in
   ten" and not acceptable). Today: mean pitch 85.3 over the 28 real scans (simple pieces 97-99, dense virtuoso 80-92, Liszt Schott
   pieces far lower because of layout). Plan consequence: after run 3 (control vs harder data) decide whether data alone can get there;
