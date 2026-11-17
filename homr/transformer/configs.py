@@ -7,12 +7,31 @@ from homr.transformer.vocabulary import Vocabulary
 workspace = os.path.join(os.path.dirname(__file__))
 root_dir = os.getcwd()
 
+# Input resolution of the transformer: the staff image is fitted into a canvas of
+# BASE_HEIGHT x BASE_WIDTH pixels, which the encoder cuts into patch_size squares.
+# HOMR_INPUT_SCALE scales the canvas (1.5 gives 384 x 1920 and a 24 x 120 token grid),
+# for resolution experiments. The default of 1 is the released model; the ONNX files, the
+# checkpoint and every training/inference process must use the same value.
+BASE_HEIGHT = 256
+BASE_WIDTH = 1280
+PATCH_SIZE = 16
+
+
+def _scaled_canvas(scale: float) -> tuple[int, int]:
+    height, width = round(BASE_HEIGHT * scale), round(BASE_WIDTH * scale)
+    if height % PATCH_SIZE or width % PATCH_SIZE or scale <= 0:
+        raise ValueError(
+            f"HOMR_INPUT_SCALE={scale} gives a {height}x{width} canvas, "
+            f"which is not a multiple of the patch size {PATCH_SIZE}"
+        )
+    return height, width
+
 
 class FilePaths:
     def __init__(self) -> None:
         # Upstream 566 fine-tuned for complete time signatures and printed accidentals,
         # released on the fork (see download_weights in homr/main.py)
-        model_name = "pytorch_model_meteracc-r2s7-afae0e3"
+        model_name = os.environ.get("HOMR_MODEL_NAME", "pytorch_model_meteracc-r2s7-afae0e3")
         self.encoder_path = os.path.join(
             workspace,
             f"encoder_{model_name}.onnx",
@@ -83,9 +102,9 @@ class Config:
         self.vocab = Vocabulary()
         self.filepaths = FilePaths()
         self.channels = 1
-        self.patch_size = 16
-        self.max_height = 256
-        self.max_width = 1280
+        self.patch_size = PATCH_SIZE
+        self.input_scale = float(os.environ.get("HOMR_INPUT_SCALE", "1"))
+        self.max_height, self.max_width = _scaled_canvas(self.input_scale)
         self.max_seq_len = 608
         self.pad_token = 0
         self.bos_token = 1

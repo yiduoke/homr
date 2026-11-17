@@ -42,6 +42,7 @@ from training.transformer.distribute import Distribute
 from training.transformer.lift_reset import reset_lift_head
 from training.transformer.meter_vocabulary import grow_rows, time_signature_source_row
 from training.transformer.metrics import HomrTrainer
+from training.transformer.resolution import adapt_positional_embeddings
 
 GROWN = {
     "decoder.net.rhythm_emb.emb.weight": "rhythm",
@@ -79,6 +80,9 @@ def warm_start(model: TrOMR, checkpoint: str, old_vocab_path: str) -> None:
         "articulation": model.config.vocab.articulation,
     }
     state = model.state_dict()
+    # A finer input grid (HOMR_INPUT_SCALE) has more positions; no-op at the default scale
+    for change in adapt_positional_embeddings(old_state, state):
+        eprint("Positional embedding resampled:", change)
 
     copied = remapped = fresh = 0
     for key, old in old_state.items():
@@ -189,10 +193,11 @@ def main() -> None:
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size // 2,
         num_train_epochs=epochs,
+        max_steps=int(os.environ.get("FT_MAX_STEPS", "-1")),
         weight_decay=0.05,
         warmup_ratio=0.03,
         lr_scheduler_type="cosine",
-        load_best_model_at_end=True,
+        load_best_model_at_end=os.environ.get("FT_LAST", "0") != "1",
         metric_for_best_model="eval_accuracy",
         greater_is_better=True,
         report_to=["tensorboard"],

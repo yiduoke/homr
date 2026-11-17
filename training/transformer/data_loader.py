@@ -125,6 +125,9 @@ class DataLoader:
             img = random_staff_crop(img, crop_info)
         img = distort_image(img, allow_occlusions=not self.is_validation)
         img = add_image_into_tr_omr_canvas(img)
+        expected = (self.config.max_height, self.config.max_width)
+        if img.shape[:2] != expected:
+            raise RuntimeError(f"Canvas is {img.shape[:2]}, the config wants {expected}")
 
         if self.is_validation:
             random.setstate(state)
