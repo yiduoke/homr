@@ -14,6 +14,7 @@ from validation.score_notes import (
     count_matches,
     parse_musicxml,
     score_notes,
+    score_notes_ignoring_staff,
 )
 
 
@@ -251,6 +252,69 @@ class TestIndividualNoteScoring(unittest.TestCase):
         self.assertEqual(
             score_notes(hyp, ref)["metrics"]["pitch_inventory"]["combined"]["reference"], 6
         )
+
+    def test_ignoring_the_staff_matches_notes_across_staves(self) -> None:
+        # The reference files C4 and E4 on staff 1 and 2, the prediction the other way round
+        ref = _score((Note(1, 60, 0, 1), Note(2, 64, 0, 1)), staves=2)
+        hyp = _score((Note(1, 64, 0, 1), Note(2, 60, 0, 1)), staves=2)
+
+        default = score_notes(ref, hyp)["metrics"]["pitch_onset_duration"]["combined"]
+        agnostic = score_notes_ignoring_staff(ref, hyp)["metrics"]["pitch_onset_duration"][
+            "combined"
+        ]
+
+        self.assertEqual(default["matched"], 0)
+        self.assertEqual(agnostic["matched"], 2)
+        self.assertEqual(agnostic["f1"], 1)
+
+    def test_ignoring_the_staff_still_needs_pitch_and_timing(self) -> None:
+        ref = _score((Note(1, 60, 0, 1), Note(2, 64, 1, 1)), staves=2)
+        hyp = _score((Note(2, 60, 0, 1), Note(2, 64, 0, 1), Note(1, 67, 1, 1)), staves=2)
+
+        metrics = score_notes_ignoring_staff(ref, hyp)["metrics"]
+
+        self.assertEqual(metrics["pitch_inventory"]["combined"]["matched"], 2)
+        self.assertEqual(metrics["pitch_onset"]["combined"]["matched"], 1)
+        self.assertEqual(metrics["pitch_onset"]["combined"]["predicted"], 3)
+
+    def test_ignoring_the_staff_does_not_need_the_same_number_of_staves(self) -> None:
+        ref = _score((Note(1, 60, 0, 1), Note(2, 48, 0, 1)), staves=2)
+        hyp = _score((Note(1, 60, 0, 1), Note(2, 48, 0, 1), Note(3, 40, 0, 1)), staves=3)
+
+        agnostic = score_notes_ignoring_staff(ref, hyp)["metrics"]["pitch_onset_duration"]
+
+        self.assertEqual(agnostic["combined"]["matched"], 2)
+        self.assertEqual(agnostic["combined"]["predicted"], 3)
+
+    def test_ignoring_the_staff_is_not_defined_without_shared_bars(self) -> None:
+        ref = _score((Note(1, 60, 0, 1),), (Note(1, 62, 0, 1),))
+        hyp = Score((), 1, ((Measure("1", (Note(1, 60, 0, 1),)),),))
+
+        self.assertIsNone(score_notes_ignoring_staff(ref, hyp)["metrics"])
+
+    def test_cli_option_adds_staff_agnostic_scores_and_keeps_default_results(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            reference = Path(tmp) / "reference.musicxml"
+            plain, option = Path(tmp) / "plain.json", Path(tmp) / "option.json"
+            chord = "<chord/>"
+            reference.write_text(_xml(_note() + _note("E", chord, staff=2)))
+            hypothesis = Path(tmp) / "hypothesis.musicxml"
+            hypothesis.write_text(_xml(_note("E") + _note("C", chord, staff=2)))
+            command = [sys.executable, "-m", "validation.score_notes", str(reference)]
+            command += [f"h={hypothesis}", "--json"]
+            for flags, path in (([], plain), (["--ignore-staff"], option)):
+                done = subprocess.run(  # noqa: S603
+                    [*command, str(path), *flags], capture_output=True, check=False
+                )
+                self.assertEqual(done.returncode, 0, done.stderr.decode())
+            default, with_option = (
+                json.loads(p.read_text())["results"][0] for p in (plain, option)
+            )
+            self.assertNotIn("staff_agnostic", default)
+            agnostic = with_option.pop("staff_agnostic")
+            self.assertEqual(default, with_option)
+            self.assertEqual(agnostic["metrics"]["pitch_onset_duration"]["combined"]["f1"], 1)
+            self.assertEqual(default["metrics"]["pitch_onset_duration"]["combined"]["f1"], 0)
 
     def test_cli_json_and_input_protection(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
