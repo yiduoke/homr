@@ -344,5 +344,38 @@ class TestIndividualNoteScoring(unittest.TestCase):
             self.assertEqual(reference.read_text(), text)
 
 
+class HiddenNotesTest(unittest.TestCase):
+    def _notes(self, content: str) -> list[tuple[float, float]]:
+        score = parse_musicxml(_xml(content))
+        return [(n.onset, n.pitch) for n in score.measures[0].notes]
+
+    def test_hidden_note_is_not_counted_but_keeps_its_time(self) -> None:
+        hidden = (
+            '<note print-object="no"><pitch><step>D</step><octave>4</octave></pitch>'
+            "<duration>2</duration></note>"
+        )
+        notes = self._notes(hidden + _note("E"))
+        self.assertEqual(notes, [(1.0, 64.0)])
+
+    def test_invisible_notehead_is_not_counted(self) -> None:
+        invisible = "<notehead>none</notehead>"
+        notes = self._notes(_note("C", invisible) + _note("E"))
+        self.assertEqual(notes, [(1.0, 64.0)])
+
+    def test_hidden_chord_member_keeps_the_chord_onset(self) -> None:
+        hidden_member = (
+            '<note print-object="no"><chord/><pitch><step>E</step><octave>4</octave></pitch>'
+            "<duration>2</duration></note>"
+        )
+        notes = self._notes(_note("C") + hidden_member + _note("G"))
+        self.assertEqual(notes, [(0.0, 60.0), (1.0, 67.0)])
+
+    def test_visible_cue_and_grace_notes_are_counted(self) -> None:
+        cue = "<cue/>"
+        grace = "<grace/>"
+        notes = self._notes(_note("C", cue) + _note("D", grace))
+        self.assertEqual(len(notes), 2)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -8,6 +8,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import sys
 import xml.etree.ElementTree as ET
 from collections import Counter
@@ -20,6 +21,17 @@ Metric = Literal["pitch_inventory", "pitch_onset", "pitch_onset_duration"]
 METRICS: tuple[Metric, ...] = ("pitch_inventory", "pitch_onset", "pitch_onset_duration")
 DEFAULT_TOLERANCE = 1 / 96  # quarter notes; covers small MusicXML tuplet rounding errors
 _SEMITONES = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
+# Notes the score does not draw (print-object="no", e.g. the notes an ornament sounds as, stored
+# for playback, or an invisible notehead) cannot be read from the page, so they are not counted.
+# They still advance the cursor, so chords, voices and later onsets are parsed as before.
+# SCORE_COUNT_HIDDEN=1 restores the old behaviour. Visible cue and grace notes are counted.
+COUNT_HIDDEN = os.environ.get("SCORE_COUNT_HIDDEN") == "1"
+
+
+def _is_hidden(note: ET.Element) -> bool:
+    return note.get("print-object") == "no" or any(
+        (head.text or "").strip() == "none" for head in note.findall("notehead")
+    )
 
 
 @dataclass(frozen=True)
@@ -116,6 +128,8 @@ def _read_part(part: ET.Element, staff_offset: int) -> tuple[list[Measure], int]
                 if element.find("unpitched") is not None:
                     raise ValueError("Unpitched percussion is not supported")
                 if pitch is None:
+                    continue
+                if not COUNT_HIDDEN and _is_hidden(element):
                     continue
                 staff = int(element.findtext("staff") or "1")
                 if staff < 1:
@@ -279,9 +293,11 @@ def count_matches(
 def _mean_pitches(bars: list[tuple[Measure, ...]]) -> list[float | None]:
     """Mean pitch of each staff over the whole score (None for a staff without notes)."""
     return [
-        (sum(n.pitch for m in staff for n in m.notes) / count)
-        if (count := sum(len(m.notes) for m in staff))
-        else None
+        (
+            (sum(n.pitch for m in staff for n in m.notes) / count)
+            if (count := sum(len(m.notes) for m in staff))
+            else None
+        )
         for staff in bars
     ]
 

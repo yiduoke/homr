@@ -1,3 +1,4 @@
+import os
 from typing import Any
 
 import numpy as np
@@ -8,6 +9,32 @@ from homr.simple_logging import eprint
 from homr.transformer.configs import Config
 from homr.transformer.vocabulary import EncodedSymbol
 from homr.type_definitions import NDArray
+
+# A staff never holds a long run of one repeating cycle: the longest in the test references is 24
+# notes, while a decoder stuck in a loop repeats a pair of notes for hundreds of steps until it
+# hits max_seq_len. A cycle of up to LOOP_MAX_PERIOD symbols repeated for LOOP_RUN symbols ends
+# the staff, keeping the first LOOP_KEEP symbols of the repeat. HOMR_LOOP_GUARD=0 switches it off.
+LOOP_GUARD = os.environ.get("HOMR_LOOP_GUARD", "1") != "0"
+LOOP_MAX_PERIOD = 4
+LOOP_RUN = 64
+LOOP_KEEP = 24
+
+
+def _loop_key(symbol: EncodedSymbol) -> tuple[str, str, str, str]:
+    return (symbol.rhythm, symbol.pitch, symbol.lift, symbol.position)
+
+
+def _loop_cut(symbols: list[EncodedSymbol], runs: list[int]) -> int | None:
+    """The length to cut the symbols to if the last one completes a long repeating run."""
+    last = _loop_key(symbols[-1])
+    for period in range(1, LOOP_MAX_PERIOD + 1):
+        if len(symbols) > period and _loop_key(symbols[-1 - period]) == last:
+            runs[period] += 1
+            if runs[period] >= LOOP_RUN:
+                return len(symbols) - runs[period] - period + LOOP_KEEP
+        else:
+            runs[period] = 0
+    return None
 
 
 class ScoreDecoder:
@@ -79,6 +106,8 @@ class ScoreDecoder:
         context_reduced = kwargs["context"][:, :1]
 
         symbols: list[EncodedSymbol] = []
+        # Consecutive matches with the symbol p places back, for cycles of up to LOOP_MAX_PERIOD
+        runs = [0] * (LOOP_MAX_PERIOD + 1)
 
         for step in range(self.max_seq_len):
             x_lift = out_lift[:, -1:]  # for all: shape=(1,1)
@@ -150,6 +179,11 @@ class ScoreDecoder:
                 coordinates=attention,
             )
             symbols.append(symbol)
+            cut = _loop_cut(symbols, runs) if LOOP_GUARD else None
+            if cut is not None:
+                eprint(f"Repeating output stopped after {len(symbols)} symbols, kept {cut}")
+                del symbols[cut:]
+                break
 
             out_lift = np.concatenate((out_lift, lift_sample), axis=-1)
             out_pitch = np.concatenate((out_pitch, pitch_sample), axis=-1)
