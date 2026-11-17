@@ -40,8 +40,14 @@ for page_idx, path in enumerate(pages):
     # Parts are matched by id. On a page whose small extra staff comes first the piano gets
     # another id, so that page's notes are lost (Mazeppa p. 11, Rachmaninoff p. 5); matching
     # by "most notes" instead was tried on 2026-11-15 and broke whole pieces (K. 309 97 -> 65).
+    # music21 names a part by its part name, so two simultaneous parts which homr calls
+    # "Voice" (the two hands of a piano page whose staves were not joined) would share one
+    # key and be poured into one part, counting the measures of both. The n-th part of a
+    # page with a given name continues the n-th such part of the pages before it.
+    seen_on_page: dict[str, int] = {}
     for part in score.parts:
-        key = part.id
+        seen_on_page[part.id] = seen_on_page.get(part.id, 0) + 1
+        key = part.id if seen_on_page[part.id] == 1 else f"{part.id}#{seen_on_page[part.id]}"
         target = part_streams.get(key)
         if target is None:
             target = stream.Part()
