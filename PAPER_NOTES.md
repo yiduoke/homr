@@ -188,3 +188,23 @@ groups under C. Timing on such bars has no single correct answer; report with an
 3. Outside benchmarks above, with training-overlap checks.
 4. Real-scan training pairs (168 KernScores pieces ready) as a separate experiment.
 5. Disclose AI use (PROGRESS "Reproducibility and AI use").
+
+## Update 2026-11-16 evening (real-scan test set, brackets, layout)
+
+- **Eval set is now 29 real scans plus the 9 older pieces** (IMSLP editions from 1724 to 1990s; ASAP expert
+  references; Petrushka by Claude, unchecked). Table `run/out/testset/SUMMARY.md`, details EXPERIMENTS T1.
+  Mean pitch / +onset / fully right, released model vs upstream 566: 83.5 / 69.3 / 67.5 vs 80.8 / 65.8 / 64.1,
+  ahead on 23 of 29 pieces. Dense virtuosic pieces stay at 82-92 pitch F1 (Hammerklavier fugue 78, Liszt
+  Rhapsody 6 90.9 staff-ignored, Ravel 80.9 staff-ignored).
+- **Octave brackets (EXPERIMENTS B1):** released 254 of 322 found (round 3: 244, upstream 566: 180); the
+  remaining La Campanella errors are bracket extent and continuation. Ignoring octave errors changes pitch F1
+  only for La Campanella (85.2 -> 91.2); pooled 89.6 -> 91.0 on the 9 older pieces.
+- **Layout (EXPERIMENTS L1):** Rachmaninoff 61.7 -> 88.9 with ossia drop and four-staff merge (a code fix,
+  not a model change); report layout separately from reading in the paper.
+- **Failure cases to report honestly:** staff pairing on the Schott Liszt editions (hands read as separate
+  parts), three-staff references (Ravel, Petrushka) scored with the staff ignored, a malformed ASAP reference
+  (Appassionata).
+- **Run 3 design (professor, agreed):** control vs harder-data candidate from the released model, two seeds
+  each, same budget; precision and recall of pitch reported separately; octaves in the primary metric;
+  recipe fixed in advance (last checkpoint, one candidate mixture) so no selection on the test pieces;
+  corrected layout baseline first. See PROGRESS "Decisions of 2026-11-16".
