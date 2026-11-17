@@ -6,7 +6,6 @@ page curl and perspective change it only little.
 """
 
 import os
-from collections.abc import Callable
 
 import cv2
 import numpy as np
@@ -192,34 +191,6 @@ def _select_grand_staffs(pairs: list[tuple[int, int]], probabilities: NDArray) -
     return selected
 
 
-def _pairs_as_grand_staffs(
-    staff_count: int,
-    pairs: list[tuple[int, int]],
-    probabilities: NDArray,
-    find: Callable[[int], int],
-) -> dict[int, int]:
-    """
-    Some editions are not recognized as grand staffs: on every pair of the Schott scans of
-    Liszt's Transcendental Etudes and Sonata the model says "same system", never "grand
-    staff", although the page is a normal piano page. If the model finds no grand staff on a
-    page, and all systems with several staffs have exactly two, the pairs are grand staffs.
-    HOMR_NO_SAME_SYSTEM_GRAND=1 switches this off, e.g. for a choir written on two staffs.
-    """
-    if os.environ.get("HOMR_NO_SAME_SYSTEM_GRAND") == "1":
-        return {}
-    size: dict[int, int] = {}
-    for i in range(staff_count):
-        size[find(i)] = size.get(find(i), 0) + 1
-    multi = [n for n in size.values() if n > 1]
-    if not multi or any(n != 2 for n in multi):  # noqa: PLR2004
-        return {}
-    return {
-        i: j
-        for (i, j), p in zip(pairs, probabilities, strict=True)
-        if find(i) == find(j) and p[SAME_SYSTEM] > 0.5  # noqa: PLR2004
-    }
-
-
 def _merge_grand_staff(upper: Staff, lower: Staff) -> Staff:
     """
     Staff.merge keeps the x positions which both grids have, as without the model. If
@@ -261,8 +232,6 @@ def group_staffs(
         if p[SEPARATE] < 0.5:  # noqa: PLR2004
             system_of[find(j)] = find(i)
     grand_staffs = {pairs[k][0]: pairs[k][1] for k in _select_grand_staffs(pairs, probabilities)}
-    if not grand_staffs:
-        grand_staffs = _pairs_as_grand_staffs(len(staffs), pairs, probabilities, find)
     lower_staffs = set(grand_staffs.values())
     systems: dict[int, list[Staff]] = {}
     for i, staff in enumerate(staffs):
