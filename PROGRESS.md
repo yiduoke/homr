@@ -686,6 +686,11 @@ changes on two runs. Mazeppa stays ~1 point below 566 in both runs.
   before merging it generally. Octave round stays deferred; no architecture changes until this
   experiment answers something. If harder data helps broadly, expand it; if not, look at image
   resolution, capacity or decoding. Immediate deliverable: a verified mixture and a controlled run.
+- **Findings from the 29 scans (details `run/EXPERIMENTS.md` T1 follow-up):** rare or fast-changing meters
+  are read badly (Debussy Reflets 4/8 read as 4/4, Ravel Alborada 6/8-3/8-9/8-3/4 with invented 12/8, 5/8, 7/8);
+  repeated notes in long beamed runs are dropped and the bar padded with rests (Prokofiev opening: audible pauses);
+  sextuplets read as sixteenths (Polonaise bar 20); Schott Liszt pages fail staff pairing (hands become alternating
+  bars). To do: fix Liszt pairing (code), keep these four as before/after examples for run 3 (pitch) and the tuplet run.
 - **Petrushka reference** (Claude transcription, unchecked, `run/out/testset/stravinsky-petrushka/`):
   first look full-match F1 ours 38.8 / 566 46.2, but not like-for-like; the reference has 3 staves per
   system, our output 2 (the layout merge handles only four-staff systems). Open question: 3-staff fix.
