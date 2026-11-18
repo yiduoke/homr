@@ -5,13 +5,15 @@ comes next. Written for people and coding agents picking up the work. Upstream i
 liebharc/homr; its own docs (README.md, Training.md, IDEAS_FOR_CONTRIBUTORS.md,
 AGENTS.md) still apply.
 
-Last updated: 2026-11-17 (7:30 pm Pacific).
+Last updated: 2026-11-17 (8:00 pm Pacific).
 
 Related documents: [PAPER_NOTES.md](PAPER_NOTES.md) (the paper's story, final numbers only);
 [EXPERIMENTS.md](https://github.com/yiduoke/homr-research/blob/main/EXPERIMENTS.md) in the private research repo
 [yiduoke/homr-research](https://github.com/yiduoke/homr-research) (exact commands, commits,
 checksums and outputs per result; local checkout `run/`); [Training.md](Training.md) (model
 cards); release [meteracc_checkpoints](https://github.com/yiduoke/homr/releases/tag/meteracc_checkpoints).
+
+**Status 8:00 pm Pacific 2026-11-17 (D29, `run/EXPERIMENTS.md`, `run/eval_run1/pilot_auto.sh`, log `run/eval_run1/pilot_auto.log`):** automation of the pilot evaluation is running on the laptop (nohup under caffeinate; boxes keep working if the laptop sleeps). For each of the four pilot models (CTRL_RENDER s7, SCAN s7, CTRL_RENDER s11, SCAN s11, expected DONE about 8:30 pm, 9:40 pm, 10:50 pm, 12:00 am) it exports to ONNX on vast-homr4 (niced, CPU only; the recipe reproduces the run3 ONNX byte for byte), copies to vast-homr5 through the laptop, waits until vast-homr5 is idle (another agent uses it), reads the held-out passages (72 v2 validation passages and the 145-crop extension, scan and twin; baselines released, run3_ctrl_s7/s11 read once) and runs the 28-scan GPU evaluation (tags `pilot_<ARM>_s<SEED>_gpu`, `/root/logs/gpu_chain.status`), pulling results to `run/out/testset/` and `run/eval_run1/pilot_val/<model>/`. New: rendered twins of the 134 renderable extension crops (`twin_render.py --batch2`). The final comparison `run/eval_run1/pilot_final_table.py` (SCAN - CTRL_RENDER per seed, 28 scans and held-out by work, run3 controls and released model as context, seed spread stated) is written and tested on the resolution tags, not run for the pilot. All four evaluations should be done about 1 am Pacific.
 
 **Status 7:30 pm Pacific 2026-11-17 (D26, `run/EXPERIMENTS.md`, `run/brace_collection/README.md`):** real thin-brace examples collected. The three Schott test scans are the Schmid-Lindner volumes of B. Schott's Soehne 1917 (Etudes #964191 plate 30341, Sonata #364674 plate 30373); the same volume (other ten pieces, 86 pages, 394 grand pairs, shipped model misses 392) and two more files of the series (Concert-Etudes, two Piano Concertos, 1918) form the same-edition pool: 194 pages, 164 labelled, 905 grand pairs, labels checked by eye (0 wrong in 135 crops), `run/brace_collection/split.tsv`. 46 independent editions (1800-1987) screened: 37 have a curved brace and are read at 99.8 % (1,332 grand pairs, 2 missed), so there is **no second thin straight brace with a point in the public scans**; the nearest are Beethoven Op. 27/2 Cappi 1802 (straight bracket with hooks, 40 of 46 missed, weak scan) and Reichardt 1819, reserved for the transfer test, and the 37 curved editions as regression controls. Mazeppa pages of the volume stay reserved (test composition). No training, no GPU box; 49 PDFs (175 MB) in `~/Downloads/imslp_brace_batch/`.
 

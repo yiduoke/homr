@@ -33,6 +33,10 @@ for _m in ("augraphy", "augraphy.base", "augraphy.base.augmentationpipeline", "a
 import verovio
 verovio.enableLog(verovio.LOG_OFF)
 from pieces import BY
+if os.environ.get("TWIN_BATCH2"):                          # D29: batch 2 pieces (set by --batch2; the pool workers re-import this module)
+    sys.path.insert(0, ROOT + "/batch2/scripts")
+    import pieces2
+    BY.update(pieces2.BY)
 import training.omr_datasets.verovio_staffs as vs     # fill_voices, clef_changes_within_measures, parse_page, _random_for (code of integration_wt, unchanged)
 
 FONTS = ["Leipzig", "Bravura", "Gootville", "Leland", "Petaluma"]
@@ -455,10 +459,27 @@ if __name__ == "__main__":
     ap.add_argument("--report", default=ROOT + "/twins_report.json")
     ap.add_argument("--svg", default=None)
     ap.add_argument("--lists", nargs="*", default=None, help="v2: lists (names in lists/) to render instead of the frozen pilot lists")
+    ap.add_argument("--batch2", default=None, help="D29: a list file of batch 2 (e.g. batch2/lists/batch2_val_v2.txt): render those crops (batch2/manifest.csv, batch2/scripts/pieces2.py)")
     args = ap.parse_args()
     man = read_manifest()
+    todo = groups(args.lists) if args.lists else groups()
+    if args.batch2:                                        # batch 2 (held-out extension): its own manifest and piece table, twins under batch2/twins_<list>
+        os.environ["TWIN_BATCH2"] = "1"
+        sys.path.insert(0, ROOT + "/batch2/scripts")
+        import pieces2
+        BY.update(pieces2.BY)
+        man = {r["crop"]: r for r in csv.DictReader(open(ROOT + "/batch2/manifest.csv"))}
+        todo = []
+        for line in open(args.batch2):
+            if line.strip():
+                img, tok = line.strip().split(",")
+                todo.append(("batch2", img.replace("scan_pairs_virtuoso/batch2/", ""), tok.replace("scan_pairs_virtuoso/", "")))
+        if args.out == ROOT + "/twins":
+            args.out = ROOT + "/batch2/twins"
+        if args.report == ROOT + "/twins_report.json":
+            args.report = ROOT + "/batch2/twins_report.json"
     jobs = []
-    for lst, img, tok in (groups(args.lists) if args.lists else groups()):
+    for lst, img, tok in todo:
         r = man[img]
         name = os.path.basename(img)[:-4]
         if args.only and name not in args.only:
