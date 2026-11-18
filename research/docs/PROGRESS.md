@@ -13,6 +13,8 @@ Related documents: [PAPER_NOTES.md](PAPER_NOTES.md) (the paper's story, final nu
 checksums and outputs per result; local checkout `run/`); [Training.md](Training.md) (model
 cards); release [meteracc_checkpoints](https://github.com/yiduoke/homr/releases/tag/meteracc_checkpoints).
 
+**Status 4:50 pm Pacific 2026-11-17 (D20, `run/EXPERIMENTS.md`):** second batch of verified-pair material prepared: 21 works (plus 2 reserves) chosen by ASAP-XML predictors and by looking at the pages, 17 IMSLP PDFs (46 MB) downloaded to `~/Downloads/imslp_virtuoso_batch2/`; about 137 pages (about 152 with reserves) expected to give about 570 crops (pilot 878 + this = about 1,450 against the target of 1,500). Rich in octave-bracket continuations (Ravel Une barque 75 brackets, Liszt Waldesrauschen/Gnomenreigen/Gondoliera, Chopin Op.10/5 and 10/8, Beethoven Op.81a), repeated notes (Beethoven Op.7, 27/1, 31/1), cross-staff (Schumann Arabeske) and unnumbered tuplets (Rachmaninoff, Berceuse). No straight-bracket edition found. Lists: `run/scan_pairs_more_candidates.md`, `run/scan_pairs_downloads_batch2.md`. Not paired yet.
+
 ## Summary
 
 The fork teaches homr's transformer to read octave brackets (8va, 8vb) on real printed
