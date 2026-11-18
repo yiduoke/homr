@@ -263,3 +263,24 @@ barline . . . . .""")
     assert len({r[1] for r in rows[:4]}) == 1
     assert len({r[1] for r in rows[4:]}) == 1
     assert rows[0][1] != rows[4][1]
+
+
+def test_voices_of_a_crossing_beam_can_stay_with_their_positions() -> None:
+    # The page merger repairs overfull voices per voice label; with join_beam_voices off the labels
+    # are those of the positions and the beam states alone tell the group.
+    tokens = f"""{_TWO_STAVES}
+note_16 A3 _ _ beamStart lower2
+note_16 C4 _ _ beamContinue upper
+note_16 E4 _ _ beamContinue upper
+note_16 C4 _ _ beamStop upper
+note_4 A3 _ _ _ lower
+barline . . . . ."""
+    joined = _staff_voice_beams(_generate(tokens))
+    staffs = [read_token_lines(tokens.splitlines())]
+    apart = _staff_voice_beams(
+        generate_xml(XmlGeneratorArguments(join_beam_voices=False), staffs, "")
+    )
+    states = ["begin", "continue", "continue", "end", ""]
+    assert [r[2] for r in apart] == [r[2] for r in joined] == states
+    assert len({r[1] for r in joined[:4]}) == 1
+    assert apart[0][1] != apart[1][1]

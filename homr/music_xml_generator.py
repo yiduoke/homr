@@ -139,11 +139,18 @@ class SymbolChord:
 
 class XmlGeneratorArguments:
     def __init__(
-        self, large_page: bool | None = None, metronome: int | None = None, tempo: int | None = None
+        self,
+        large_page: bool | None = None,
+        metronome: int | None = None,
+        tempo: int | None = None,
+        join_beam_voices: bool = True,
     ):
         self.large_page = large_page
         self.metronome = metronome
         self.tempo = tempo
+        # A beam which changes staff is one voice in the page file. Without it the notes
+        # keep the voice of their position and the beam states alone tell the group.
+        self.join_beam_voices = join_beam_voices
 
 
 def build_identification() -> ET.Element:
@@ -202,7 +209,7 @@ def build_part(
     resolve_accidentals(part)
     convert_ties(part)
     add_stems(part)
-    convert_beams(part)
+    convert_beams(part, args.join_beam_voices)
     _remove_position_attributes(part)
     return part
 
@@ -1033,7 +1040,7 @@ class _BeamGroup:
     keys: set[tuple[str, bool]]
 
 
-def convert_beams(part: ET.Element) -> None:
+def convert_beams(part: ET.Element, join_voices: bool = True) -> None:
     """Turn the primary beam states of the model into complete beams.
 
     The model predicts for each chord whether its primary beam starts, continues
@@ -1068,7 +1075,7 @@ def convert_beams(part: ET.Element) -> None:
             close(key)
         elif key in open_groups:
             group = open_groups[key]
-            if len(group.keys) > 1:
+            if join_voices and len(group.keys) > 1:
                 _join_voice(group.events, event)
             group.events.append(event)
             if event.state == "end":
@@ -1078,7 +1085,8 @@ def convert_beams(part: ET.Element) -> None:
             other = _cross_staff_group(open_groups, event)
             if other is not None:
                 group = open_groups[other]
-                _join_voice(group.events, event)
+                if join_voices:
+                    _join_voice(group.events, event)
                 group.events.append(event)
                 group.keys.add(key)
                 open_groups[key] = group
