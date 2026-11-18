@@ -141,3 +141,125 @@ barline . . . . .""")
     # A beam is drawn within one voice, the lower note moves into it
     assert notes[1].findtext("staff") == "2"
     assert notes[1].findtext("voice") == notes[0].findtext("voice")
+
+
+def _staff_voice_beams(xml: ET.Element) -> list[tuple[str, str, str]]:
+    return [
+        (
+            note.findtext("staff", "1"),
+            note.findtext("voice", "1"),
+            ",".join(b.text or "" for b in note.findall("beam") if b.get("number") == "1"),
+        )
+        for note in xml.iter("note")
+        if note.find("rest") is None
+    ]
+
+
+_TWO_STAVES = """clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
+timeSignature_2/4 . . . . ."""
+
+
+def test_beam_from_the_lower_to_the_upper_staff_stays_one_group() -> None:
+    # Debussy, Pour le piano, bar 1, beat 1: A3 of the left hand starts the beam of the right
+    xml = _generate(f"""{_TWO_STAVES}
+note_16 A3 _ _ beamStart lower2
+note_16 C4 _ _ beamContinue upper
+note_16 E4 _ _ beamContinue upper
+note_16 C4 _ _ beamStop upper
+note_4 A3 _ _ _ lower
+barline . . . . .""")
+    rows = _staff_voice_beams(xml)
+    assert [r[2] for r in rows[:4]] == ["begin", "continue", "continue", "end"]
+    assert [r[0] for r in rows[:4]] == ["2", "1", "1", "1"]
+    assert len({r[1] for r in rows[:4]}) == 1
+
+
+def test_beam_from_the_upper_to_the_lower_staff_stays_one_group() -> None:
+    xml = _generate(f"""{_TWO_STAVES}
+note_16 E5 _ _ beamStart upper
+note_16 C3 _ _ beamContinue lower
+note_16 D3 _ _ beamContinue lower
+note_16 E3 _ _ beamStop lower
+barline . . . . .""")
+    rows = _staff_voice_beams(xml)
+    assert [r[2] for r in rows] == ["begin", "continue", "continue", "end"]
+    assert [r[0] for r in rows] == ["1", "2", "2", "2"]
+    assert len({r[1] for r in rows}) == 1
+
+
+def test_beam_which_changes_staff_twice_stays_one_group() -> None:
+    xml = _generate(f"""{_TWO_STAVES}
+note_16 C3 _ _ beamStart lower
+note_16 C5 _ _ beamContinue upper
+note_16 D5 _ _ beamContinue upper
+note_16 D3 _ _ beamContinue lower
+note_16 E3 _ _ beamStop lower
+note_8 G4 _ _ _ upper
+barline . . . . .""")
+    rows = _staff_voice_beams(xml)
+    assert [r[2] for r in rows[:5]] == ["begin", "continue", "continue", "continue", "end"]
+    assert len({r[1] for r in rows[:5]}) == 1
+
+
+def test_accompaniment_keeps_its_own_beam_under_a_beam_which_changes_staff() -> None:
+    # Left hand eighths beamed together while a sixteenth beam goes from the left to the right hand
+    xml = _generate("""clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
+timeSignature_4/4 . . . . .
+note_8 C2 _ _ beamStart lower
+note_16 A3 _ _ beamStart lower2
+note_16 C4 _ _ beamContinue upper
+note_16 E4 _ _ beamContinue upper
+note_16 C4 _ _ beamStop upper
+note_8 D2 _ _ beamStop lower
+barline . . . . .""")
+    rows = _staff_voice_beams(xml)
+    by_beam = {}
+    for staff, voice, state in rows:
+        by_beam.setdefault(voice, []).append((staff, state))
+    groups = sorted(by_beam.values())
+    assert [[s for _, s in g] for g in groups] == [
+        ["begin", "continue", "continue", "end"],
+        ["begin", "end"],
+    ]
+    # the accompaniment stays on the lower staff, the sixteenths cross
+    assert sorted(len({st for st, _ in g}) for g in groups) == [1, 2]
+
+
+def test_a_new_beam_after_a_crossing_one_is_separate() -> None:
+    xml = _generate(f"""{_TWO_STAVES}
+note_16 E5 _ _ beamStart upper
+note_16 C3 _ _ beamStop lower
+note_16 D3 _ _ beamStart lower
+note_16 E3 _ _ beamStop lower
+barline . . . . .""")
+    assert [r[2] for r in _staff_voice_beams(xml)] == ["begin", "end", "begin", "end"]
+
+
+def test_an_unbeamed_note_ends_the_group_of_a_crossing_beam() -> None:
+    xml = _generate(f"""{_TWO_STAVES}
+note_16 E5 _ _ beamStart upper
+note_16 C3 _ _ beamContinue lower
+note_8 D3 _ _ _ lower
+note_16 E3 _ _ beamStop lower
+barline . . . . .""")
+    # E5 and C3 stay a group, the stop without its start is repaired away
+    assert [r[2] for r in _staff_voice_beams(xml)] == ["begin", "end", "", ""]
+
+
+def test_ordinary_groups_on_both_staves_are_unchanged() -> None:
+    xml = _generate(f"""{_TWO_STAVES}
+note_16 C5 _ _ beamStart upper
+note_16 D5 _ _ beamContinue upper
+note_16 E5 _ _ beamContinue upper
+note_16 F5 _ _ beamStop upper
+note_16 C3 _ _ beamStart lower
+note_16 D3 _ _ beamContinue lower
+note_16 E3 _ _ beamContinue lower
+note_16 F3 _ _ beamStop lower
+barline . . . . .""")
+    rows = _staff_voice_beams(xml)
+    assert [r[2] for r in rows] == ["begin", "continue", "continue", "end"] * 2
+    assert [r[0] for r in rows] == ["1"] * 4 + ["2"] * 4
+    assert len({r[1] for r in rows[:4]}) == 1
+    assert len({r[1] for r in rows[4:]}) == 1
+    assert rows[0][1] != rows[4][1]

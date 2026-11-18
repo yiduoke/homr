@@ -1025,6 +1025,14 @@ class _BeamEvent:
     end: tuple[int, int]
 
 
+@dataclass
+class _BeamGroup:
+    """The chords of one open beam and the positions of the model which write into it."""
+
+    events: list[_BeamEvent]
+    keys: set[tuple[str, bool]]
+
+
 def convert_beams(part: ET.Element) -> None:
     """Turn the primary beam states of the model into complete beams.
 
@@ -1032,17 +1040,24 @@ def convert_beams(part: ET.Element) -> None:
     or stops. Groups are formed per position of the model (e.g. upper2) rather
     than per MusicXML voice, as voices can swap between chords. Rests don't
     interrupt a group and it can cross a barline. A beam which continues on the
-    other staff joins the open group there, the notes then move into its voice.
-    A group with only one note, or a state which doesn't fit, is repaired rather
-    than written as it is. Secondary beams and hooks follow from the durations.
+    other staff joins the open group there, the notes then move into its voice
+    and the positions of the model they come from stay with the group until it
+    ends, so a beam which starts on one staff and goes on for several notes on the
+    other one stays a single group. A group with only one note, or a state which
+    doesn't fit, is repaired rather than written as it is. Secondary beams and
+    hooks follow from the durations.
     """
-    open_groups: dict[tuple[str, bool], list[_BeamEvent]] = {}
+    open_groups: dict[tuple[str, bool], _BeamGroup] = {}
     groups: list[list[_BeamEvent]] = []
 
     def close(key: tuple[str, bool]) -> None:
-        group = open_groups.pop(key, [])
-        if len(group) >= 2:
-            groups.append(group)
+        group = open_groups.get(key)
+        if group is None:
+            return
+        for member in group.keys:
+            del open_groups[member]
+        if len(group.events) >= 2:
+            groups.append(group.events)
 
     for event in _beam_events(part):
         key = (event.position, event.is_grace)
@@ -1051,21 +1066,33 @@ def convert_beams(part: ET.Element) -> None:
             continue
         if event.state == "begin":
             close(key)
-        elif key not in open_groups:
+        elif key in open_groups:
+            group = open_groups[key]
+            if len(group.keys) > 1:
+                _join_voice(group.events, event)
+            group.events.append(event)
+            if event.state == "end":
+                close(key)
+            continue
+        else:
             other = _cross_staff_group(open_groups, event)
             if other is not None:
-                _join_voice(open_groups[other], event)
-                open_groups[other].append(event)
+                group = open_groups[other]
+                _join_voice(group.events, event)
+                group.events.append(event)
+                group.keys.add(key)
+                open_groups[key] = group
                 if event.state == "end":
-                    close(other)
+                    close(key)
                 continue
-        open_groups.setdefault(key, []).append(event)
+        group = _BeamGroup([event], {key})
+        open_groups[key] = group
         if event.state == "end":
             close(key)
     for key in list(open_groups):
         close(key)
-    for group in groups:
-        _write_beams([event.notes for event in group])
+    for events in groups:
+        _write_beams([event.notes for event in events])
 
 
 def _beam_events(part: ET.Element) -> list[_BeamEvent]:
@@ -1119,18 +1146,32 @@ def _note_times(measure: ET.Element) -> dict[int, tuple[int, int]]:
 
 
 def _cross_staff_group(
-    open_groups: dict[tuple[str, bool], list[_BeamEvent]], event: _BeamEvent
+    open_groups: dict[tuple[str, bool], _BeamGroup], event: _BeamEvent
 ) -> tuple[str, bool] | None:
-    """The open group on the other staff which the event can continue, if there is one."""
+    """The open group on the other staff which the event can continue, if there is one.
+
+    Several groups can be open at once, e.g. an accompaniment beam under a beam which
+    changes staff. The one which is still going at this moment, its last chord ending
+    exactly where the event starts, then is the one meant. Otherwise the group has to
+    be the only one the event can continue.
+    """
     staff = event.notes[0].findtext("staff", "1")
-    candidates = [
-        key
+    candidates = {
+        id(group): (key, group)
         for key, group in open_groups.items()
         if key[1] == event.is_grace
-        and group[-1].notes[0].findtext("staff", "1") != staff
-        and group[-1].end <= event.start
-    ]
-    return candidates[0] if len(candidates) == 1 else None
+        and group.events[-1].notes[0].findtext("staff", "1") != staff
+        and group.events[-1].end <= event.start
+    }
+    if len(candidates) > 1:
+        candidates = {
+            ident: (key, group)
+            for ident, (key, group) in candidates.items()
+            if group.events[-1].end == event.start
+        }
+    if len(candidates) != 1:
+        return None
+    return next(iter(candidates.values()))[0]
 
 
 def _join_voice(group: list[_BeamEvent], event: _BeamEvent) -> None:
