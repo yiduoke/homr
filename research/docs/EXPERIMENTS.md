@@ -538,6 +538,19 @@ Procedure from the scan/render audit (D11). Encoding: reference = sounding pitch
 **Same pattern elsewhere** (`octave_checks/shift_inventory.md`, nothing fixed): references without shifts but with shifts in the released scan output: Hammerklavier (14), Kreisleriana (2); references with orphan stops (no start): Wanderer 14, Rhapsody 6 15, Pour le piano 4, Petrushka 3; many brackets cross barlines (Scherzo 3: 39). Chopin 25/11 spans 37-38 and 83-87 lose many scan pitches and may show the Winter Wind error again.
 
 
+## D16. Second cloud machine vast-homr5 for evaluation and pair building (2026-11-17, 3:40-4:25 pm Pacific; `cloud2_README.md`)
+
+vast.ai instance 61144905 (`ssh vast-homr5`), Titan RTX 24 GB, 28 vCPU (Xeon E5-2680 v4), 31 GB RAM, about $0.134/h; the training box vast-homr4 is not used for this.
+Env `/venv/main` (onnxruntime-gpu 1.32, opencv 5.0.0.93, numpy 2.4.6, rapidocr 3.9.2: the laptop's versions), laptop paths mirrored, `run/integration_wt`, `run/res_wt`
+(clean, 4715ec5), `run/models/run3_ctrl_s7|s11`, scan pages, references and scripts copied (about 1 GB, tar over ssh); helpers `cloud2_push.sh`, `cloud2_pull.sh`,
+`cloud2_models.sh` (box 4 to box 5 through the laptop; no key on the boxes). Check: Bach fugue 873, released model, `HOMR_FORCE_CPU=1`: the scorer JSON equals the laptop's
+`note-scores-layout1.json` in every metric and alignment entry; GPU (fp16) gives 99.48 instead of 99.55 pooled pitch (one note). So CPU runs are laptop-exact, GPU runs are a separate
+setting (tags `res_<arm>_gpu`). Speed: box CPU 2.6-3x slower than the laptop per piece (A11 vs A7: Op. 10/4 60 vs 21 s, Prokofiev 130 vs 52, Scherzo 3 187 vs 71);
+box GPU about 1.9 s/page on 22 inputs (41 s) vs about 7 s/page on the box CPU. Moved: `res_eval.py --arm A11` (laptop chain killed before A11 started; laptop A7 had finished all 28 pieces)
+runs on the box in tmux `a11` (CPU, `HOMR_FORCE_CPU=1`, log `/root/logs/res_eval_A11.log`, results pulled with `./cloud2_pull.sh res_A_s11`); tmux `after` then re-runs failed pieces
+and the GPU arms `res_A_s7_gpu`, `res_A_s11_gpu` (the baselines for the B arms on the GPU). Problem met: two evaluations plus another agent's 8 workers filled the 31 GB and OOM-killed pool
+workers (pieces FAILED in the log); the GPU run was stopped and everything is re-run one at a time, finished pieces are kept. ONNX hashes of `run3_ctrl_s11` on the box equal the laptop's.
+
 ## R7. Input-resolution experiment, prepared 2:35 pm, LAUNCHED 2:55 pm Pacific 2026-11-17 (spec `res_experiment_spec.md`)
 
 Question: finer grid (384x1920 canvas, 24x120 tokens) vs 256x1280 (16x80) from released run2s7, same list (`run2_train_excl_v3`, 6,716

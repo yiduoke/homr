@@ -990,6 +990,12 @@ On rendered page 8 of Hungarian Rhapsody No. 6, the released model’s output re
 - Released model pitch F1 on kept crops: strong mean 0.981, hard 0.73; lowest piece Schubert D.899/1 0.949. By eye: strong 0/36 wrong, hard 2/16 wrong (both removed), pooled 3.8% (95% upper bound 13.2%).
 - Gaps to fill with extra works: multi-system octave-bracket continuations, unnumbered tuplets, repeated notes, cross-staff passages; 60 octave-bracket crops wait for an eye check (`lists/train_octave_unverified.txt`). Laptop only; no GPU box job; nothing pushed.
 
+## Status 2026-11-17, 4:25 pm Pacific: second cloud machine (vast-homr5) ready, A11 evaluation moved there
+
+- Instance 61144905 (`ssh vast-homr5`, Titan RTX, 28 vCPU, 31 GB RAM, $0.134/h) has homr (`integration_wt`, `res_wt`), onnxruntime-gpu, the scans, references and the 19 virtuoso PDFs, with the laptop paths mirrored. Commands for running a tag/arm, copying ONNX from vast-homr4, pulling results and pushing files: `run/cloud2_README.md` (scripts `cloud2_push.sh`, `cloud2_pull.sh`, `cloud2_models.sh`).
+- Check: Bach fugue 873 with the released model, CPU path (`HOMR_FORCE_CPU=1`): scores identical to the laptop; GPU (fp16) differs by one note (99.48 vs 99.55). CPU on the box is 2.6-3x slower than the laptop, GPU about 4x faster than the laptop on the transformer part.
+- Laptop A7 (resolution arm A, seed 7) had finished; the laptop chain was stopped before A11. A11 runs on the box (CPU, same settings, tmux `a11`, log `/root/logs/res_eval_A11.log`), then GPU baselines `res_A_s7_gpu` and `res_A_s11_gpu` (tmux `after`). Another agent's jobs share the box (31 GB RAM): one evaluation at a time.
+
 ## Status 2026-11-17, 3:45 pm Pacific: octave-bracket checks (Winter Wind m. 20, Schubert D. 899/4 m. 64)
 
 - Chopin Op. 25/11 bars 19-20: print, reference and render agree (8va from bar 19 note 17 to bar 20 note 12); the released model ends the bracket after bar 19 note 20 and writes 16 notes an octave low. Model error, reference unchanged.
