@@ -1,0 +1,533 @@
+{
+ "schubert-impromptu-d899-4": {
+  "566": {
+   "status": "rescored dense",
+   "sens_before": {
+    "f1": 96.07,
+    "po": 95.04,
+    "full": 95.02
+   },
+   "sens_after": {
+    "f1": 98.56,
+    "po": 97.87,
+    "full": 97.85
+   },
+   "pooled_before": {
+    "f1": 96.09,
+    "po": 95.04,
+    "full": 95.02
+   },
+   "pooled_after": {
+    "f1": 98.58,
+    "po": 97.87,
+    "full": 97.85
+   }
+  },
+  "ctl_slots": {
+   "status": "rescored note-scores+pooled+dense",
+   "sens_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "sens_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   },
+   "pooled_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "pooled_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   }
+  },
+  "ctl_slots_nodrop": {
+   "status": "rescored note-scores+pooled+dense",
+   "sens_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "sens_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   },
+   "pooled_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "pooled_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   }
+  },
+  "layout1": {
+   "status": "kept (already rescored)",
+   "sens_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "sens_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   },
+   "pooled_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "pooled_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   }
+  },
+  "pilot_CTRL_RENDER_s7_gpu": {
+   "status": "rescored note-scores+pooled+dense",
+   "sens_before": {
+    "f1": 96.66,
+    "po": 95.71,
+    "full": 95.69
+   },
+   "sens_after": {
+    "f1": 99.15,
+    "po": 98.55,
+    "full": 98.53
+   },
+   "pooled_before": {
+    "f1": 96.66,
+    "po": 95.71,
+    "full": 95.69
+   },
+   "pooled_after": {
+    "f1": 99.15,
+    "po": 98.55,
+    "full": 98.53
+   }
+  },
+  "r3B7": {
+   "status": "rescored dense",
+   "sens_before": {
+    "f1": 96.34,
+    "po": 94.81,
+    "full": 94.79
+   },
+   "sens_after": {
+    "f1": 98.83,
+    "po": 97.65,
+    "full": 97.63
+   },
+   "pooled_before": {
+    "f1": 96.34,
+    "po": 94.81,
+    "full": 94.79
+   },
+   "pooled_after": {
+    "f1": 98.83,
+    "po": 97.65,
+    "full": 97.63
+   }
+  },
+  "r3cand_s11": {
+   "status": "rescored dense",
+   "sens_before": {
+    "f1": 96.48,
+    "po": 95.4,
+    "full": 95.36
+   },
+   "sens_after": {
+    "f1": 98.97,
+    "po": 98.24,
+    "full": 98.2
+   },
+   "pooled_before": {
+    "f1": 96.48,
+    "po": 95.4,
+    "full": 95.36
+   },
+   "pooled_after": {
+    "f1": 98.97,
+    "po": 98.24,
+    "full": 98.2
+   }
+  },
+  "r3cand_s7": {
+   "status": "rescored dense",
+   "sens_before": {
+    "f1": 96.46,
+    "po": 95.38,
+    "full": 95.34
+   },
+   "sens_after": {
+    "f1": 98.95,
+    "po": 98.22,
+    "full": 98.17
+   },
+   "pooled_before": {
+    "f1": 96.46,
+    "po": 95.38,
+    "full": 95.34
+   },
+   "pooled_after": {
+    "f1": 98.95,
+    "po": 98.22,
+    "full": 98.17
+   }
+  },
+  "r3ctrl_s11": {
+   "status": "rescored dense",
+   "sens_before": {
+    "f1": 96.46,
+    "po": 95.38,
+    "full": 95.34
+   },
+   "sens_after": {
+    "f1": 98.95,
+    "po": 98.22,
+    "full": 98.17
+   },
+   "pooled_before": {
+    "f1": 96.46,
+    "po": 95.38,
+    "full": 95.34
+   },
+   "pooled_after": {
+    "f1": 98.95,
+    "po": 98.22,
+    "full": 98.17
+   }
+  },
+  "r3ctrl_s7": {
+   "status": "rescored dense",
+   "sens_before": {
+    "f1": 96.69,
+    "po": 95.66,
+    "full": 95.62
+   },
+   "sens_after": {
+    "f1": 99.18,
+    "po": 98.5,
+    "full": 98.45
+   },
+   "pooled_before": {
+    "f1": 96.69,
+    "po": 95.66,
+    "full": 95.62
+   },
+   "pooled_after": {
+    "f1": 99.18,
+    "po": 98.5,
+    "full": 98.45
+   }
+  },
+  "rb2_slots": {
+   "status": "rescored note-scores+pooled+dense",
+   "sens_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "sens_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   },
+   "pooled_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "pooled_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   }
+  },
+  "rb2_slots_nodrop": {
+   "status": "rescored note-scores+pooled+dense",
+   "sens_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "sens_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   },
+   "pooled_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "pooled_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   }
+  },
+  "rb3_slots": {
+   "status": "rescored note-scores+pooled+dense",
+   "sens_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "sens_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   },
+   "pooled_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "pooled_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   }
+  },
+  "rb3_slots_nodrop": {
+   "status": "rescored note-scores+pooled+dense",
+   "sens_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "sens_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   },
+   "pooled_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "pooled_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   }
+  },
+  "relbrace2_gpu": {
+   "status": "rescored note-scores+pooled+dense",
+   "sens_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "sens_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   },
+   "pooled_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "pooled_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   }
+  },
+  "relbrace3_gpu": {
+   "status": "rescored note-scores+pooled+dense",
+   "sens_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "sens_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   },
+   "pooled_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "pooled_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   }
+  },
+  "res_A_s11_gpu": {
+   "status": "kept (already rescored)",
+   "sens_before": {
+    "f1": 96.48,
+    "po": 95.4,
+    "full": 95.36
+   },
+   "sens_after": {
+    "f1": 98.97,
+    "po": 98.24,
+    "full": 98.2
+   },
+   "pooled_before": {
+    "f1": 96.48,
+    "po": 95.4,
+    "full": 95.36
+   },
+   "pooled_after": {
+    "f1": 98.97,
+    "po": 98.24,
+    "full": 98.2
+   }
+  },
+  "res_A_s7": {
+   "status": "rescored dense",
+   "sens_before": {
+    "f1": 96.69,
+    "po": 95.66,
+    "full": 95.62
+   },
+   "sens_after": {
+    "f1": 99.18,
+    "po": 98.5,
+    "full": 98.45
+   },
+   "pooled_before": {
+    "f1": 96.69,
+    "po": 95.66,
+    "full": 95.62
+   },
+   "pooled_after": {
+    "f1": 99.18,
+    "po": 98.5,
+    "full": 98.45
+   }
+  },
+  "res_A_s7_gpu": {
+   "status": "kept (already rescored)",
+   "sens_before": {
+    "f1": 96.69,
+    "po": 95.66,
+    "full": 95.62
+   },
+   "sens_after": {
+    "f1": 99.18,
+    "po": 98.5,
+    "full": 98.45
+   },
+   "pooled_before": {
+    "f1": 96.69,
+    "po": 95.66,
+    "full": 95.62
+   },
+   "pooled_after": {
+    "f1": 99.18,
+    "po": 98.5,
+    "full": 98.45
+   }
+  },
+  "res_B_s11_gpu": {
+   "status": "kept (already rescored)",
+   "sens_before": {
+    "f1": 96.09,
+    "po": 95.06,
+    "full": 95.04
+   },
+   "sens_after": {
+    "f1": 98.58,
+    "po": 97.89,
+    "full": 97.87
+   },
+   "pooled_before": {
+    "f1": 96.11,
+    "po": 95.06,
+    "full": 95.04
+   },
+   "pooled_after": {
+    "f1": 98.6,
+    "po": 97.89,
+    "full": 97.87
+   }
+  },
+  "res_B_s7_gpu": {
+   "status": "kept (already rescored)",
+   "sens_before": {
+    "f1": 96.07,
+    "po": 95.04,
+    "full": 95.02
+   },
+   "sens_after": {
+    "f1": 98.56,
+    "po": 97.87,
+    "full": 97.85
+   },
+   "pooled_before": {
+    "f1": 96.09,
+    "po": 95.04,
+    "full": 95.02
+   },
+   "pooled_after": {
+    "f1": 98.58,
+    "po": 97.87,
+    "full": 97.85
+   }
+  },
+  "run2s7": {
+   "status": "rescored dense",
+   "sens_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "sens_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   },
+   "pooled_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "pooled_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   }
+  },
+  "shipped_merge_role_gpu": {
+   "status": "rescored note-scores+pooled+dense",
+   "sens_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "sens_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   },
+   "pooled_before": {
+    "f1": 96.7,
+    "po": 95.76,
+    "full": 95.74
+   },
+   "pooled_after": {
+    "f1": 99.19,
+    "po": 98.59,
+    "full": 98.57
+   }
+  }
+ }
+}

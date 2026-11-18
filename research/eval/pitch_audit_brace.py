@@ -29,7 +29,7 @@ E1 = HOME / "eval_run1"
 import os
 TAG = os.environ.get("AUDIT_TAG", "relbrace3_gpu")  # D28: any tag with res-scores-<tag>.json (brace_eval.py)
 AUDIT_JSON = E1 / f"brace_audit_{TAG}.json"
-EDITION_REF = {"schubert-impromptu-d899-4"}
+from edition_refs import EDITION as EDITION_REF  # noqa: E402  (one shared list of edition-corrected pieces)
 CATS = PA.CATS
 SCHOTT = ["liszt-sonata", "liszt-te-5", "liszt-te-10"]  # known staff-pairing failure (bars doubled), reported separately
 

@@ -27,7 +27,7 @@ import res_lib as L  # noqa: E402
 
 L.WT = f"{L.R}/rel_wt"
 MERGER = f"{L.R}/merge_wt/merge_pages.py"
-EDITION = {"schubert-impromptu-d899-4"}
+from edition_refs import EDITION  # noqa: E402  (one shared list of edition-corrected pieces)
 
 
 def sh(cmd, env=None, cwd=None, log=None):

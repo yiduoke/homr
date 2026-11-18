@@ -5,13 +5,15 @@ comes next. Written for people and coding agents picking up the work. Upstream i
 liebharc/homr; its own docs (README.md, Training.md, IDEAS_FOR_CONTRIBUTORS.md,
 AGENTS.md) still apply.
 
-Last updated: 2026-11-17 (9:55 pm Pacific).
+Last updated: 2026-11-17 (10:10 pm Pacific).
 
 Related documents: [PAPER_NOTES.md](PAPER_NOTES.md) (the paper's story, final numbers only);
 [EXPERIMENTS.md](https://github.com/yiduoke/homr-research/blob/main/EXPERIMENTS.md) in the private research repo
 [yiduoke/homr-research](https://github.com/yiduoke/homr-research) (exact commands, commits,
 checksums and outputs per result; local checkout `run/`); [Training.md](Training.md) (model
 cards); release [meteracc_checkpoints](https://github.com/yiduoke/homr/releases/tag/meteracc_checkpoints).
+
+**Status 10:10 pm Pacific 2026-11-17 (D33, `run/EXPERIMENTS.md`, `run/octave_checks/REFS_REPORT.md`, scripts in `run/octave_checks/`, figures `run/octave_checks/refs/`, shared list `run/eval_run1/edition_refs.py`):** reference hygiene for octave brackets on the suspects (Hammerklavier, Wanderer, Liszt HR 6, Debussy Pour le piano, Kreisleriana, Scriabin Sonata 5; Petrushka not decidable). By eye on the print and Verovio engravings of the reference and the released output (12 figures, 3 more by page view): all disputed spans are model errors (stops too late or never, a stop one bar early, a bracket not read, invented 8vb/8va); the references hold the sounding pitch under the printed brackets and lack only the directions (orphan stops are pitch-neutral). No edition-specific reference is needed besides Schubert D. 899/4; D32's (e) verdicts for Hammerklavier bar 247 and Wanderer bars 473-474 are corrected. The list of edition-corrected pieces is now one file imported by the table scripts; all 23 saved Schubert tags were rescored against the edition reference (new tables `*-edition2`, identical to `*-edition`; later pilot tags: rerun `octave_checks/rescore_edition.py`). Open: HR 6 ossia pages, Wanderer 423-424, Petrushka, a few Scriabin and Debussy bars not viewed.
 
 **Status 9:55 pm Pacific 2026-11-17 (D32, `run/EXPERIMENTS.md`, `run/octave_checks/OCTAVE_CAUSES.md`, scripts and data in `run/octave_checks/`, figures `run/octave_checks/causes/`):** octave errors classified into five causes before the next training mix is chosen. On 1,840 analysed development crops (pilot + batch 2, validation kept apart) 740 (40 %) have an octave or bracket difference: wrong register 455 crops, starts 81, stops 73, continuations 34, edition/reference 94 (eye agreement 82 % on 50 crops). The released model gets the stop of a bracket right only 60 % of the time (start 75 %, start of a continuation 87 %); the pool holds 66 + 72 continuation crops, 190 start and 188 stop crops, 18 lower-staff brackets. On the 27 real scans the 3.02 octave points split as register 1.40, continuations 0.58, starts 0.49, mixed 0.39, read-only brackets 0.11, stops 0.04 (bracket-related 1.62); Hammerklavier and Wanderer are reference gaps (print has the 8va), Winter Wind is a continuation. Recommendation: multi-system continuations with the stop, stop variety, 8vb, high/low ledger-line passages without brackets, no unreviewed ASAP octave labels.
 

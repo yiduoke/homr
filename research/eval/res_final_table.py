@@ -46,7 +46,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import res_lib as L  # noqa: E402
 
 T, P = L.OUT, f"{L.R}/out/pooled"
-EDITION = {"schubert-impromptu-d899-4"}
+from edition_refs import EDITION  # noqa: E402  (one shared list of edition-corrected pieces)
 SCHOTT = {"liszt-sonata", "liszt-te-5", "liszt-te-10"}
 PETRUSHKA = "stravinsky-petrushka"
 TIE = 0.1  # points: a piece is a tie when |mean d| <= TIE (as res_paired.py)
@@ -82,8 +82,8 @@ def first_result(path: str) -> dict | None:
     return json.load(open(path))["results"][0] if os.path.exists(path) else None
 
 
-def rescore_schubert(tag: str, force: bool) -> str:
-    piece = "schubert-impromptu-d899-4"
+def rescore_edition_piece(piece: str, tag: str, force: bool) -> str:
+    """Re-score one saved tag of one edition-corrected piece against its -reference-edition file (same scorer as the other pieces)."""
     pred = f"{T}/{piece}/{piece}-{tag}.musicxml"
     if not os.path.exists(pred):
         return "no output"
@@ -197,9 +197,9 @@ def main() -> None:
     # ---- step 1: re-score Schubert against the edition reference
     status = {}
     for t in tags:
-        if "schubert-impromptu-d899-4" in pieces:
-            status[t] = rescore_schubert(t, a.force_rescore)
-            print(f"{t}: Schubert {status[t]}", flush=True)
+        for ep in sorted(EDITION & set(pieces)):
+            status[t] = status.get(t, "") + ("; " if t in status else "") + f"{ep}: {rescore_edition_piece(ep, t, a.force_rescore)}"
+            print(f"{t}: {ep} {status[t]}", flush=True)
 
     # ---- load
     cols = ([] if a.no_baseline else [a.baseline]) + tags

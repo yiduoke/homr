@@ -11,6 +11,7 @@ from collections import Counter, defaultdict
 os.environ["AUDIT_VISIBLE"] = "1"
 sys.path.insert(0, "/Users/yiduoke/Documents/homr/run/eval_run1")
 import pitch_audit as PA  # noqa: E402
+from edition_refs import EDITION  # noqa: E402  (one shared list of edition-corrected pieces)
 
 E = "/Users/yiduoke/Documents/homr/run/eval_run1"
 T = "/Users/yiduoke/Documents/homr/run/out/testset"
@@ -20,7 +21,7 @@ SCHOTT = {"liszt-sonata", "liszt-te-5", "liszt-te-10"}
 
 def run_notes(piece, ignore):
     """set of (ref_bar, name, onset) of reference notes inside a run of >= 4 equal events on one staff."""
-    parts, _ = PA.read_file(f"{T}/{piece}/{piece}-reference{'-edition' if piece == 'schubert-impromptu-d899-4' else ''}.musicxml")
+    parts, _ = PA.read_file(f"{T}/{piece}/{piece}-reference{'-edition' if piece in EDITION else ''}.musicxml")
     nb = len(parts[0][0])
     out, total = set(), 0
     for i in range(nb):
