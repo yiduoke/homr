@@ -1,0 +1,3 @@
+scan_pairs_virtuoso/batch2/images/N1/N1_p-09_s4.png,scan_pairs_virtuoso/batch2/tokens/N1_p-09_s4.tokens
+scan_pairs_virtuoso/batch2/images/N1/N1_p-09_s5.png,scan_pairs_virtuoso/batch2/tokens/N1_p-09_s5.tokens
+scan_pairs_virtuoso/batch2/images/N10/N10_p-15_s3.png,scan_pairs_virtuoso/batch2/tokens/N10_p-15_s3.tokens

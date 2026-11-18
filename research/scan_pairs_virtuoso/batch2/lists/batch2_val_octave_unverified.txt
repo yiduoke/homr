@@ -1,0 +1,14 @@
+scan_pairs_virtuoso/batch2/images/N11/N11_p-16_s4.png,scan_pairs_virtuoso/batch2/tokens/N11_p-16_s4.tokens
+scan_pairs_virtuoso/batch2/images/N2/N2_p-04_s1.png,scan_pairs_virtuoso/batch2/tokens/N2_p-04_s1.tokens
+scan_pairs_virtuoso/batch2/images/N2/N2_p-04_s2.png,scan_pairs_virtuoso/batch2/tokens/N2_p-04_s2.tokens
+scan_pairs_virtuoso/batch2/images/N4/N4_p-17_s0.png,scan_pairs_virtuoso/batch2/tokens/N4_p-17_s0.tokens
+scan_pairs_virtuoso/batch2/images/N11/N11_p-08_s5.png,scan_pairs_virtuoso/batch2/tokens/N11_p-08_s5.tokens
+scan_pairs_virtuoso/batch2/images/N11/N11_p-14_s4.png,scan_pairs_virtuoso/batch2/tokens/N11_p-14_s4.tokens
+scan_pairs_virtuoso/batch2/images/N11/N11_p-14_s5.png,scan_pairs_virtuoso/batch2/tokens/N11_p-14_s5.tokens
+scan_pairs_virtuoso/batch2/images/N11/N11_p-15_s0.png,scan_pairs_virtuoso/batch2/tokens/N11_p-15_s0.tokens
+scan_pairs_virtuoso/batch2/images/N11/N11_p-15_s5.png,scan_pairs_virtuoso/batch2/tokens/N11_p-15_s5.tokens
+scan_pairs_virtuoso/batch2/images/N11/N11_p-16_s3.png,scan_pairs_virtuoso/batch2/tokens/N11_p-16_s3.tokens
+scan_pairs_virtuoso/batch2/images/N12/N12_p-02_s0.png,scan_pairs_virtuoso/batch2/tokens/N12_p-02_s0.tokens
+scan_pairs_virtuoso/batch2/images/N12/N12_p-02_s2.png,scan_pairs_virtuoso/batch2/tokens/N12_p-02_s2.tokens
+scan_pairs_virtuoso/batch2/images/N12/N12_p-05_s0.png,scan_pairs_virtuoso/batch2/tokens/N12_p-05_s0.tokens
+scan_pairs_virtuoso/batch2/images/N12/N12_p-06_s4.png,scan_pairs_virtuoso/batch2/tokens/N12_p-06_s4.tokens

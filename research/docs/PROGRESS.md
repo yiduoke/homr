@@ -5,13 +5,15 @@ comes next. Written for people and coding agents picking up the work. Upstream i
 liebharc/homr; its own docs (README.md, Training.md, IDEAS_FOR_CONTRIBUTORS.md,
 AGENTS.md) still apply.
 
-Last updated: 2026-11-17 (5:00 pm Pacific).
+Last updated: 2026-11-17 (6:00 pm Pacific).
 
 Related documents: [PAPER_NOTES.md](PAPER_NOTES.md) (the paper's story, final numbers only);
 [EXPERIMENTS.md](https://github.com/yiduoke/homr-research/blob/main/EXPERIMENTS.md) in the private research repo
 [yiduoke/homr-research](https://github.com/yiduoke/homr-research) (exact commands, commits,
 checksums and outputs per result; local checkout `run/`); [Training.md](Training.md) (model
 cards); release [meteracc_checkpoints](https://github.com/yiduoke/homr/releases/tag/meteracc_checkpoints).
+
+**Status 6:00 pm Pacific 2026-11-17 (D21, `run/EXPERIMENTS.md`, `run/scan_pairs_virtuoso/batch2/README.md`):** second batch of verified real-scan pairs built on the laptop: 742 kept crops (train 550 + validation extension 145 + Demets Ravel Une barque 47 in its own list), 177 quarantined; labels from the fixed tuplet converter, octave disagreements (50 crops) reviewed by eye (27 admitted with corrected tokens, 7 as is, 16 quarantined), clef/key disagreements listed (62). Released-model pitch F1 0.979, pitch+onset 0.801 on the kept crops; by eye 0 wrong in 46 random strong crops (upper bound 7.7 %), 2 of 7 hard wrong. 62 kept crops start inside an 8va, 28 of them continue through the whole system. No GPU box used.
 
 **Status 5:00 pm Pacific 2026-11-17 (D18, `run/EXPERIMENTS.md`, `run/scan_pairs_virtuoso/rhythm_audit.md`):** tuplet/duration converter fixed in a new module (branch `tuplet-fix`, worktree `run/tuplet_wt`, 12 tests, parser untouched): of the 59 crops quarantined for irregular tuplets/duration errors, 30 are re-admitted (6 exact, 24 with a declared rounded group, 30 of 30 viewed by eye) and 30 stay out with reasons (`lists/train_tuplet_fixed.txt`, `lists/tuplet_quarantine_final.txt`; printed values and meter totals cannot both hold for 4:3/5:3, the 10 meter-exact crops are listed apart). Rhythm audit of the 864 strong crops: 105 labels (12.2%) have a detectable rhythm error, 79 of them are bar rests written as `rest_8` (typeless rest in the ASAP XML; fixed tokens `tokens_typeless_rest_fixed/`), 13 nested tuplets of Kreisleriana 3, 14 cadenza bars; by eye 5 of 60 wrong (95% upper bound 18.4%). The released model's rhythm agreement is far below its pitch agreement (pitch 0.980, pitch+onset 0.836, full-note 0.810; 0.58 on the 244 crops with a tuplet in the label); in Op.25/1, Op.25/2, Sonata 2 finale the label is right and the model misses the implied tuplet. No GPU box used.
 

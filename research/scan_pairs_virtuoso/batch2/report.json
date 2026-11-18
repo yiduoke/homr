@@ -1,0 +1,313 @@
+{
+ "pieces": {
+  "N1": {
+   "title": "Liszt Concert Etude S.145/1 Waldesrauschen",
+   "group": "train",
+   "strong": 37,
+   "hard": 2,
+   "octave_verified": 3,
+   "quarantine": 3,
+   "pitch_f1": 0.9567512039385553,
+   "onset_f1": 0.46357030192136656
+  },
+  "N2": {
+   "title": "Liszt Concert Etude S.145/2 Gnomenreigen",
+   "group": "val",
+   "strong": 41,
+   "hard": 1,
+   "octave_verified": 2,
+   "quarantine": 1,
+   "pitch_f1": 0.9678399818896872,
+   "onset_f1": 0.9042759059745215
+  },
+  "N3": {
+   "title": "Liszt Venezia e Napoli 1 Gondoliera",
+   "group": "train",
+   "strong": 26,
+   "hard": 0,
+   "octave_verified": 0,
+   "quarantine": 7,
+   "pitch_f1": 0.9676414240808221,
+   "onset_f1": 0.7274912145519891
+  },
+  "N4": {
+   "title": "Chopin Etude Op.10/5",
+   "group": "val",
+   "strong": 20,
+   "hard": 0,
+   "octave_verified": 1,
+   "quarantine": 3,
+   "pitch_f1": 0.9791495531141935,
+   "onset_f1": 0.6124495803772052
+  },
+  "N5": {
+   "title": "Chopin Etude Op.10/7",
+   "group": "train",
+   "strong": 18,
+   "hard": 0,
+   "octave_verified": 0,
+   "quarantine": 0,
+   "pitch_f1": 0.9876185983954561,
+   "onset_f1": 0.985844630652902
+  },
+  "N6": {
+   "title": "Chopin Etude Op.10/8",
+   "group": "train",
+   "strong": 21,
+   "hard": 0,
+   "octave_verified": 7,
+   "quarantine": 3,
+   "pitch_f1": 0.9908734408306051,
+   "onset_f1": 0.9812085181800211
+  },
+  "N7": {
+   "title": "Chopin Etude Op.25/8",
+   "group": "train",
+   "strong": 14,
+   "hard": 0,
+   "octave_verified": 0,
+   "quarantine": 3,
+   "pitch_f1": 0.9766095914122666,
+   "onset_f1": 0.7147837222461991
+  },
+  "N8": {
+   "title": "Chopin Berceuse Op.57",
+   "group": "train",
+   "strong": 21,
+   "hard": 0,
+   "octave_verified": 4,
+   "quarantine": 5,
+   "pitch_f1": 0.9730224226872947,
+   "onset_f1": 0.7921416828811593
+  },
+  "N9": {
+   "title": "Chopin Sonata 2 mvt 1",
+   "group": "train",
+   "strong": 32,
+   "hard": 0,
+   "octave_verified": 2,
+   "quarantine": 8,
+   "pitch_f1": 0.960851533200478,
+   "onset_f1": 0.7500697120022334
+  },
+  "N10": {
+   "title": "Chopin Sonata 2 mvt 3 Marche funebre",
+   "group": "train",
+   "strong": 15,
+   "hard": 1,
+   "octave_verified": 0,
+   "quarantine": 2,
+   "pitch_f1": 0.9766478336681915,
+   "onset_f1": 0.8973973418516464
+  },
+  "N11": {
+   "title": "Beethoven Op.81a mvt 3",
+   "group": "val",
+   "strong": 40,
+   "hard": 0,
+   "octave_verified": 6,
+   "quarantine": 7,
+   "pitch_f1": 0.9912220903426926,
+   "onset_f1": 0.9538844425634655
+  },
+  "N12": {
+   "title": "Beethoven Op.81a mvt 1",
+   "group": "val",
+   "strong": 30,
+   "hard": 0,
+   "octave_verified": 4,
+   "quarantine": 3,
+   "pitch_f1": 0.9792205470306927,
+   "onset_f1": 0.9381457629094792
+  },
+  "N13": {
+   "title": "Beethoven Op.7 mvt 1",
+   "group": "train",
+   "strong": 61,
+   "hard": 0,
+   "octave_verified": 0,
+   "quarantine": 5,
+   "pitch_f1": 0.9956175587059921,
+   "onset_f1": 0.9464520982374076
+  },
+  "N14": {
+   "title": "Beethoven Op.27/1 mvt 4",
+   "group": "train",
+   "strong": 52,
+   "hard": 0,
+   "octave_verified": 0,
+   "quarantine": 3,
+   "pitch_f1": 0.9948483761314874,
+   "onset_f1": 0.9609773576520665
+  },
+  "N15": {
+   "title": "Beethoven Op.31/1 mvt 1",
+   "group": "train",
+   "strong": 36,
+   "hard": 0,
+   "octave_verified": 0,
+   "quarantine": 46,
+   "pitch_f1": 0.9933915700935809,
+   "onset_f1": 0.9637942285856828
+  },
+  "N16": {
+   "title": "Rachmaninoff Prelude Op.23/4",
+   "group": "train",
+   "strong": 19,
+   "hard": 0,
+   "octave_verified": 1,
+   "quarantine": 1,
+   "pitch_f1": 0.9822143116107123,
+   "onset_f1": 0.5838383616646504
+  },
+  "N17": {
+   "title": "Rachmaninoff Prelude Op.32/5",
+   "group": "train",
+   "strong": 17,
+   "hard": 0,
+   "octave_verified": 0,
+   "quarantine": 2,
+   "pitch_f1": 0.9822682917833331,
+   "onset_f1": 0.23782957374573283
+  },
+  "N18": {
+   "title": "Rachmaninoff Prelude Op.32/10",
+   "group": "train",
+   "strong": 13,
+   "hard": 0,
+   "octave_verified": 0,
+   "quarantine": 4,
+   "pitch_f1": 0.9906341771548156,
+   "onset_f1": 0.6452165163299878
+  },
+  "N19": {
+   "title": "Ravel Miroirs 3 Une barque sur l'ocean",
+   "group": "demets",
+   "strong": 42,
+   "hard": 1,
+   "octave_verified": 4,
+   "quarantine": 37,
+   "pitch_f1": 0.9369462821418875,
+   "onset_f1": 0.41187124115390633
+  },
+  "N20": {
+   "title": "Schubert Impromptu D.935/3",
+   "group": "train",
+   "strong": 28,
+   "hard": 0,
+   "octave_verified": 0,
+   "quarantine": 21,
+   "pitch_f1": 0.9956909699877261,
+   "onset_f1": 0.6768184807994014
+  },
+  "N21": {
+   "title": "Schumann Arabeske Op.18",
+   "group": "train",
+   "strong": 35,
+   "hard": 0,
+   "octave_verified": 0,
+   "quarantine": 2,
+   "pitch_f1": 0.9623610956066811,
+   "onset_f1": 0.8866249843627159
+  },
+  "NR1": {
+   "title": "Chopin Etude Op.10/10 (reserve)",
+   "group": "train",
+   "strong": 23,
+   "hard": 0,
+   "octave_verified": 0,
+   "quarantine": 1,
+   "pitch_f1": 0.9856708749109675,
+   "onset_f1": 0.7552873351820756
+  },
+  "NR2": {
+   "title": "Schubert Impromptu D.935/1 (reserve)",
+   "group": "train",
+   "strong": 62,
+   "hard": 0,
+   "octave_verified": 0,
+   "quarantine": 10,
+   "pitch_f1": 0.9908999964602112,
+   "onset_f1": 0.9534781710711443
+  }
+ },
+ "groups": {
+  "train": {
+   "strong": 530,
+   "hard": 3,
+   "octave_verified": 17,
+   "quarantine": 126,
+   "kept": 550,
+   "pitch_f1": 0.9823153110700874,
+   "onset_f1": 0.8113704231462385
+  },
+  "val": {
+   "strong": 131,
+   "hard": 1,
+   "octave_verified": 13,
+   "quarantine": 14,
+   "kept": 145,
+   "pitch_f1": 0.9795642384369084,
+   "onset_f1": 0.8856911817078755
+  },
+  "demets": {
+   "strong": 42,
+   "hard": 1,
+   "octave_verified": 4,
+   "quarantine": 37,
+   "kept": 47,
+   "pitch_f1": 0.9369462821418875,
+   "onset_f1": 0.41187124115390633
+  }
+ },
+ "quarantine": {
+  "alignment ambiguous": 9,
+  "trainer filter (vocabulary/length)": 6,
+  "bar mismatch": 10,
+  "rhythm: MusicXML bar longer than the meter": 12,
+  "octave review: not admitted (label wrong / edition difference / partial)": 20,
+  "ledger lines > 5 (trainer filter)": 21,
+  "edition/key mismatch": 3,
+  "not music of the piece (before start / after end)": 52,
+  "crop not one grand staff": 2,
+  "duration/tuplet not representable (no token)": 31,
+  "wrong by eye": 2,
+  "rhythm: token sum differs from MusicXML (volta/repeat split, cadenza)": 22
+ },
+ "roles": {
+  "train|kept": 550,
+  "ALL|kept": 742,
+  "train|has_8va_token": 73,
+  "ALL|has_8va_token": 155,
+  "train|bracket starts and stops in the crop": 30,
+  "ALL|bracket starts and stops in the crop": 66,
+  "train|open_at_end (continues into next system)": 29,
+  "ALL|open_at_end (continues into next system)": 66,
+  "train|start_inside_8va": 28,
+  "ALL|start_inside_8va": 62,
+  "train|end_an_8va (starts inside, stop in crop)": 16,
+  "ALL|end_an_8va (starts inside, stop in crop)": 34,
+  "train|continue_through_8va (starts inside, no stop)": 12,
+  "ALL|continue_through_8va (starts inside, no stop)": 28,
+  "val|kept": 145,
+  "val|has_8va_token": 62,
+  "val|open_at_end (continues into next system)": 33,
+  "val|start_inside_8va": 30,
+  "val|continue_through_8va (starts inside, no stop)": 13,
+  "val|end_an_8va (starts inside, stop in crop)": 17,
+  "val|bracket starts and stops in the crop": 21,
+  "demets|kept": 47,
+  "demets|has_8va_token": 20,
+  "demets|bracket starts and stops in the crop": 15,
+  "demets|start_inside_8va": 4,
+  "demets|continue_through_8va (starts inside, no stop)": 3,
+  "demets|open_at_end (continues into next system)": 4,
+  "demets|end_an_8va (starts inside, stop in crop)": 1
+ },
+ "eye": {},
+ "all": {
+  "n": 742,
+  "pitch": 0.9789039230762379,
+  "onset": 0.8005888172672597
+ }
+}

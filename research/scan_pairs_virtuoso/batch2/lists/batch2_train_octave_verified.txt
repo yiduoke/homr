@@ -1,0 +1,17 @@
+scan_pairs_virtuoso/batch2/images/N1/N1_p-02_s0.png,scan_pairs_virtuoso/batch2/tokens/N1_p-02_s0.tokens
+scan_pairs_virtuoso/batch2/images/N1/N1_p-03_s1.png,scan_pairs_virtuoso/batch2/tokens/N1_p-03_s1.tokens
+scan_pairs_virtuoso/batch2/images/N1/N1_p-04_s0.png,scan_pairs_virtuoso/batch2/tokens/N1_p-04_s0.tokens
+scan_pairs_virtuoso/batch2/images/N6/N6_p-26_s1.png,scan_pairs_virtuoso/batch2/tokens/N6_p-26_s1.tokens
+scan_pairs_virtuoso/batch2/images/N6/N6_p-26_s2.png,scan_pairs_virtuoso/batch2/tokens/N6_p-26_s2.tokens
+scan_pairs_virtuoso/batch2/images/N6/N6_p-27_s0.png,scan_pairs_virtuoso/batch2/tokens/N6_p-27_s0.tokens
+scan_pairs_virtuoso/batch2/images/N6/N6_p-27_s1.png,scan_pairs_virtuoso/batch2/tokens/N6_p-27_s1.tokens
+scan_pairs_virtuoso/batch2/images/N6/N6_p-28_s5.png,scan_pairs_virtuoso/batch2/tokens/N6_p-28_s5.tokens
+scan_pairs_virtuoso/batch2/images/N6/N6_p-28_s6.png,scan_pairs_virtuoso/batch2/tokens/N6_p-28_s6.tokens
+scan_pairs_virtuoso/batch2/images/N6/N6_p-29_s2.png,scan_pairs_virtuoso/batch2/tokens/N6_p-29_s2.tokens
+scan_pairs_virtuoso/batch2/images/N8/N8_p-05_s3.png,scan_pairs_virtuoso/batch2/tokens/N8_p-05_s3.tokens
+scan_pairs_virtuoso/batch2/images/N8/N8_p-06_s1.png,scan_pairs_virtuoso/batch2/tokens/N8_p-06_s1.tokens
+scan_pairs_virtuoso/batch2/images/N8/N8_p-08_s1.png,scan_pairs_virtuoso/batch2/tokens/N8_p-08_s1.tokens
+scan_pairs_virtuoso/batch2/images/N8/N8_p-08_s2.png,scan_pairs_virtuoso/batch2/tokens/N8_p-08_s2.tokens
+scan_pairs_virtuoso/batch2/images/N9/N9_p-02_s5.png,scan_pairs_virtuoso/batch2/tokens/N9_p-02_s5.tokens
+scan_pairs_virtuoso/batch2/images/N9/N9_p-03_s0.png,scan_pairs_virtuoso/batch2/tokens/N9_p-03_s0.tokens
+scan_pairs_virtuoso/batch2/images/N16/N16_p-04_s2.png,scan_pairs_virtuoso/batch2/tokens/N16_p-04_s2.tokens

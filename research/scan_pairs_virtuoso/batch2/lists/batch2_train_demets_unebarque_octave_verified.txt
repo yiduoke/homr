@@ -1,0 +1,4 @@
+scan_pairs_virtuoso/batch2/images/N19/N19_p-25_s3.png,scan_pairs_virtuoso/batch2/tokens/N19_p-25_s3.tokens
+scan_pairs_virtuoso/batch2/images/N19/N19_p-25_s4.png,scan_pairs_virtuoso/batch2/tokens/N19_p-25_s4.tokens
+scan_pairs_virtuoso/batch2/images/N19/N19_p-26_s0.png,scan_pairs_virtuoso/batch2/tokens/N19_p-26_s0.tokens
+scan_pairs_virtuoso/batch2/images/N19/N19_p-26_s1.png,scan_pairs_virtuoso/batch2/tokens/N19_p-26_s1.tokens

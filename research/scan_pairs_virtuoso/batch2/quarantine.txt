@@ -1,0 +1,177 @@
+scan_pairs_virtuoso/batch2/images/N1/N1_p-03_s3.png,scan_pairs_virtuoso/batch2/tokens/N1_p-03_s3.tokens,alignment ambiguous (a shifted measure window matches the read better, or bar-wise similarity < 0.35)
+scan_pairs_virtuoso/batch2/images/N1/N1_p-04_s3.png,scan_pairs_virtuoso/batch2/tokens/N1_p-04_s3.tokens,trainer:vocab
+scan_pairs_virtuoso/batch2/images/N1/N1_p-05_s3.png,scan_pairs_virtuoso/batch2/tokens/N1_p-05_s3.tokens,alignment ambiguous (a shifted measure window matches the read better, or bar-wise similarity < 0.35)
+scan_pairs_virtuoso/batch2/images/N2/N2_p-06_s3.png,scan_pairs_virtuoso/batch2/tokens/N2_p-06_s3.tokens,trainer:vocab
+scan_pairs_virtuoso/batch2/images/N3/N3_p-02_s0.png,scan_pairs_virtuoso/batch2/tokens/N3_p-02_s0.tokens,bar mismatch
+scan_pairs_virtuoso/batch2/images/N3/N3_p-04_s2.png,scan_pairs_virtuoso/batch2/tokens/N3_p-04_s2.tokens,rhythm: MusicXML bar longer than the meter (cadenza) at measure 44
+scan_pairs_virtuoso/batch2/images/N3/N3_p-04_s3.png,scan_pairs_virtuoso/batch2/tokens/N3_p-04_s3.tokens,octave-bracket disagreement (label has an 8va/8vb sign, the released model's read lacks one);rhythm: MusicXML bar longer than the meter (cadenza) at measure 45
+scan_pairs_virtuoso/batch2/images/N3/N3_p-05_s2.png,scan_pairs_virtuoso/batch2/tokens/N3_p-05_s2.tokens,trainer:ledger;rhythm: MusicXML bar longer than the meter (cadenza) at measure 65
+scan_pairs_virtuoso/batch2/images/N3/N3_p-05_s3.png,scan_pairs_virtuoso/batch2/tokens/N3_p-05_s3.tokens,rhythm: MusicXML bar longer than the meter (cadenza) at measure 66
+scan_pairs_virtuoso/batch2/images/N3/N3_p-05_s4.png,scan_pairs_virtuoso/batch2/tokens/N3_p-05_s4.tokens,edition mismatch (key signature 6 in the label, 4 in the scan read);rhythm: MusicXML bar longer than the meter (cadenza) at measure 67
+scan_pairs_virtuoso/batch2/images/N3/N3_p-07_s4.png,scan_pairs_virtuoso/batch2/tokens/N3_p-07_s4.tokens,rhythm: MusicXML bar longer than the meter (cadenza) at measure 95
+scan_pairs_virtuoso/batch2/images/N4/N4_p-19_s3.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N4/N4_p-19_s4.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N4/N4_p-19_s5.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N6/N6_p-27_s4.png,scan_pairs_virtuoso/batch2/tokens/N6_p-27_s4.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/N6/N6_p-27_s5.png,scan_pairs_virtuoso/batch2/tokens/N6_p-27_s5.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/N6/N6_p-29_s3.png,scan_pairs_virtuoso/batch2/tokens/N6_p-29_s3.tokens,octave-bracket disagreement (label has an 8va/8vb sign, the released model's read lacks one);octave review: label brackets partly agree and partly disagree with the print (4 notes edition difference, 3 agree): not corrected
+scan_pairs_virtuoso/batch2/images/N7/N7_p-01_s0.png,scan_pairs_virtuoso/batch2/,crop:not_one_grand_staff
+scan_pairs_virtuoso/batch2/images/N7/N7_p-03_s0.png,scan_pairs_virtuoso/batch2/tokens/N7_p-03_s0.tokens,octave-bracket disagreement (label lacks an 8va/8vb sign, the released model's read has one);octave review: print has 12/8 (eighth notes) where the label has 4/4 with triplets: time signature and note values differ from the print (no bracket issue)
+scan_pairs_virtuoso/batch2/images/N7/N7_p-04_s3.png,scan_pairs_virtuoso/batch2/tokens/N7_p-04_s3.tokens,octave-bracket disagreement (label has an 8va/8vb sign, the released model's read lacks one);octave review: more than 5 ledger lines after the correction (print writes the notes at pitch (ledger lines) without 8va, )
+scan_pairs_virtuoso/batch2/images/N8/N8_p-04_s1.png,scan_pairs_virtuoso/batch2/tokens/N8_p-04_s1.tokens,alignment ambiguous (a shifted measure window matches the read better, or bar-wise similarity < 0.35)
+scan_pairs_virtuoso/batch2/images/N8/N8_p-04_s2.png,scan_pairs_virtuoso/batch2/tokens/N8_p-04_s2.tokens,octave-bracket disagreement (label has an 8va/8vb sign, the released model's read lacks one);octave review: more than 5 ledger lines after the correction (print writes the notes at pitch (ledger lines) without 8va, )
+scan_pairs_virtuoso/batch2/images/N8/N8_p-05_s0.png,scan_pairs_virtuoso/batch2/tokens/N8_p-05_s0.tokens,octave review: label 8va covers about 5 chords of bar 1 where the print brackets 2 (9 notes an octave off the print)
+scan_pairs_virtuoso/batch2/images/N8/N8_p-05_s4.png,scan_pairs_virtuoso/batch2/tokens/N8_p-05_s4.tokens,octave-bracket disagreement (label has an 8va/8vb sign, the released model's read lacks one);octave review: label bracket starts earlier than the printed one (partial overlap of notes, edition/ASAP differ): not corrected
+scan_pairs_virtuoso/batch2/images/N8/N8_p-07_s0.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_80..')
+scan_pairs_virtuoso/batch2/images/N9/N9_p-01_s1.png,scan_pairs_virtuoso/batch2/tokens/N9_p-01_s1.tokens,rhythm: MusicXML bar longer than the meter (cadenza) at measure 7
+scan_pairs_virtuoso/batch2/images/N9/N9_p-03_s5.png,scan_pairs_virtuoso/batch2/tokens/N9_p-03_s5.tokens,bar mismatch
+scan_pairs_virtuoso/batch2/images/N9/N9_p-04_s0.png,scan_pairs_virtuoso/batch2/tokens/N9_p-04_s0.tokens,by eye: print has 6 bars, label 7
+scan_pairs_virtuoso/batch2/images/N9/N9_p-04_s3.png,scan_pairs_virtuoso/batch2/tokens/N9_p-04_s3.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/N9/N9_p-04_s5.png,scan_pairs_virtuoso/batch2/tokens/N9_p-04_s5.tokens,rhythm: token duration sum differs from the MusicXML in measure 135 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N9/N9_p-05_s0.png,scan_pairs_virtuoso/batch2/tokens/N9_p-05_s0.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/N9/N9_p-07_s3.png,scan_pairs_virtuoso/batch2/tokens/N9_p-07_s3.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/N9/N9_p-07_s5.png,scan_pairs_virtuoso/batch2/tokens/N9_p-07_s5.tokens,octave-bracket disagreement (label has an 8va/8vb sign, the released model's read lacks one);octave review: final bar: scan read agrees with the label except 3 notes, print has the final chord at pitch while ASAP has 8va: unclear, not corrected
+scan_pairs_virtuoso/batch2/images/N10/N10_p-16_s0.png,scan_pairs_virtuoso/batch2/tokens/N10_p-16_s0.tokens,rhythm: token duration sum differs from the MusicXML in measure 31 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N10/N10_p-16_s4.png,scan_pairs_virtuoso/batch2/tokens/N10_p-16_s4.tokens,bar mismatch
+scan_pairs_virtuoso/batch2/images/N11/N11_p-08_s0.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N11/N11_p-08_s1.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N11/N11_p-08_s2.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N11/N11_p-08_s3.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N11/N11_p-11_s5.png,scan_pairs_virtuoso/batch2/tokens/N11_p-11_s5.tokens,octave-bracket disagreement (label has an 8va/8vb sign, the released model's read lacks one);rhythm: token duration sum differs from the MusicXML in measure 82 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N11/N11_p-15_s1.png,scan_pairs_virtuoso/batch2/tokens/N11_p-15_s1.tokens,by eye: ASAP has 8va over bar 1 where the print writes the notes at pitch (octave off)
+scan_pairs_virtuoso/batch2/images/N11/N11_p-16_s4.png,scan_pairs_virtuoso/batch2/tokens/N11_p-16_s4.tokens,octave review: label 8va starts in the second half of bar 2 where the print writes those notes at pitch and brackets only the first chord of bar 3
+scan_pairs_virtuoso/batch2/images/N12/N12_p-01_s3.png,scan_pairs_virtuoso/batch2/tokens/N12_p-01_s3.tokens,rhythm: token duration sum differs from the MusicXML in measure 17 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N12/N12_p-03_s3.png,scan_pairs_virtuoso/batch2/tokens/N12_p-03_s3.tokens,rhythm: token duration sum differs from the MusicXML in measure 70 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N12/N12_p-05_s4.png,scan_pairs_virtuoso/batch2/tokens/N12_p-05_s4.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/N13/N13_p-01_s4.png,scan_pairs_virtuoso/batch2/tokens/N13_p-01_s4.tokens,bar mismatch
+scan_pairs_virtuoso/batch2/images/N13/N13_p-11_s2.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N13/N13_p-11_s3.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N13/N13_p-11_s4.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N13/N13_p-11_s5.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N14/N14_p-08_s0.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N14/N14_p-08_s1.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N14/N14_p-16_s2.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_92')
+scan_pairs_virtuoso/batch2/images/N15/N15_p-01_s0.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-01_s1.png,scan_pairs_virtuoso/batch2/tokens/N15_p-01_s1.tokens,bar mismatch
+scan_pairs_virtuoso/batch2/images/N15/N15_p-03_s2.png,scan_pairs_virtuoso/batch2/tokens/N15_p-03_s2.tokens,alignment ambiguous (a shifted measure window matches the read better, or bar-wise similarity < 0.35)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-03_s3.png,scan_pairs_virtuoso/batch2/tokens/N15_p-03_s3.tokens,alignment ambiguous (a shifted measure window matches the read better, or bar-wise similarity < 0.35)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-03_s4.png,scan_pairs_virtuoso/batch2/tokens/N15_p-03_s4.tokens,bar mismatch
+scan_pairs_virtuoso/batch2/images/N15/N15_p-03_s5.png,scan_pairs_virtuoso/batch2/tokens/N15_p-03_s5.tokens,bar mismatch
+scan_pairs_virtuoso/batch2/images/N15/N15_p-05_s0.png,scan_pairs_virtuoso/batch2/tokens/N15_p-05_s0.tokens,bar mismatch
+scan_pairs_virtuoso/batch2/images/N15/N15_p-05_s1.png,scan_pairs_virtuoso/batch2/tokens/N15_p-05_s1.tokens,bar mismatch
+scan_pairs_virtuoso/batch2/images/N15/N15_p-08_s0.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-08_s1.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-08_s2.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-08_s3.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-08_s4.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-08_s5.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-09_s0.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-09_s1.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-09_s2.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-09_s3.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-09_s4.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-09_s5.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-10_s0.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-10_s1.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-10_s2.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-10_s3.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-10_s4.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-10_s5.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-10_s6.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-11_s0.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-11_s1.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-11_s2.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-11_s3.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-11_s4.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-11_s5.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-11_s6.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-12_s0.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-12_s1.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-12_s2.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-12_s3.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-12_s4.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-12_s5.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-13_s0.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-13_s1.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-13_s2.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-13_s3.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-13_s4.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N15/N15_p-13_s5.png,scan_pairs_virtuoso/batch2/,not_piece_music (before start/after end of the piece)
+scan_pairs_virtuoso/batch2/images/N16/N16_p-01_s0.png,scan_pairs_virtuoso/batch2/,crop:not_one_grand_staff
+scan_pairs_virtuoso/batch2/images/N17/N17_p-01_s2.png,scan_pairs_virtuoso/batch2/tokens/N17_p-01_s2.tokens,rhythm: MusicXML bar longer than the meter (cadenza) at measure 5
+scan_pairs_virtuoso/batch2/images/N17/N17_p-02_s2.png,scan_pairs_virtuoso/batch2/tokens/N17_p-02_s2.tokens,alignment ambiguous (a shifted measure window matches the read better, or bar-wise similarity < 0.35);rhythm: MusicXML bar longer than the meter (cadenza) at measure 13
+scan_pairs_virtuoso/batch2/images/N18/N18_p-02_s0.png,scan_pairs_virtuoso/batch2/tokens/N18_p-02_s0.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/N18/N18_p-02_s1.png,scan_pairs_virtuoso/batch2/tokens/N18_p-02_s1.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/N18/N18_p-02_s4.png,scan_pairs_virtuoso/batch2/tokens/N18_p-02_s4.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/N18/N18_p-02_s5.png,scan_pairs_virtuoso/batch2/tokens/N18_p-02_s5.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/N19/N19_p-14_s1.png,scan_pairs_virtuoso/batch2/tokens/N19_p-14_s1.tokens,bar mismatch
+scan_pairs_virtuoso/batch2/images/N19/N19_p-15_s1.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_48..')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-16_s0.png,scan_pairs_virtuoso/batch2/tokens/N19_p-16_s0.tokens,alignment ambiguous (a shifted measure window matches the read better, or bar-wise similarity < 0.35)
+scan_pairs_virtuoso/batch2/images/N19/N19_p-16_s2.png,scan_pairs_virtuoso/batch2/tokens/N19_p-16_s2.tokens,rhythm: MusicXML bar longer than the meter (cadenza) at measure 23
+scan_pairs_virtuoso/batch2/images/N19/N19_p-17_s4.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('rest_44')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-18_s0.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_52')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-18_s1.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_72')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-18_s2.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_52')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-18_s3.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('rest_72')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-18_s4.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_52')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-19_s0.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_72')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-19_s1.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_69')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-19_s2.png,scan_pairs_virtuoso/batch2/tokens/N19_p-19_s2.tokens,alignment ambiguous (a shifted measure window matches the read better, or bar-wise similarity < 0.35)
+scan_pairs_virtuoso/batch2/images/N19/N19_p-19_s3.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_149')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-19_s4.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_75')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-21_s2.png,scan_pairs_virtuoso/batch2/tokens/N19_p-21_s2.tokens,tuplet not representable: duration 0.0833 of a whole note, but 4 2:1 gives 0.1250 (x4);rhythm: token duration sum differs from the MusicXML in measure 68 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N19/N19_p-21_s3.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('rest_72')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-21_s4.png,scan_pairs_virtuoso/batch2/tokens/N19_p-21_s4.tokens,trainer:ledger;tuplet not representable: duration 0.0833 of a whole note, but 4 2:1 gives 0.1250 (x4);rhythm: token duration sum differs from the MusicXML in measure 70 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N19/N19_p-22_s0.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('rest_72')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-22_s1.png,scan_pairs_virtuoso/batch2/tokens/N19_p-22_s1.tokens,tuplet not representable: duration 0.0833 of a whole note, but 4 2:1 gives 0.1250 (x3);rhythm: token duration sum differs from the MusicXML in measure 72 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N19/N19_p-22_s2.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_72')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-22_s3.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('rest_17')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-22_s4.png,scan_pairs_virtuoso/batch2/tokens/N19_p-22_s4.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/N19/N19_p-23_s0.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_52')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-23_s1.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_52')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-24_s2.png,scan_pairs_virtuoso/batch2/tokens/N19_p-24_s2.tokens,alignment ambiguous (a shifted measure window matches the read better, or bar-wise similarity < 0.35)
+scan_pairs_virtuoso/batch2/images/N19/N19_p-26_s2.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_76')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-27_s4.png,scan_pairs_virtuoso/batch2/tokens/N19_p-27_s4.tokens,rhythm: token duration sum differs from the MusicXML in measure 111 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N19/N19_p-28_s0.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_44')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-28_s2.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('rest_44')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-28_s3.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_52')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-29_s0.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_88')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-29_s2.png,scan_pairs_virtuoso/batch2/tokens/N19_p-29_s2.tokens,edition mismatch (key signature 3 in the label, 2 in the scan read);rhythm: MusicXML bar longer than the meter (cadenza) at measure 124
+scan_pairs_virtuoso/batch2/images/N19/N19_p-29_s4.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_96..')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-30_s1.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('rest_72')
+scan_pairs_virtuoso/batch2/images/N19/N19_p-30_s2.png,scan_pairs_virtuoso/batch2/tokens/N19_p-30_s2.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/N19/N19_p-30_s4.png,scan_pairs_virtuoso/batch2/tokens/N19_p-30_s4.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/N20/N20_p-15_s1.png,scan_pairs_virtuoso/batch2/tokens/N20_p-15_s1.tokens,rhythm: token duration sum differs from the MusicXML in measure 8 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N20/N20_p-15_s4.png,scan_pairs_virtuoso/batch2/tokens/N20_p-15_s4.tokens,rhythm: token duration sum differs from the MusicXML in measure 19 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N20/N20_p-16_s2.png,scan_pairs_virtuoso/batch2/tokens/N20_p-16_s2.tokens,rhythm: token duration sum differs from the MusicXML in measure 34 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N20/N20_p-16_s4.png,scan_pairs_virtuoso/batch2/tokens/N20_p-16_s4.tokens,rhythm: token duration sum differs from the MusicXML in measure 38 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N20/N20_p-16_s6.png,scan_pairs_virtuoso/batch2/tokens/N20_p-16_s6.tokens,octave-bracket disagreement (label lacks an 8va/8vb sign, the released model's read has one);rhythm: token duration sum differs from the MusicXML in measure 45 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N20/N20_p-17_s0.png,scan_pairs_virtuoso/batch2/tokens/N20_p-17_s0.tokens,rhythm: token duration sum differs from the MusicXML in measure 46 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N20/N20_p-17_s1.png,scan_pairs_virtuoso/batch2/tokens/N20_p-17_s1.tokens,octave-bracket disagreement (label lacks an 8va/8vb sign, the released model's read has one);octave review: print has an 8va over part of the system that the ASAP label lacks (Var. IV-VI of Schubert D.935/3), partial span, not corrected
+scan_pairs_virtuoso/batch2/images/N20/N20_p-17_s3.png,scan_pairs_virtuoso/batch2/tokens/N20_p-17_s3.tokens,edition mismatch (key signature -2 in the label, 0 in the scan read);rhythm: token duration sum differs from the MusicXML in measure 54 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N20/N20_p-18_s1.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_27')
+scan_pairs_virtuoso/batch2/images/N20/N20_p-18_s2.png,scan_pairs_virtuoso/batch2/tokens/N20_p-18_s2.tokens,rhythm: MusicXML bar longer than the meter (cadenza) at measure 70
+scan_pairs_virtuoso/batch2/images/N20/N20_p-19_s0.png,scan_pairs_virtuoso/batch2/tokens/N20_p-19_s0.tokens,rhythm: token duration sum differs from the MusicXML in measure 85 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N20/N20_p-19_s2.png,scan_pairs_virtuoso/batch2/tokens/N20_p-19_s2.tokens,octave-bracket disagreement (label lacks an 8va/8vb sign, the released model's read has one);octave review: print has an 8va over part of the system that the ASAP label lacks (Var. IV-VI of Schubert D.935/3), partial span, not corrected
+scan_pairs_virtuoso/batch2/images/N20/N20_p-19_s4.png,scan_pairs_virtuoso/batch2/tokens/N20_p-19_s4.tokens,rhythm: token duration sum differs from the MusicXML in measure 93 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N20/N20_p-20_s3.png,scan_pairs_virtuoso/batch2/tokens/N20_p-20_s3.tokens,octave-bracket disagreement (label lacks an 8va/8vb sign, the released model's read has one);octave review: print has an 8va over part of the system that the ASAP label lacks (Var. IV-VI of Schubert D.935/3), partial span, not corrected
+scan_pairs_virtuoso/batch2/images/N20/N20_p-20_s4.png,scan_pairs_virtuoso/batch2/tokens/N20_p-20_s4.tokens,octave-bracket disagreement (label lacks an 8va/8vb sign, the released model's read has one);octave review: print has an 8va over part of the system that the ASAP label lacks (Var. IV-VI of Schubert D.935/3), partial span, not corrected
+scan_pairs_virtuoso/batch2/images/N20/N20_p-20_s5.png,scan_pairs_virtuoso/batch2/tokens/N20_p-20_s5.tokens,octave-bracket disagreement (label lacks an 8va/8vb sign, the released model's read has one);octave review: print has an 8va over part of the system that the ASAP label lacks (Var. IV-VI of Schubert D.935/3), partial span, not corrected
+scan_pairs_virtuoso/batch2/images/N20/N20_p-20_s6.png,scan_pairs_virtuoso/batch2/tokens/N20_p-20_s6.tokens,octave-bracket disagreement (label lacks an 8va/8vb sign, the released model's read has one);rhythm: token duration sum differs from the MusicXML in measure 116 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N20/N20_p-21_s0.png,scan_pairs_virtuoso/batch2/tokens/N20_p-21_s0.tokens,rhythm: token duration sum differs from the MusicXML in measure 118 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N20/N20_p-21_s1.png,scan_pairs_virtuoso/batch2/,conversion error: KeyError('note_54')
+scan_pairs_virtuoso/batch2/images/N20/N20_p-21_s2.png,scan_pairs_virtuoso/batch2/tokens/N20_p-21_s2.tokens,octave-bracket disagreement (label lacks an 8va/8vb sign, the released model's read has one);octave review: print has an 8va over part of the system that the ASAP label lacks (Var. IV-VI of Schubert D.935/3), partial span, not corrected
+scan_pairs_virtuoso/batch2/images/N20/N20_p-21_s3.png,scan_pairs_virtuoso/batch2/tokens/N20_p-21_s3.tokens,octave-bracket disagreement (label lacks an 8va/8vb sign, the released model's read has one);octave review: print has an 8va over part of the system that the ASAP label lacks (Var. IV-VI of Schubert D.935/3), partial span, not corrected
+scan_pairs_virtuoso/batch2/images/N21/N21_p-02_s2.png,scan_pairs_virtuoso/batch2/tokens/N21_p-02_s2.tokens,rhythm: token duration sum differs from the MusicXML in measure 43 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/N21/N21_p-05_s0.png,scan_pairs_virtuoso/batch2/tokens/N21_p-05_s0.tokens,rhythm: token duration sum differs from the MusicXML in measure 148 (outside a rounded group)
+scan_pairs_virtuoso/batch2/images/NR1/NR1_p-36_s5.png,scan_pairs_virtuoso/batch2/tokens/NR1_p-36_s5.tokens,octave review: label 8va runs 3 notes into bar 3 which the print writes at pitch (bracket ends with bar 2)
+scan_pairs_virtuoso/batch2/images/NR2/NR2_p-02_s2.png,scan_pairs_virtuoso/batch2/tokens/NR2_p-02_s2.tokens,trainer:vocab
+scan_pairs_virtuoso/batch2/images/NR2/NR2_p-02_s5.png,scan_pairs_virtuoso/batch2/tokens/NR2_p-02_s5.tokens,trainer:vocab
+scan_pairs_virtuoso/batch2/images/NR2/NR2_p-03_s1.png,scan_pairs_virtuoso/batch2/tokens/NR2_p-03_s1.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/NR2/NR2_p-03_s2.png,scan_pairs_virtuoso/batch2/tokens/NR2_p-03_s2.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/NR2/NR2_p-03_s3.png,scan_pairs_virtuoso/batch2/tokens/NR2_p-03_s3.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/NR2/NR2_p-08_s2.png,scan_pairs_virtuoso/batch2/tokens/NR2_p-08_s2.tokens,trainer:vocab
+scan_pairs_virtuoso/batch2/images/NR2/NR2_p-08_s5.png,scan_pairs_virtuoso/batch2/tokens/NR2_p-08_s5.tokens,trainer:vocab
+scan_pairs_virtuoso/batch2/images/NR2/NR2_p-09_s2.png,scan_pairs_virtuoso/batch2/tokens/NR2_p-09_s2.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/NR2/NR2_p-09_s3.png,scan_pairs_virtuoso/batch2/tokens/NR2_p-09_s3.tokens,trainer:ledger
+scan_pairs_virtuoso/batch2/images/NR2/NR2_p-09_s4.png,scan_pairs_virtuoso/batch2/tokens/NR2_p-09_s4.tokens,trainer:ledger

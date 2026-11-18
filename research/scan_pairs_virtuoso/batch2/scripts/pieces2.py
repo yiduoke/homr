@@ -1,0 +1,30 @@
+"""Batch-2 piece configuration. pid N1.. (train unless group V = validation extension; group T-demets = Ravel Une barque, own list).
+pages: PDF page numbers (p-NN) holding the selected music (junk systems before the first and after the last measure are allowed by align.py)."""
+P = []
+def add(pid, group, title, asap, pdf, pages, edition, note=""):
+    P.append(dict(pid=pid, group=group, title=title, asap=asap, pdf=pdf, pages=pages, edition=edition, note=note, skip=0))
+R = lambda a, b: list(range(a, b + 1))
+add("N1", "T", "Liszt Concert Etude S.145/1 Waldesrauschen", "Liszt_Concert_Etude_S145_1", "liszt-waldesrauschen-cotta", R(1, 9), "Cotta, 1863 (first edition)")
+add("N2", "V", "Liszt Concert Etude S.145/2 Gnomenreigen", "Liszt_Concert_Etude_S145_2", "liszt-gnomenreigen-trautwein", R(1, 9), "Trautwein, first-edition plates")
+add("N3", "T", "Liszt Venezia e Napoli 1 Gondoliera", "Liszt_Annees_de_pelerinage_2_1_Gondoliera", "liszt-venezia-napoli-schott", R(2, 8), "Schott, 1861")
+add("N4", "V", "Chopin Etude Op.10/5", "Chopin_Etudes_op_10_5", "chopin-etudes-op10-boteandbock-klindworth", R(16, 19), "Bote & Bock, ed. Klindworth, 1880")
+add("N5", "T", "Chopin Etude Op.10/7", "Chopin_Etudes_op_10_7", "chopin-etudes-op10-boteandbock-klindworth", R(23, 25), "Bote & Bock, ed. Klindworth, 1880")
+add("N6", "T", "Chopin Etude Op.10/8", "Chopin_Etudes_op_10_8", "chopin-etudes-op10-boteandbock-klindworth", R(26, 30), "Bote & Bock, ed. Klindworth, 1880")
+add("N7", "T", "Chopin Etude Op.25/8", "Chopin_Etudes_op_25_8", "chopin-etude-op25-8-schott-pachmann", R(1, 6), "Schott, ed. de Pachmann, 1904")
+add("N8", "T", "Chopin Berceuse Op.57", "Chopin_Berceuse_op_57", "chopin-berceuse-barcarolle-peters-scholtz", R(3, 8), "Peters, ed. Scholtz")
+add("N9", "T", "Chopin Sonata 2 mvt 1", "Chopin_Sonata_2_1st_no_repeat", "chopin-sonata2-augener-klindworth", R(1, 7), "Augener, ed. Klindworth")
+add("N10", "T", "Chopin Sonata 2 mvt 3 Marche funebre", "Chopin_Sonata_2_3rd", "chopin-sonata2-augener-klindworth", R(15, 17), "Augener, ed. Klindworth")
+add("N11", "V", "Beethoven Op.81a mvt 3", "Beethoven_Piano_Sonatas_26-3", "beethoven-op81a-breitkopf-serie16", R(8, 16), "Breitkopf & Haertel, Serie 16, 1862", "starts in the 4th system of p8")
+add("N12", "V", "Beethoven Op.81a mvt 1", "Beethoven_Piano_Sonatas_26-1", "beethoven-op81a-breitkopf-serie16", R(1, 6), "Breitkopf & Haertel, Serie 16, 1862")
+add("N13", "T", "Beethoven Op.7 mvt 1", "Beethoven_Piano_Sonatas_4-1", "beethoven-op7-ue-schenker", R(1, 11), "Universal Edition, ed. Schenker")
+add("N14", "T", "Beethoven Op.27/1 mvt 4", "Beethoven_Piano_Sonatas_13-4", "beethoven-op27-1-peters-pauer", R(8, 16), "Peters, ed. Pauer", "starts in the 3rd system of p8")
+add("N15", "T", "Beethoven Op.31/1 mvt 1", "Beethoven_Piano_Sonatas_16-1", "beethoven-op31-1-ullstein-lamond", R(1, 13), "Ullstein/Breitkopf, ed. Lamond")
+add("N16", "T", "Rachmaninoff Prelude Op.23/4", "Rachmaninoff_Preludes_op_23_4", "rachmaninoff-op23-4-gutheil", R(1, 6), "Gutheil, 1904")
+add("N17", "T", "Rachmaninoff Prelude Op.32/5", "Rachmaninoff_Preludes_op_32_5", "rachmaninoff-op32-5-gutheil", R(1, 4), "Gutheil, 1911")
+add("N18", "T", "Rachmaninoff Prelude Op.32/10", "Rachmaninoff_Preludes_op_32_10", "rachmaninoff-op32-10-gutheil", R(1, 3), "Gutheil, 1911")
+add("N19", "D", "Ravel Miroirs 3 Une barque sur l'ocean", "Ravel_Miroirs_3_Une_Barque", "ravel-miroirs-demets-reprint", R(14, 30), "Demets (reprint scan; same book as the Alborada test scan)")
+add("N20", "T", "Schubert Impromptu D.935/3", "Schubert_Impromptu_op142_3", "schubert-impromptus-d935-breitkopf-epstein", R(15, 21), "Breitkopf & Haertel, ed. Epstein, 1888")
+add("N21", "T", "Schumann Arabeske Op.18", "Schumann_Arabeske", "schumann-arabeske-breitkopf-clara", R(1, 6), "Breitkopf & Haertel, ed. Clara Schumann, 1887")
+add("NR1", "T", "Chopin Etude Op.10/10 (reserve)", "Chopin_Etudes_op_10_10", "chopin-etudes-op10-boteandbock-klindworth", R(34, 37), "Bote & Bock, ed. Klindworth, 1880")
+add("NR2", "T", "Schubert Impromptu D.935/1 (reserve)", "Schubert_Impromptu_op142_1", "schubert-impromptus-d935-breitkopf-epstein", R(1, 11), "Breitkopf & Haertel, ed. Epstein, 1888")
+BY = {p["pid"]: p for p in P}
