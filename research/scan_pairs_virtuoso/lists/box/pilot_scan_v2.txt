@@ -783,9 +783,9 @@
 /workspace/pilot/images/B4/B4_p-17_s5.png,/workspace/pilot/tokens/B4_p-17_s5.tokens
 /workspace/pilot/images/A4/A4_p-14_s1.png,/workspace/pilot/tokens/A4_p-14_s1.tokens
 /workspace/pilot/images/A4/A4_p-14_s2.png,/workspace/pilot/tokens/A4_p-14_s2.tokens
-/workspace/pilot/images/A10/A10_p-12_s2.png,/workspace/pilot/tokens/A10_p-12_s2.tokens
+/workspace/pilot/images/A10/A10_p-12_s2.png,/workspace/pilot/tokens_typeless_rest_fixed/A10_p-12_s2.tokens
 /workspace/pilot/images/A12/A12_p-07_s4.png,/workspace/pilot/tokens/A12_p-07_s4.tokens
-/workspace/pilot/images/A13/A13_p-11_s4.png,/workspace/pilot/tokens/A13_p-11_s4.tokens
+/workspace/pilot/images/A13/A13_p-11_s4.png,/workspace/pilot/tokens_typeless_rest_fixed/A13_p-11_s4.tokens
 /workspace/pilot/images/A14/A14_p-11_s1.png,/workspace/pilot/tokens/A14_p-11_s1.tokens
 /workspace/pilot/images/A17/A17_p-05_s2.png,/workspace/pilot/tokens/A17_p-05_s2.tokens
 /workspace/pilot/images/A17/A17_p-09_s1.png,/workspace/pilot/tokens/A17_p-09_s1.tokens
