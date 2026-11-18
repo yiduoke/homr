@@ -1,0 +1,69 @@
+A3_p-03_s3	clef lab G2/G2 read G2/F4 ; key lab 4 read -5
+A4_p-03_s4	clef lab G2/G2 read G2/F4
+A4_p-06_s0	clef lab G2/G2 read G2/F4
+A9_p-57_s3	clef lab G2/F4 read F4/F4
+A9_p-58_s0	clef lab G2/F4 read F4/F4
+A9_p-58_s1	clef lab G2/F4 read F4/F4
+A9_p-58_s3	clef lab G2/F4 read F4/F4
+A9_p-58_s4	clef lab G2/F4 read G2/G2
+A9_p-59_s0	clef lab G2/F4 read F4/F4
+A9_p-59_s1	clef lab G2/F4 read F4/F4
+A9_p-59_s2	clef lab G2/F4 read F4/F4
+A9_p-59_s3	clef lab G2/F4 read F4/F4
+A9_p-59_s4	clef lab G2/F4 read F4/F4
+A9_p-60_s1	clef lab G2/F4 read F4/F4
+A9_p-60_s2	clef lab G2/F4 read F4/F4
+A9_p-62_s1	clef lab G2/F4 read F4/F4 ; key lab -3 read 0
+A10_p-01_s0	clef lab F4/F4 read G2/F4
+A10_p-01_s1	clef lab G2/G2 read G2/F4
+A10_p-06_s4	clef lab F4/F4 read G2/F4
+A10_p-07_s1	clef lab G2/F4 read G2/G2
+A10_p-08_s1	clef lab G2/F4 read G2/G2
+A11_p-05_s1	clef lab F4/F4 read G2/F4
+A11_p-06_s4	clef lab G2/G2 read G2/F4
+A11_p-09_s3	clef lab F4/F4 read G2/F4
+A12_p-04_s5	clef lab F4/F4 read G2/F4
+A12_p-05_s0	clef lab F4/F4 read G2/F4
+A12_p-06_s4	clef lab G2/G2 read G2/F4
+A13_p-04_s2	clef lab G2/F4 read G2/G2
+A13_p-07_s3	clef lab G2/F4 read F4/F4
+A13_p-09_s4	clef lab G2/F4 read F4/F4
+A14_p-01_s3	clef lab G2/F4 read F4/F4
+A14_p-01_s4	clef lab G2/F4 read F4/F4
+A14_p-03_s5	key lab -3 read 2
+A14_p-11_s2	clef lab G2/F4 read F4/F4
+A14_p-11_s3	clef lab G2/F4 read F4/F4
+A14_p-11_s4	clef lab G2/F4 read F4/F4
+A14_p-12_s3	clef lab G2/F4 read G2/G2
+A14_p-14_s0	clef lab F4/F4 read G2/F4
+A14_p-14_s1	clef lab F4/F4 read G2/F4
+A14_p-15_s2	clef lab G2/F4 read G2/G2
+A15_p-02_s4	clef lab G2/F4 read F4/F4
+A15_p-03_s0	clef lab G2/F4 read F4/F4
+A16_p-19_s3	clef lab G2/F4 read G2/G2
+A16_p-23_s4	clef lab G2/F4 read F4/G2
+A16_p-24_s2	clef lab G2/F4 read G2/G2
+A16_p-25_s0	clef lab G2/G2 read G2/F4
+A17_p-05_s3	clef lab G2/F4 read F4/F4
+A17_p-06_s0	clef lab G2/F4 read F4/F4
+A17_p-08_s0	clef lab G2/F4 read F4/F4
+A17_p-08_s1	clef lab G2/F4 read F4/F4
+A17_p-09_s3	clef lab G2/F4 read F4/F4
+A17_p-12_s0	clef lab G2/F4 read F4/F4
+B2_p-07_s3	clef lab G2/F4 read F4/F4
+B2_p-08_s1	clef lab G2/F4 read F4/F4
+B2_p-10_s0	clef lab G2/F4 read F4/F4
+B3_p-20_s0	clef lab F4/F4 read G2/F4
+B3_p-20_s4	clef lab G2/G2 read G2/F4
+B3_p-21_s2	clef lab F4/F4 read G2/F4
+B3_p-21_s3	clef lab F4/F4 read G2/F4
+B3_p-23_s2	clef lab F4/F4 read G2/F4
+B3_p-23_s3	clef lab F4/F4 read G2/F4
+B3_p-23_s4	clef lab F4/F4 read G2/F4
+B3_p-23_s6	clef lab F4/F4 read G2/F4
+B4_p-12_s3	clef lab G2/F4 read F4/F4
+A17_p-09_s0	clef lab G2/F4 read F4/F4
+A2_p-081_s2	added crop / eye
+A6_p-04_s4	added crop / eye
+A16_p-24_s0	added crop / eye
+A9_p-57_s2	added crop / eye

@@ -1,0 +1,7 @@
+A5_p-01_s0	4/4 numerals	label: common (C)	S meter symbol
+A7_p-05_s0	cut (C with a stroke)	label: 2/2 numerals	S meter symbol
+A9_p-57_s0	common (C)	label: cut	S meter symbol
+A15_p-02_s3	common (C), reprinted at the Allegro	label: none	M time signature missing in the label
+A18_p-11_s3	2/4 reprinted after the double bar	label: none	M time signature missing in the label
+B1_p-50_s0	4/4 numerals	label: common (C)	S meter symbol
+A10_p-10_s4	cut (C with a stroke)	label: 4/4 numerals	S meter symbol

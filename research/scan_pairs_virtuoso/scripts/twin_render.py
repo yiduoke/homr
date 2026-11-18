@@ -119,8 +119,8 @@ def asap_root(asap):
     return _XML_CACHE[asap]
 
 
-def xml_for(asap, a):
-    """Whole piece, with every time signature before measure index a hidden."""
+def xml_for(asap, a, patch=None, b=None):
+    """Whole piece, with every time signature before measure index a hidden. patch: octave bracket to add (see octave_patch)."""
     root = copy.deepcopy(asap_root(asap))
     part = root.find("part")
     for i, m in enumerate(part.findall("measure")):
@@ -128,7 +128,81 @@ def xml_for(asap, a):
             break
         for t in m.iter("time"):
             t.set("print-object", "no")
+    if patch:
+        apply_octave_patch(part, a, patch, b)
     return ET.tostring(root, encoding="unicode")
+
+
+def octave_patch(token_file):
+    """v2: for the crops whose label was corrected to the PRINT (an 8va bracket the ASAP XML lacks, notes lowered by an octave; octave_review.md), the
+    bracket in the corrected token file as (measure offset in the crop, ordinal of the first bracketed upper-staff note column in that measure,
+    measure offset and ordinal of the last bracketed column or None when the bracket stays open). The XML keeps its sounding pitches: Verovio engraves them
+    an octave lower under the bracket, i.e. what the corrected tokens say."""
+    lines = open(token_file).read().split("\n")
+    bar = 0; k = 0; start = end = None
+    for ln in lines:
+        if ln.startswith("barline"):
+            bar += 1; k = 0; continue
+        if ln.startswith("octaveShift_8v"):
+            start = (bar, k); continue
+        if ln.startswith("octaveShiftStop"):
+            end = (bar, k - 1) if k > 0 else None; continue
+        els = [e for e in ln.split("&") if e.startswith("note_") and e.endswith(" upper")]
+        if els:
+            k += 1
+    if start is None:
+        return None
+    if end is not None and end[1] < 0:
+        end = None
+    return dict(start=start, end=end)
+
+
+def _upper_onsets(measure):
+    """Distinct onsets (in ticks) of the non-rest, non-grace notes of staff 1, with the index of the first note element at each onset (after chord members:
+    index of the last member) in the measure's child list."""
+    t = 0; last_t = 0; out = {}
+    children = list(measure)
+    for idx, el in enumerate(children):
+        if el.tag == "backup":
+            t -= int(el.findtext("duration")); continue
+        if el.tag == "forward":
+            t += int(el.findtext("duration")); continue
+        if el.tag != "note":
+            continue
+        chord = el.find("chord") is not None
+        onset = last_t if chord else t
+        dur = int(el.findtext("duration") or 0) if el.find("grace") is None else 0
+        if not chord:
+            last_t = t
+            onset = t
+            t += dur
+        if el.find("rest") is None and el.find("grace") is None and (el.findtext("staff") or "1") == "1" and el.get("print-object") != "no":
+            d = out.setdefault(onset, [idx, idx, dur]); d[1] = idx; d[2] = max(d[2], dur)
+    return dict(sorted(out.items())), children
+
+
+def apply_octave_patch(part, a, patch, b=None):
+    measures = part.findall("measure")
+    def direction(kind):
+        d = ET.Element("direction"); d.set("placement", "above")
+        dt = ET.SubElement(d, "direction-type"); o = ET.SubElement(dt, "octave-shift")
+        o.set("type", kind); o.set("size", "8"); o.set("number", "1")
+        ET.SubElement(d, "staff").text = "1"
+        return d
+    inserts = []                                   # (measure, child index to insert before, element); applied from the back
+    if patch["end"] is None and b is not None and b < len(measures):       # bracket continues into the next system: it ends after the first note of the next measure
+        patch = dict(patch, end=(b - a, 0))
+    (m0, k0), end = patch["start"], patch["end"]
+    ons, ch = _upper_onsets(measures[a + m0])
+    first_idx = list(ons.values())[k0][0]
+    inserts.append((measures[a + m0], first_idx, direction("down")))
+    if end is not None:
+        m1, k1 = end
+        ons1, ch1 = _upper_onsets(measures[a + m1])
+        last_idx = list(ons1.values())[k1][1]
+        inserts.append((measures[a + m1], last_idx + 1, direction("stop")))
+    for m, idx, el in sorted(inserts, key=lambda x: -x[1]):
+        m.insert(idx, el)
 
 
 def token_stats(path):
@@ -285,7 +359,9 @@ def render_crop(name, pid, a, b, token_file, out_png, svg_dir=None):
     tk.setOptions({"pageWidth": 60000, "pageHeight": 6000, "scale": SCALE, "adjustPageHeight": True, "adjustPageWidth": True, "breaks": "none",
                    "header": "none", "footer": "none", "svgBoundingBoxes": True, "font": font_for(pid), "mnumInterval": 0,
                    "pageMarginLeft": 50, "pageMarginRight": 50, "pageMarginTop": 50, "pageMarginBottom": 50})
-    if not tk.loadData(xml_for(cfg["asap"], a)):
+    patch = octave_patch(token_file) if ("tokens_corrected" in token_file and os.path.exists(token_file.replace("octave_review/tokens_corrected", "tokens"))
+                                           and "octaveShift" not in open(token_file.replace("octave_review/tokens_corrected", "tokens")).read()) else None
+    if not tk.loadData(xml_for(cfg["asap"], a, patch, b)):
         res.update(status="drop", reason="verovio load failed"); return res
     chosen = None
     forced = os.environ.get("TWIN_LEVEL")
@@ -358,10 +434,10 @@ def read_manifest():
     return rows
 
 
-def groups():
-    """(list name, relative crop path, token path) of the frozen training and validation lists."""
+def groups(names=("train_strong", "train_hard", "val_strong")):
+    """(list name, relative crop path, token path) of the frozen training and validation lists (or the lists named by --lists)."""
     out = []
-    for lst in ("train_strong", "train_hard", "val_strong"):
+    for lst in names:
         for line in open(f"{ROOT}/lists/{lst}.txt"):
             line = line.strip()
             if not line:
@@ -378,15 +454,20 @@ if __name__ == "__main__":
     ap.add_argument("--out", default=ROOT + "/twins")
     ap.add_argument("--report", default=ROOT + "/twins_report.json")
     ap.add_argument("--svg", default=None)
+    ap.add_argument("--lists", nargs="*", default=None, help="v2: lists (names in lists/) to render instead of the frozen pilot lists")
     args = ap.parse_args()
     man = read_manifest()
     jobs = []
-    for lst, img, tok in groups():
+    for lst, img, tok in (groups(args.lists) if args.lists else groups()):
         r = man[img]
         name = os.path.basename(img)[:-4]
         if args.only and name not in args.only:
             continue
-        a, b = (int(x) for x in r["asap_measure_range"].split("-"))
+        if r["asap_measure_range"]:
+            a, b = (int(x) for x in r["asap_measure_range"].split("-"))
+        else:                                              # v2: three tuplet crops failed the first conversion and have no range in manifest.csv
+            c = next(x for x in json.load(open(f"{ROOT}/work/tuplet/conv_{r['pid']}.json")) if x["name"] == name)
+            a, b = c["start"] + 1, c["start"] + c["L"]
         jobs.append((name, r["pid"], a - 1, b, f"{ROOT}/{tok}", f"{args.out}/{r['pid']}/{name}.png", args.svg))
     print(len(jobs), "crops", flush=True)
     with multiprocessing.Pool(args.workers) as pool:

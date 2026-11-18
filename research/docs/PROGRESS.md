@@ -5,13 +5,15 @@ comes next. Written for people and coding agents picking up the work. Upstream i
 liebharc/homr; its own docs (README.md, Training.md, IDEAS_FOR_CONTRIBUTORS.md,
 AGENTS.md) still apply.
 
-Last updated: 2026-11-17 (6:25 pm Pacific).
+Last updated: 2026-11-17 (6:45 pm Pacific).
 
 Related documents: [PAPER_NOTES.md](PAPER_NOTES.md) (the paper's story, final numbers only);
 [EXPERIMENTS.md](https://github.com/yiduoke/homr-research/blob/main/EXPERIMENTS.md) in the private research repo
 [yiduoke/homr-research](https://github.com/yiduoke/homr-research) (exact commands, commits,
 checksums and outputs per result; local checkout `run/`); [Training.md](Training.md) (model
 cards); release [meteracc_checkpoints](https://github.com/yiduoke/homr/releases/tag/meteracc_checkpoints).
+
+**Status 6:45 pm Pacific 2026-11-17 (D23, `run/EXPERIMENTS.md`, `run/scan_pairs_virtuoso/PILOT_SPEC.md` section 7):** pilot label lists v2 built before launch: all passages use corrected tokens (78 + 6 stale bar-rest labels found and fixed), 34 octave-verified and 30 tuplet-fixed crops added in both arms with twins, Chopin Sonata 2 movements all on the train side, 7 printed-notation mismatches and 69 clef-label errors removed (19 of 19 checked clef flags were label errors); pilot train 881, validation 72, batch 2 train 520 / val 145; batch 2 printed-notation candidates (Op.25/8 12/8, Sonata 2 mvt 1 6/4, Ravel) listed with corrected tokens where unambiguous, none admitted. Released model on v2 validation: scan pitch F1 0.991, twin 0.996. Resolution choice still pending.
 
 **Status 6:25 pm Pacific 2026-11-17 (D14, `run/EXPERIMENTS.md`, `run/staff_rel_realbrace/README.md`; branch `staff-relations-real`, worktree `run/rel_wt`):** staff relation model trained on real scans for the Schott brace. Independent real scans have no Schott-style brace (only Reichardt 1819 is thin and nearly straight; the shipped model reads all other real editions at 100 % except Op. 31 Schirmer with a cut-off staff start). Data: 250 piano pages / 2,418 pairs, 1,603 song pairs, 9,419 rendered pairs, 2,978 pairs with brace variations drawn on page images before segmentation. Held-out real editions: no errors for any model; held-out thin edition: variations did not help (53 of 56 grand pairs missed, as shipped). On the Schott TEST scans grand-staff calls rise from 1 to 56 (real thin pages) / 90 (variations) / 98 (both) of 169, no separate pair joined, the other 25 of 26 scan sets unchanged (Petrushka: 8 pair decisions on 6 pages, no false merge). Full pipeline is worse than the shipped model on 2 of 3 pieces (Sonata 59.9-61.5 vs 79.95, Etude 5 43.0-67.0 vs 77.0; Etude 10 79.9 with B vs 76.9) because pages with mixed systems lose bars. Not ready to ship; `HOMR_STAFF_RELATION_MODEL` env var added (default unchanged), 1 test. Models in `run/staff_rel_realbrace/`. Heavy steps on vast-homr5 only (training on its GPU, 6 short runs), vast-homr4 untouched.
 

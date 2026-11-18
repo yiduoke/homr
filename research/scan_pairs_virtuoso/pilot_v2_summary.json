@@ -1,0 +1,43 @@
+{
+ "pilot_v2": 881,
+ "val_v2": 72,
+ "by_origin": {
+  "v1 pilot": 796,
+  "moved from val (Sonata 2 mvt 2)": 26,
+  "octave-verified": 30,
+  "tuplet-fixed": 29
+ },
+ "moved_C2": 26,
+ "removed_printed": 7,
+ "removed_clef": 69,
+ "tokens_replaced_in_v1_pilot": 78,
+ "pilot_by_piece": {
+  "A2": 50,
+  "A3": 10,
+  "A4": 89,
+  "A5": 22,
+  "A6": 19,
+  "A7": 16,
+  "A8": 22,
+  "A9": 9,
+  "A10": 55,
+  "A11": 41,
+  "A12": 51,
+  "A13": 68,
+  "A14": 62,
+  "A15": 33,
+  "A16": 46,
+  "A17": 51,
+  "A18": 25,
+  "A19": 44,
+  "B1": 28,
+  "B2": 43,
+  "B3": 17,
+  "B4": 54,
+  "C2": 26
+ },
+ "val_by_piece": {
+  "C1": 19,
+  "C3": 53
+ }
+}

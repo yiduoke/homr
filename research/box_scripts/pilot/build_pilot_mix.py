@@ -19,7 +19,7 @@ ap.add_argument("--twin", default="/workspace/pilot/lists/pilot_twin_render.txt"
 ap.add_argument("--scan", default="/workspace/pilot/lists/pilot_scan.txt")
 ap.add_argument("--repeat", type=int, default=8)
 ap.add_argument("--seed", type=int, default=20261120)
-ap.add_argument("--groups", default="A,B")
+ap.add_argument("--groups", default="A,B,C")   # v2: C = Sonata 2 mvt 2 (C2), moved from validation to the train side; not in the rendered mixture
 ap.add_argument("--steps", type=int, default=6716)
 ap.add_argument("--batch", type=int, default=32)
 ap.add_argument("--out", default="/workspace/pilot/mix")
@@ -41,7 +41,7 @@ slots = [("b", i) for i in range(len(base))] + [("p", i) for _ in range(a.repeat
 random.Random(a.seed).shuffle(slots)
 os.makedirs(a.out, exist_ok=True)
 for arm, plist in (("CTRL_RENDER", tw), ("SCAN", sc)):
-    path = f"{a.out}/mix_{arm}_R{a.repeat}{'' if groups == {'A', 'B'} else '_' + ''.join(sorted(groups))}.txt"
+    path = f"{a.out}/mix_{arm}_R{a.repeat}{'' if groups == {'A', 'B', 'C'} else '_' + ''.join(sorted(groups))}.txt"
     with open(path, "w") as f:
         for kind, i in slots:
             f.write((base[i] if kind == "b" else plist[i]) + "\n")
