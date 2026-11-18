@@ -1,0 +1,14 @@
+scan_pairs_virtuoso/images/A4/A4_p-14_s1.png,scan_pairs_virtuoso/tokens/A4_p-14_s1.tokens
+scan_pairs_virtuoso/images/A4/A4_p-14_s2.png,scan_pairs_virtuoso/tokens/A4_p-14_s2.tokens
+scan_pairs_virtuoso/images/A10/A10_p-12_s2.png,scan_pairs_virtuoso/tokens/A10_p-12_s2.tokens
+scan_pairs_virtuoso/images/A12/A12_p-07_s4.png,scan_pairs_virtuoso/tokens/A12_p-07_s4.tokens
+scan_pairs_virtuoso/images/A13/A13_p-11_s4.png,scan_pairs_virtuoso/tokens/A13_p-11_s4.tokens
+scan_pairs_virtuoso/images/A14/A14_p-11_s1.png,scan_pairs_virtuoso/tokens/A14_p-11_s1.tokens
+scan_pairs_virtuoso/images/A17/A17_p-05_s2.png,scan_pairs_virtuoso/tokens/A17_p-05_s2.tokens
+scan_pairs_virtuoso/images/A17/A17_p-09_s0.png,scan_pairs_virtuoso/tokens/A17_p-09_s0.tokens
+scan_pairs_virtuoso/images/A17/A17_p-09_s1.png,scan_pairs_virtuoso/tokens/A17_p-09_s1.tokens
+scan_pairs_virtuoso/images/A17/A17_p-12_s5.png,scan_pairs_virtuoso/tokens/A17_p-12_s5.tokens
+scan_pairs_virtuoso/images/A19/A19_p-07_s1.png,scan_pairs_virtuoso/tokens/A19_p-07_s1.tokens
+scan_pairs_virtuoso/images/A19/A19_p-07_s3.png,scan_pairs_virtuoso/tokens/A19_p-07_s3.tokens
+scan_pairs_virtuoso/images/A19/A19_p-11_s0.png,scan_pairs_virtuoso/tokens/A19_p-11_s0.tokens
+scan_pairs_virtuoso/images/A19/A19_p-12_s1.png,scan_pairs_virtuoso/tokens/A19_p-12_s1.tokens

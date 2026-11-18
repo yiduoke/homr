@@ -984,6 +984,12 @@ On rendered page 8 of Hungarian Rhapsody No. 6, the released model’s output re
 
 **Open reference and render checks.** Alongside the resolution experiment, trace the octave brackets in *Winter Wind* m. 20 and Schubert D. 899 No. 4 m. 64 across the scan, reference XML, render and model output. Scriabin’s extra rendered staff has already been fixed. Correct verified source or engraving errors, document genuine edition differences, and rescore every affected checkpoint on the same reference version. [Correction procedure](https://github.com/yiduoke/homr-research/blob/main/eval_run1/scan_render_audit.md#render-and-reference-xml-corrections)
 
+## Status 2026-11-17, 4:30 pm Pacific: pilot set of verified virtuoso real-scan pairs (D13, `run/scan_pairs_virtuoso/`)
+
+- 26 pieces from the IMSLP downloads paired with ASAP: train strong 864 (19 group-A + 4 group-B pieces), hard 14, validation (group C, separate lists) strong 104, quarantine 252. 878 verified training crops, not the 1,500 targeted (208 pages, 1,112 systems; 5.3 systems per page).
+- Released model pitch F1 on kept crops: strong mean 0.981, hard 0.73; lowest piece Schubert D.899/1 0.949. By eye: strong 0/36 wrong, hard 2/16 wrong (both removed), pooled 3.8% (95% upper bound 13.2%).
+- Gaps to fill with extra works: multi-system octave-bracket continuations, unnumbered tuplets, repeated notes, cross-staff passages; 60 octave-bracket crops wait for an eye check (`lists/train_octave_unverified.txt`). Laptop only; no GPU box job; nothing pushed.
+
 ## Status 2026-11-17, 3:45 pm Pacific: octave-bracket checks (Winter Wind m. 20, Schubert D. 899/4 m. 64)
 
 - Chopin Op. 25/11 bars 19-20: print, reference and render agree (8va from bar 19 note 17 to bar 20 note 12); the released model ends the bracket after bar 19 note 20 and writes 16 notes an octave low. Model error, reference unchanged.

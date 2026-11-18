@@ -1,0 +1,6 @@
+scan_pairs_virtuoso/images/C2/C2_p-10_s1.png,scan_pairs_virtuoso/tokens/C2_p-10_s1.tokens
+scan_pairs_virtuoso/images/C2/C2_p-11_s4.png,scan_pairs_virtuoso/tokens/C2_p-11_s4.tokens
+scan_pairs_virtuoso/images/C2/C2_p-14_s1.png,scan_pairs_virtuoso/tokens/C2_p-14_s1.tokens
+scan_pairs_virtuoso/images/C3/C3_p-20_s5.png,scan_pairs_virtuoso/tokens/C3_p-20_s5.tokens
+scan_pairs_virtuoso/images/C3/C3_p-22_s2.png,scan_pairs_virtuoso/tokens/C3_p-22_s2.tokens
+scan_pairs_virtuoso/images/C3/C3_p-22_s3.png,scan_pairs_virtuoso/tokens/C3_p-22_s3.tokens

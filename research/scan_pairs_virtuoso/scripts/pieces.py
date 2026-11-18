@@ -1,0 +1,35 @@
+"""Piece configuration. pages: list of PDF page numbers (p-NN files of work/pages/<pdf>) that hold the selected music.
+group: A / B training, C validation. status notes in 'note'."""
+P = []
+def add(pid, group, title, asap, pdf, pages, edition, note=""):
+    P.append(dict(pid=pid, group=group, title=title, asap=asap, pdf=pdf, pages=pages, edition=edition, note=note))
+R = lambda a, b: list(range(a, b + 1))
+add("A1", "A", "Liszt TE1 Preludio", "Liszt_Transcendental_Etudes_1", "liszt-transcendental-etudes-peters", R(3, 5), "Peters, ed. Sauer, 1913-17")
+add("A2", "A", "Liszt TE9 Ricordanza", "Liszt_Transcendental_Etudes_9", "liszt-transcendental-etudes-peters", R(69, 81), "Peters, ed. Sauer, 1913-17")
+add("A3", "A", "Liszt TE11 Harmonies du soir", "Liszt_Transcendental_Etudes_11", "liszt-te11-harmonies-breitkopf", R(1, 10), "Breitkopf & Haertel, 1852")
+add("A4", "A", "Liszt Ballade 2", "Liszt_Ballade_2", "liszt-ballade2-kistner", R(1, 21), "Kistner, 1854")
+add("A5", "A", "Chopin Etude Op.10/1", "Chopin_Etudes_op_10_1", "chopin-etudes-op10-durand", R(1, 5), "Durand, ed. Debussy, 1915")
+add("A6", "A", "Chopin Etude Op.25/1", "Chopin_Etudes_op_25_1", "chopin-etudes-op25-kullak", R(1, 4), "Schlesinger, ed. Kullak, 1883")
+add("A7", "A", "Chopin Etude Op.25/2", "Chopin_Etudes_op_25_2", "chopin-etudes-op25-kullak", R(5, 7), "Schlesinger, ed. Kullak, 1883")
+add("A8", "A", "Chopin Etude Op.25/5", "Chopin_Etudes_op_25_5", "chopin-etudes-op25-aibl-buelow", R(18, 22), "Aibl, ed. Buelow")
+add("A9", "A", "Chopin Etude Op.25/12", "Chopin_Etudes_op_25_12", "chopin-etudes-op25-aibl-buelow", R(57, 62), "Aibl, ed. Buelow")
+add("A10", "A", "Chopin Ballade 1", "Chopin_Ballades_1", "chopin-ballade1-litolff", R(1, 12), "Litolff, ed. Koehler")
+add("A11", "A", "Chopin Ballade 3", "Chopin_Ballades_3", "chopin-ballade3-schott", R(1, 11), "Schott, ed. Scharwenka, c.1911")
+add("A12", "A", "Chopin Barcarolle", "Chopin_Barcarolle", "chopin-barcarolle-augener", R(1, 10), "Augener, ed. Klindworth/Scharwenka, 1883")
+add("A13", "A", "Chopin Scherzo 2", "Chopin_Scherzos_31", "chopin-scherzo2-muzgiz", R(1, 19), "Muzgiz, ed. Klindworth, 1937")
+add("A14", "A", "Chopin Sonata 3 mvt 4", "Chopin_Sonata_3_4th", "chopin-sonata3-finale-pwm", R(1, 15), "PWM national ed., 1950")
+add("A15", "A", "Beethoven Op.111 mvt 1", "Beethoven_Piano_Sonatas_32-1", "beethoven-op111-cotta", R(1, 10), "Cotta, ed. Buelow, c.1875")
+add("A16", "A", "Beethoven Op.110 mvt 3-4", "Beethoven_Piano_Sonatas_31-3_4", "beethoven-op110-ricordi", R(14, 25), "Ricordi, ed. Casella, 1920", "starts in the lower part of p14")
+add("A17", "A", "Beethoven Op.27/2 mvt 3", "Beethoven_Piano_Sonatas_14-3", "beethoven-op27-2-litolff", R(5, 13), "Litolff, ed. Schultze", "starts at the 3rd system of p5")
+add("A18", "A", "Schumann Kreisleriana 3", "Schumann_Kreisleriana_3", "schumann-kreisleriana-peters", R(10, 15), "Peters, ed. Doerffel/Schmidt, 1887")
+add("A19", "A", "Schubert Impromptu D.899/1", "Schubert_Impromptu_op_90_D_899_1", "schubert-impromptus-d899-schirmer", R(4, 12), "Schirmer, ed. Buonamici, 1897")
+add("B1", "B", "Chopin Etude Op.10/12", "Chopin_Etudes_op_10_12", "chopin-etudes-op10-durand", R(50, 55), "Durand, ed. Debussy, 1915")
+add("B2", "B", "Chopin Ballade 2", "Chopin_Ballades_2", "chopin-ballade2-schirmer", R(1, 10), "Schirmer, ed. Joseffy, 1915")
+add("B3", "B", "Chopin Sonata 2 mvt 4", "Chopin_Sonata_2_4th", "chopin-sonata2-peters", R(20, 23), "Peters")
+add("B4", "B", "Beethoven Op.31/2 mvt 3", "Beethoven_Piano_Sonatas_17-3", "beethoven-op31-2-schirmer-split", [1, 4, 5, 8, 9, 12, 13, 16, 17], "Schirmer, ed. Lebert/Buelow, 1895-96", "PDF pages are two-page spreads with one half upside down: split, upside-down halves dropped (only the upright halves are consecutive book pages)")
+add("C1", "C", "Liszt TE3 Paysage", "Liszt_Transcendental_Etudes_3", "liszt-transcendental-etudes-peters", R(11, 15), "Peters, ed. Sauer, 1913-17")
+add("C2", "C", "Chopin Sonata 2 mvt 2", "Chopin_Sonata_2_2nd", "chopin-sonata2-peters", R(10, 16), "Peters")
+add("C3", "C", "Schubert Impromptu D.899/2", "Schubert_Impromptu_op_90_D_899_2", "schubert-impromptus-d899-schirmer", R(13, 22), "Schirmer, ed. Buonamici, 1897")
+SKIP = {"A16": 1, "A17": 2}
+for _p in P: _p["skip"] = SKIP.get(_p["pid"], 0)
+BY = {p["pid"]: p for p in P}
