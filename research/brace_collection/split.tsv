@@ -1,0 +1,48 @@
+group	role	pairs	grand	shipped_missed_grand	pages(labelled)
+balakirev-islamey-jurgenson1909	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	52	29	0	004 007 010 013 016 019
+beethoven-op110-haslinger1835	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	83	45	1	003 005 009 011 013 015 017
+beethoven-op13-eder1800	TRANSFER TEST ONLY (never train; 2 pages)	16	9	7	009 011
+beethoven-op27-1-cappi1801	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	1	1	0	005
+beethoven-op27-2-cappi1802	TRANSFER TEST ONLY (never train)	82	46	40	003 004 005 007 008 009 011 013 014 015
+beethoven-op27-2-cranz1814	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	77	42	0	003 005 007 009 011 013 015
+beethoven-op31-2-naegeli1803	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	93	52	0	003 005 007 009 011 013 015 017 019 021 023
+beethoven-op31-2-simrock1802	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	5	3	1	017
+berg-sonata-op1-schlesinger1910	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	45	25	0	003 005 007 009 011
+brahms-ballades10-breitkopf1856	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	105	58	0	003 005 007 009 011 013 015 017 019 021 023
+brahms-op1-simrock1898	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	100	55	0	004 007 010 013 016 019 022 025 028 031
+brahms-op79-peters1910	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	58	32	0	001 004 007 010 013 016
+brahms-rhapsodies79-simrock1880	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	54	30	0	004 007 010 013 016 019
+chopin-nocturnes9-kistner1833	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	66	36	0	003 005 007 009 011 013
+chopin-sonata2-breitkopf1840	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	119	65	0	003 005 007 009 011 013 015 017 019 021 023
+chopin-sonata2-friedlein1850	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	39	22	0	003 004 005 006 007
+liszt-consolations-breitkopf1850	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	69	39	0	003 005 007 009 011 013 015 019 021
+liszt-hr12-peters-sauer	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	53	29	0	003 005 007 009 011
+liszt-hr2-jurgenson1878	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	64	35	0	003 005 007 009 011 013
+liszt-hr2-senff1872	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	88	49	0	003 005 007 009 011 013 015 017 019 021
+liszt-mephisto1-peters-sauer	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	80	44	0	001 004 007 010 013 016 019 022
+liszt-mephisto1-schuberth1862	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	80	44	0	004 007 010 013 016 019 022 025
+liszt-paganini2-costallat1918	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	32	18	0	001 005 007 009
+liszt-sonata-breitkopf1924-motta	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	74	41	0	001 006 011 016 021 026 031 036
+liszt-sonata-peters-sauer	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	73	40	0	001 006 011 016 021 026 031
+liszt-sonata-salabert1949-cortot	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	37	21	0	015 022 029 036 050
+liszt-sonata-ue1917-friedman	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	67	37	0	006 011 016 021 026 031 036
+lyapunov-op11-12-zimmermann1906	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	50	28	0	001 004 007 010 013 016
+lyapunov-op11-5-zimmermann1906	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	11	6	0	005
+mendelssohn-lieder19b-simrock1832	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	71	39	0	003 005 007 009 011 013 015
+schott-concert-etudes	TRAIN-CANDIDATE (same Schott series)	27	15	15	005 008 010
+schott-concerto1	TRAIN-CANDIDATE (same Schott series; two pianos, labels G/S/G/-)	392	214	68	001 005 006 007 008 010 011 012 015 017 018 019 020 021 022 023 024 025 026 027 028 029 030 031 032 033 034 035 036 038 039 040 041 042 043 044
+schott-concerto2	TRAIN-CANDIDATE (same Schott series; two pianos, labels G/S/G/-)	517	282	68	001 002 003 004 005 007 008 009 010 011 012 013 014 015 016 017 019 020 022 023 024 026 027 028 029 030 031 032 033 034 035 036 037 038 039 040 041 042 043 044 045 046 047 048 052 053 054
+schott-te-volume.mazeppa(reserved)	RESERVED (Etude 4 Mazeppa = test composition, never train)	78	43	43	016 020 021 022 025 026 027 028
+schott-te-volume	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	487	270	270	006 007 008 009 010 011 012 013 014 015 020 021 022 025 026 027 028 038 044 045 048 049 050 051 052 053 054 055 056 057 058 059 060 061 062 063 064 065 070 073 074 086 088 089 090 091 092 093 097 098 102 103 104
+schott-te-volume.pool	TRAIN-CANDIDATE (same Schott volume, other compositions)	710	394	392	006 007 008 009 010 011 012 013 014 015 038 041 042 043 044 045 046 048 049 050 051 052 053 054 055 056 057 058 059 060 061 062 063 064 065 066 067 068 070 071 072 073 074 075 086 087 088 089 090 091 092 093 095 096 097 098 099 100 101 102 103 104 105 106 107 108 109 110 112 113 114 115 116 117 118 119 120 121
+schubert-d899-1-cranz	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	78	42	0	002 003 004 005 006 007
+schubert-d899-2-schott1913	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	55	30	0	003 005 007 009 011
+schubert-wanderer-lied-diabelli1822	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	32	12	0	002 003 004 005
+schumann-kinderszenen-breitkopf1839	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	77	43	0	003 005 007 009 011 013 015 017 019
+schumann-op12-2-breitkopf1857	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	43	24	1	002 003 004 005 006
+schumann-op12-henle1987	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	73	40	0	006 011 016 021 026 031 036
+schumann-op12-peters-sauer1925	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	73	40	0	006 011 016 021 026 031 036
+schumann-papillons-litolff	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	60	33	0	004 007 010 013 016 019
+schumann-papillons-muzyka	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	60	33	0	001 003 005 007 009 011
+schumann-papillons-peters1887	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	73	40	0	003 005 007 009 011 013 015
+scriabin-sonata3-belaieff1898	NEGATIVE CONTROL (curved brace, read by the shipped model; test or regression only, not training data for the thin-brace study)	62	34	0	005 009 013 017 021 025

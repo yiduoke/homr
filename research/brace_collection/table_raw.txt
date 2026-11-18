@@ -1,0 +1,53 @@
+edition                                    pages kept systems grand missed falsegrand falsejoin  (skip reasons)
+balakirev-islamey-jurgenson1909               7    6    29    29     0     0     0   {'nopairs': 1}
+beethoven-op106-artaria1819                   8    0     0     0     0     0     0   {'nopairs': 8}
+beethoven-op109-schlesinger1821              11    0     0     0     0     0     0   {'nopairs': 7, 'same-without-connector': 4}
+beethoven-op110-haslinger1835                 9    7    45    45     1     0     0   {'nopairs': 1, 'separate-has-connector': 1}
+beethoven-op13-eder1800                      21    2     9     9     7     0     3   {'nopairs': 2, 'n%2': 5, 'same-without-connector': 3, 'chain': 4, 'separate-has-connector': 5}
+beethoven-op22-hoffmeister1800               12    0     0     0     0     0     0   {'nopairs': 1, 'same-without-connector': 3, 'n%2': 6, 'separate-has-connector': 1, 'chain': 1}
+beethoven-op27-1-cappi1801                   15    1     1     1     0     0     0   {'nopairs': 7, 'same-without-connector': 5, 'chain': 1, 'n%2': 1}
+beethoven-op27-2-cappi1802                   16   10    46    46    40     0    10   {'nopairs': 2, 'separate-has-connector': 4}
+beethoven-op27-2-cranz1814                    8    7    42    42     0     0     0   {'nopairs': 1}
+beethoven-op31-2-naegeli1803                 12   11    52    52     0     0     0   {'nopairs': 1}
+beethoven-op31-2-simrock1802                 12    1     3     3     1     0     1   {'nopairs': 4, 'n%2': 3, 'same-without-connector': 2, 'chain': 2}
+beethoven-op54-bureau1806                     7    0     0     0     0     0     0   {'nopairs': 1, 'same-without-connector': 1, 'n%2': 3, 'chain': 2}
+berg-sonata-op1-schlesinger1910               6    5    25    25     0     0     0   {'nopairs': 1}
+brahms-ballades10-breitkopf1856              12   11    58    58     0     0     0   {'nopairs': 1}
+brahms-op1-simrock1898                       11   10    55    55     0     0     0   {'nopairs': 1}
+brahms-op79-peters1910                        6    6    32    32     0     0     0   {}
+brahms-rhapsodies79-simrock1880               7    6    30    30     0     1     1   {'nopairs': 1}
+chopin-cisza-gebethner                        1    0     0     0     0     0     0   {'nopairs': 1}
+chopin-nocturnes9-kistner1833                 7    6    36    36     0     0     0   {'nopairs': 1}
+chopin-sonata2-breitkopf1840                 12   11    65    65     0     0     0   {'nopairs': 1}
+chopin-sonata2-friedlein1850                  7    5    22    22     0     0     0   {'nopairs': 2}
+liszt-consolations-breitkopf1850             11    9    39    39     0     0     0   {'nopairs': 1, 'same-without-connector': 1}
+liszt-hr12-peters-sauer                       6    5    29    29     0     0     0   {'n%2': 1}
+liszt-hr2-jurgenson1878                       7    6    35    35     0     0     0   {'nopairs': 1}
+liszt-hr2-senff1872                          11   10    49    49     0     0     0   {'nopairs': 1}
+liszt-mephisto1-peters-sauer                  8    8    44    44     0     0     0   {}
+liszt-mephisto1-schuberth1862                 9    8    44    44     0     0     0   {'nopairs': 1}
+liszt-paganini2-costallat1918                 5    4    18    18     0     0     0   {'n%2': 1}
+liszt-sonata-breitkopf1924-motta              8    8    41    41     0     0     0   {}
+liszt-sonata-peters-sauer                     7    7    40    40     0     0     0   {}
+liszt-sonata-salabert1949-cortot              8    5    21    21     0     0     0   {'nopairs': 1, 'same-without-connector': 1, 'n%2': 1}
+liszt-sonata-ue1917-friedman                  8    7    37    37     0     0     0   {'nopairs': 1}
+lyapunov-op11-12-zimmermann1906               6    6    28    28     0     0     0   {}
+lyapunov-op11-5-zimmermann1906                5    1     6     6     0     0     0   {'separate-has-connector': 3, 'n%2': 1}
+mendelssohn-lieder19b-simrock1832             8    7    39    39     0     0     0   {'nopairs': 1}
+schubert-d899-1-cranz                         8    6    42    42     0     0     0   {'nopairs': 2}
+schubert-d899-2-schott1913                    6    5    30    30     0     0     0   {'nopairs': 1}
+schumann-kinderszenen-breitkopf1839          10    9    43    43     0     0     0   {'nopairs': 1}
+schumann-op12-2-breitkopf1857                 8    5    24    24     1     0     1   {'nopairs': 2, 'same-without-connector': 1}
+schumann-op12-henle1987                       8    7    40    40     0     0     0   {'nopairs': 1}
+schumann-op12-peters-sauer1925                8    7    40    40     0     0     0   {'same-without-connector': 1}
+schumann-papillons-litolff                    7    6    33    33     0     0     0   {'n%2': 1}
+schumann-papillons-muzyka                     6    6    33    33     0     0     0   {}
+schumann-papillons-peters1887                 8    7    40    40     0     0     0   {'same-without-connector': 1}
+scriabin-sonata3-belaieff1898                 7    6    34    34     0     0     0   {'nopairs': 1}
+schott-te-volume.mazeppa(reserved)           13    8    43    43    43     0     0   {'separate-has-connector': 4, 'same-without-connector': 1}
+schott-te-volume.pool                        86   78   394   394   392     0     0   {'nopairs': 2, 'same-without-connector': 5, 'separate-has-connector': 1}
+schott-concert-etudes                        10    3    15    15    15     0     0   {'nopairs': 1, 'n%2': 2, 'separate-has-connector': 4}
+schott-concerto1                             44   36   107   214    68     0     0   {'n%4': 5, 'same-without-connector': 2, 'separate-has-connector': 1}
+schott-concerto2                             54   47   141   282    68     0     0   {'same-without-connector': 4, 'n%4': 3}
+schubert-erlkoenig-diabelli1820s             12    0     0     0     0     0     0   {'nopairs': 2, 'separate-has-connector': 10}
+schubert-wanderer-lied-diabelli1822           5    4    12    12     0     0     0   {'nopairs': 1}
