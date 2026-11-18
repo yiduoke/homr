@@ -1,0 +1,429 @@
+{
+ "B_s0": {
+  "mazeppa": {
+   "n": 78,
+   "grand": 43,
+   "miss": 0,
+   "false_grand": 0,
+   "false_join": 0,
+   "sep": 35,
+   "same": 0,
+   "same_wrong": 0,
+   "acc": 1.0
+  },
+  "cappi1802": {
+   "n": 82,
+   "grand": 46,
+   "miss": 15,
+   "false_grand": 0,
+   "false_join": 15,
+   "sep": 36,
+   "same": 0,
+   "same_wrong": 0,
+   "acc": 0.6341463414634146
+  },
+  "eder1800": {
+   "n": 16,
+   "grand": 9,
+   "miss": 1,
+   "false_grand": 0,
+   "false_join": 2,
+   "sep": 7,
+   "same": 0,
+   "same_wrong": 0,
+   "acc": 0.8125
+  },
+  "reichardt": {
+   "n": 153,
+   "grand": 56,
+   "miss": 35,
+   "false_grand": 0,
+   "false_join": 11,
+   "sep": 41,
+   "same": 56,
+   "same_wrong": 1,
+   "acc": 0.6928104575163399
+  },
+  "schott_val": {
+   "n": 341,
+   "grand": 189,
+   "miss": 0,
+   "false_grand": 0,
+   "false_join": 0,
+   "sep": 152,
+   "same": 0,
+   "same_wrong": 0,
+   "acc": 1.0,
+   "per_group": {
+    "concert-etudes-S144": {
+     "n": 27,
+     "grand": 15,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 12,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "etudes-Gnomenreigen": {
+     "n": 87,
+     "grand": 48,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 39,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "etudes-Waldesrauschen": {
+     "n": 70,
+     "grand": 39,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 31,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "etudes-XI": {
+     "n": 76,
+     "grand": 42,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 34,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "etudes-XII": {
+     "n": 81,
+     "grand": 45,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 36,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    }
+   }
+  },
+  "schott_train_pieces": {
+   "n": 396,
+   "grand": 220,
+   "miss": 0,
+   "false_grand": 0,
+   "false_join": 0,
+   "sep": 176,
+   "same": 0,
+   "same_wrong": 0,
+   "acc": 1.0
+  },
+  "curved_val": {
+   "n": 1317,
+   "grand": 720,
+   "miss": 2,
+   "false_grand": 0,
+   "false_join": 0,
+   "sep": 585,
+   "same": 12,
+   "same_wrong": 0,
+   "acc": 0.9984813971146546,
+   "per_group": {
+    "balakirev-islamey-jurgenson1909": {
+     "n": 52,
+     "grand": 29,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 23,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "beethoven-op110-haslinger1835": {
+     "n": 83,
+     "grand": 45,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 38,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "beethoven-op27-1-cappi1801": {
+     "n": 1,
+     "grand": 1,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 0,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "beethoven-op27-2-cranz1814": {
+     "n": 77,
+     "grand": 42,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 35,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "beethoven-op31-2-naegeli1803": {
+     "n": 93,
+     "grand": 52,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 41,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "beethoven-op31-2-simrock1802": {
+     "n": 5,
+     "grand": 3,
+     "miss": 1,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 2,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 0.8
+    },
+    "brahms-ballades10-breitkopf1856": {
+     "n": 105,
+     "grand": 58,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 47,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "liszt-paganini2-costallat1918": {
+     "n": 32,
+     "grand": 18,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 14,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "liszt-sonata-breitkopf1924-motta": {
+     "n": 74,
+     "grand": 41,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 33,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "liszt-sonata-peters-sauer": {
+     "n": 73,
+     "grand": 40,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 33,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "liszt-sonata-salabert1949-cortot": {
+     "n": 37,
+     "grand": 21,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 16,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "liszt-sonata-ue1917-friedman": {
+     "n": 67,
+     "grand": 37,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 30,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "mendelssohn-lieder19b-simrock1832": {
+     "n": 71,
+     "grand": 39,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 32,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "schubert-d899-1-cranz": {
+     "n": 78,
+     "grand": 42,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 36,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "schubert-d899-2-schott1913": {
+     "n": 55,
+     "grand": 30,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 25,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "schubert-wanderer-lied-diabelli1822": {
+     "n": 32,
+     "grand": 12,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 8,
+     "same": 12,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "schumann-op12-2-breitkopf1857": {
+     "n": 43,
+     "grand": 24,
+     "miss": 1,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 19,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 0.9767441860465116
+    },
+    "schumann-op12-henle1987": {
+     "n": 73,
+     "grand": 40,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 33,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "schumann-op12-peters-sauer1925": {
+     "n": 73,
+     "grand": 40,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 33,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "schumann-papillons-litolff": {
+     "n": 60,
+     "grand": 33,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 27,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "schumann-papillons-muzyka": {
+     "n": 60,
+     "grand": 33,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 27,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    },
+    "schumann-papillons-peters1887": {
+     "n": 73,
+     "grand": 40,
+     "miss": 0,
+     "false_grand": 0,
+     "false_join": 0,
+     "sep": 33,
+     "same": 0,
+     "same_wrong": 0,
+     "acc": 1.0
+    }
+   }
+  },
+  "curved_train_works": {
+   "n": 1115,
+   "grand": 616,
+   "miss": 0,
+   "false_grand": 0,
+   "false_join": 0,
+   "sep": 499,
+   "same": 0,
+   "same_wrong": 0,
+   "acc": 1.0
+  },
+  "test_scans": {
+   "total": {
+    "inside": 169,
+    "grand": 169,
+    "between": 136,
+    "between_sep": 136,
+    "opening_systems": 13,
+    "opening_grand": 13
+   },
+   "per_piece": {
+    "liszt-te-5": {
+     "inside": 45,
+     "grand": 45,
+     "between": 36,
+     "between_sep": 36,
+     "opening_grand": 5,
+     "opening_systems": 5
+    },
+    "liszt-te-10": {
+     "inside": 48,
+     "grand": 48,
+     "between": 38,
+     "between_sep": 38,
+     "opening_grand": 4,
+     "opening_systems": 4
+    },
+    "liszt-sonata": {
+     "inside": 76,
+     "grand": 76,
+     "between": 62,
+     "between_sep": 62,
+     "opening_grand": 4,
+     "opening_systems": 4
+    }
+   }
+  }
+ }
+}
