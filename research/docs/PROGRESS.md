@@ -5,7 +5,7 @@ comes next. Written for people and coding agents picking up the work. Upstream i
 liebharc/homr; its own docs (README.md, Training.md, IDEAS_FOR_CONTRIBUTORS.md,
 AGENTS.md) still apply.
 
-Last updated: 2026-11-17 (3:45 pm Pacific).
+Last updated: 2026-11-17 (5:00 pm Pacific).
 
 Related documents: [PAPER_NOTES.md](PAPER_NOTES.md) (the paper's story, final numbers only);
 [EXPERIMENTS.md](https://github.com/yiduoke/homr-research/blob/main/EXPERIMENTS.md) in the private research repo
@@ -983,6 +983,11 @@ All 29 pairs were inspected visually, with 28 scored. At fixed bar alignment, al
 On rendered page 8 of Hungarian Rhapsody No. 6, the released model’s output repeats G5 414 times in succession. One output bar accounts for 578 of 902 unmatched predictions. Replay that crop with the existing loop guard. Keep Schott staff pairing as a layout task. Test a finer CNN spatial grid as a separate, matched training run. Local handoff and page images are in the [29-pair visual audit](https://github.com/yiduoke/homr-research/blob/main/eval_run1/scan_render_audit.md).
 
 **Open reference and render checks.** Alongside the resolution experiment, trace the octave brackets in *Winter Wind* m. 20 and Schubert D. 899 No. 4 m. 64 across the scan, reference XML, render and model output. Scriabin’s extra rendered staff has already been fixed. Correct verified source or engraving errors, document genuine edition differences, and rescore every affected checkpoint on the same reference version. [Correction procedure](https://github.com/yiduoke/homr-research/blob/main/eval_run1/scan_render_audit.md#render-and-reference-xml-corrections)
+
+## Status 2026-11-17, 5:00 pm Pacific: octave-bracket crops of the pilot scan pairs reviewed by eye (D17, `run/scan_pairs_virtuoso/octave_review.md`)
+
+- The 60 training-side `octave_unverified` crops (groups A, B; validation's 6 untouched): 27 label right, 7 label wrong and corrected (print has an 8va that the ASAP XML lacks), 6 label wrong and quarantined, 20 edition differences (print writes the high notes at pitch, ASAP has 8va), none undecided. Direction: of the 39 crops where the label has a bracket, 13 right, 20 edition, 6 wrong; of the 21 where the model saw one, 14 label right (model invented it), 7 corrected.
+- Admitted `lists/train_octave_verified.txt` 34 crops (14 with no bracket, 20 with one: 19 starts, 1 inside a continuing bracket, 16 stops, 5 continuing out; no end of a multi-system bracket), so the pilot training set is 878 + 34 = 912; quarantine `lists/octave_quarantine_final.txt` 26. The multi-system continuation gap remains. Laptop only; nothing pushed.
 
 ## Status 2026-11-17, 4:30 pm Pacific: pilot set of verified virtuoso real-scan pairs (D13, `run/scan_pairs_virtuoso/`)
 

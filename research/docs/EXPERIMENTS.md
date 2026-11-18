@@ -551,6 +551,13 @@ runs on the box in tmux `a11` (CPU, `HOMR_FORCE_CPU=1`, log `/root/logs/res_eval
 and the GPU arms `res_A_s7_gpu`, `res_A_s11_gpu` (the baselines for the B arms on the GPU). Problem met: two evaluations plus another agent's 8 workers filled the 31 GB and OOM-killed pool
 workers (pieces FAILED in the log); the GPU run was stopped and everything is re-run one at a time, finished pieces are kept. ONNX hashes of `run3_ctrl_s11` on the box equal the laptop's.
 
+## D17. Eye review of the 60 training-side octave-bracket disagreements of the pilot scan pairs (2026-11-17, 4:30-5:00 pm Pacific; `scan_pairs_virtuoso/octave_review.md`, `.csv`)
+
+Each of the 60 crops (groups A and B; the 6 validation crops were not touched) was put above an engraving of its label measures (Verovio, bracket re-opened at the window start) and compared with the print and the released model's read; token convention checked on the ASAP XML: pitch tokens are written pitch, shift tokens carry the shift.
+**Result: 27 label right (13 bracket in label and model missed, 14 model invented a bracket or stop), 7 label wrong and corrected (ASAP XML lacks the printed `<octave-shift>`, notes at sounding pitch: bracket added, notes lowered; 0 octave differences to the model's read afterwards), 6 label wrong and quarantined (Liszt TE1 x2 shifted label, TE11 orphan stops, Ballade 2 and Ballade 1 bar-count mismatches hidden behind the octave reason, Ballade 3 bracket extent), 20 edition differences (the print writes the high notes at pitch without 8va, ASAP has 8va; Muzgiz Scherzo 2, Schirmer Schubert/Ballade 2, Buelow Op.111, Scharwenka Ballade 3), 0 undecided.**
+Admitted `lists/train_octave_verified.txt`: 34 (14 without any bracket, 20 with one: 19 bracket starts, 1 crop inside a continuing bracket, 16 stops, 5 continuing into the next system; no crop holds the end of a bracket opened in an earlier system); quarantine `lists/octave_quarantine_final.txt` 26; 16 of the edition crops have a corrected tokens candidate (`lists/octave_edition_corrected_candidates.txt`, not admitted).
+Training total with the pilot: 878 + 34 = 912. The multi-system continuation gap is not closed by this review. Evidence: 18 side-by-side sheets in `octave_review_images/`; code `octave_review_scripts/`; originals and frozen lists untouched; corrected tokens in `octave_review/tokens_corrected/`.
+
 ## R7. Input-resolution experiment, prepared 2:35 pm, LAUNCHED 2:55 pm Pacific 2026-11-17 (spec `res_experiment_spec.md`)
 
 Question: finer grid (384x1920 canvas, 24x120 tokens) vs 256x1280 (16x80) from released run2s7, same list (`run2_train_excl_v3`, 6,716
