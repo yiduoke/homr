@@ -1,0 +1,23 @@
+{
+ "tag": "shipped_merge_role_gpu",
+ "relation_model": "shipped",
+ "relation_sha256_16": "shipped (pdmx2)",
+ "transcription": "released pytorch_model_meteracc-r2s7-afae0e3",
+ "HOMR_FORCE_CPU": null,
+ "HOMR_LOOP_GUARD": "1",
+ "HOMR_FIXED_MARGIN": "1",
+ "HOMR_TRUST_PAGE_TIME": "1",
+ "code": "rel_wt",
+ "rel_wt_commit": "",
+ "merger": "/Users/yiduoke/Documents/homr/run/merge_wt/merge_pages.py",
+ "merger_sha256_16": "3581cc08549f06d1",
+ "scorer_sha256_16": "71132cac3f0462b8",
+ "decoder_sha256_16": "3ff548ea6c305151",
+ "onnx_sha256_16": {
+  "decoder_pytorch_model_meteracc-r2s7-afae0e3.onnx": "8aa115147dff06e6",
+  "decoder_pytorch_model_meteracc-r2s7-afae0e3_fp16.onnx": "c8e9ce0a27afb0b1",
+  "encoder_pytorch_model_meteracc-r2s7-afae0e3.onnx": "2140b2e7e1fa204b",
+  "encoder_pytorch_model_meteracc-r2s7-afae0e3_fp16.onnx": "e1564c7ea0b78700"
+ },
+ "started_pacific": "2026-11-17 19:23 PST"
+}

@@ -5,6 +5,7 @@ parser that keeps step/alter/octave, chord info and octave-shift state.
 Read-only. Output: pitch_audit.json (all error records) + stdout summary.
 Run: /Users/yiduoke/Documents/homr/.venv/bin/python -B pitch_audit.py
 """
+import os
 import json
 import sys
 import xml.etree.ElementTree as ET
@@ -106,6 +107,9 @@ def read_file(path):
                     pitch = el.find("pitch")
                     if pitch is None:
                         continue
+                    if os.environ.get("AUDIT_VISIBLE") == "1" and (el.get("print-object") == "no" or any(
+                            (h.text or "").strip() == "none" for h in el.findall("notehead"))):
+                        continue  # hidden notes are not counted by the scorer since D10 (the cursor has advanced already)
                     step = pitch.findtext("step")
                     alter = float(pitch.findtext("alter") or "0")
                     octv = int(pitch.findtext("octave") or "0")
