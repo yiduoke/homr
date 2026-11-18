@@ -1,0 +1,91 @@
+{
+ "pilot": {
+  "candidates": 878,
+  "kept": 867,
+  "tier strong": 853,
+  "dropped: notes touch at the loosest spacing": 10,
+  "dropped: note heads": 1,
+  "tier hard": 14
+ },
+ "pilot by piece: A2": {
+  "kept": 40
+ },
+ "pilot by piece: A3": {
+  "kept": 11
+ },
+ "pilot by piece: A4": {
+  "kept": 89
+ },
+ "pilot by piece: A5": {
+  "kept": 23
+ },
+ "pilot by piece: A6": {
+  "kept": 19
+ },
+ "pilot by piece: A7": {
+  "kept": 15
+ },
+ "pilot by piece: A8": {
+  "kept": 22
+ },
+ "pilot by piece: A9": {
+  "kept": 22
+ },
+ "pilot by piece: A10": {
+  "kept": 54
+ },
+ "pilot by piece: A11": {
+  "kept": 43
+ },
+ "pilot by piece: A12": {
+  "kept": 47
+ },
+ "pilot by piece: A13": {
+  "kept": 68
+ },
+ "pilot by piece: A14": {
+  "kept": 58
+ },
+ "pilot by piece: A15": {
+  "kept": 32
+ },
+ "pilot by piece: A16": {
+  "kept": 48
+ },
+ "pilot by piece: A17": {
+  "kept": 58
+ },
+ "pilot by piece: A18": {
+  "kept": 23
+ },
+ "pilot by piece: A19": {
+  "kept": 44
+ },
+ "pilot by piece: B1": {
+  "kept": 26
+ },
+ "pilot by piece: B2": {
+  "kept": 45
+ },
+ "pilot by piece: B3": {
+  "kept": 25
+ },
+ "pilot by piece: B4": {
+  "kept": 55
+ },
+ "val": {
+  "candidates": 104,
+  "kept": 98,
+  "tier strong": 98,
+  "dropped: notes touch at the loosest spacing": 6
+ },
+ "val by piece: C1": {
+  "kept": 19
+ },
+ "val by piece: C2": {
+  "kept": 26
+ },
+ "val by piece: C3": {
+  "kept": 53
+ }
+}

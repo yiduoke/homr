@@ -1,0 +1,18 @@
+split	crop	reason
+pilot	A3_p-02_s3	notes touch at the loosest spacing (gap -2.76 ss)
+pilot	A3_p-03_s2	notes touch at the loosest spacing (gap -0.35 ss)
+pilot	A3_p-09_s3	notes touch at the loosest spacing (gap -0.35 ss)
+pilot	A4_p-10_s3	notes touch at the loosest spacing (gap -0.68 ss)
+pilot	A4_p-11_s0	notes touch at the loosest spacing (gap -2.33 ss)
+pilot	A8_p-19_s0	note heads: tokens 123, rendering 122
+pilot	A8_p-20_s3	notes touch at the loosest spacing (gap -0.72 ss)
+pilot	A8_p-22_s3	notes touch at the loosest spacing (gap -2.20 ss)
+pilot	A10_p-02_s1	notes touch at the loosest spacing (gap -0.45 ss)
+pilot	A12_p-09_s5	notes touch at the loosest spacing (gap -0.53 ss)
+pilot	B2_p-10_s3	notes touch at the loosest spacing (gap -1.14 ss)
+val	C2_p-10_s0	notes touch at the loosest spacing (gap -3.48 ss)
+val	C2_p-10_s3	notes touch at the loosest spacing (gap -3.48 ss)
+val	C2_p-14_s0	notes touch at the loosest spacing (gap -3.48 ss)
+val	C2_p-14_s2	notes touch at the loosest spacing (gap -0.35 ss)
+val	C2_p-14_s3	notes touch at the loosest spacing (gap -3.48 ss)
+val	C2_p-16_s0	notes touch at the loosest spacing (gap -3.48 ss)
