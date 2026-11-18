@@ -1,0 +1,7 @@
+source	tokens	bar	bars_in_staff	kind	tracks	bar_length	basis
+scan_pairs_v2	scan_pairs_virtuoso/tokens/A10_p-12_s2.tokens	1	2	bug_rest8	lower=note_1|upper=rest_8	1	inferred
+scan_pairs_v2	scan_pairs_virtuoso/tokens/A13_p-11_s4.tokens	1	8	bug_rest8	lower=rest_8|lower2=note_8|upper=note_8+note_8+note_8+note_8+note_8	3/4	inferred
+scan_pairs_v2	scan_pairs_virtuoso/tokens/A13_p-11_s4.tokens	3	8	bug_rest8	lower=rest_8|upper=note_8+note_8+note_8+note_8+note_8+note_8	3/4	inferred
+scan_pairs_v2	scan_pairs_virtuoso/tokens/A13_p-11_s4.tokens	4	8	bug_rest8	lower=rest_8|lower2=note_8+note_8|upper=note_8+note_8+note_8+note_8	3/4	inferred
+scan_pairs_v2	scan_pairs_virtuoso/tokens/A13_p-11_s4.tokens	6	8	bug_rest8	lower=note_2.|upper=rest_8	3/4	inferred
+scan_pairs_v2	scan_pairs_virtuoso/tokens/A13_p-11_s4.tokens	7	8	bug_rest8	lower=note_2.|upper=rest_8	3/4	inferred

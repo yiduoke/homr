@@ -5,13 +5,15 @@ comes next. Written for people and coding agents picking up the work. Upstream i
 liebharc/homr; its own docs (README.md, Training.md, IDEAS_FOR_CONTRIBUTORS.md,
 AGENTS.md) still apply.
 
-Last updated: 2026-11-17 (6:45 pm Pacific).
+Last updated: 2026-11-17 (7:00 pm Pacific).
 
 Related documents: [PAPER_NOTES.md](PAPER_NOTES.md) (the paper's story, final numbers only);
 [EXPERIMENTS.md](https://github.com/yiduoke/homr-research/blob/main/EXPERIMENTS.md) in the private research repo
 [yiduoke/homr-research](https://github.com/yiduoke/homr-research) (exact commands, commits,
 checksums and outputs per result; local checkout `run/`); [Training.md](Training.md) (model
 cards); release [meteracc_checkpoints](https://github.com/yiduoke/homr/releases/tag/meteracc_checkpoints).
+
+**Status 7:00 pm Pacific 2026-11-17 (D27, `run/EXPERIMENTS.md`, `run/barrest_audit/REPORT.md`, detector `run/barrest_audit/detect_barrest.py`):** audit of the main training data for the typeless bar-rest label bug (a rest without `<type>` written as `rest_8`, D18). The bug is not in it: the source MusicXML of 56,441 scores (all MuseScore 4.6.5 exports) has 0 typeless rests, while the original ASAP XML has them in 138 of 211 files, which is why only the pilot was hit. A token-file detector (bar length from the meter tokens or inferred) flags 820 of 149,891 training staves (0.55 %) and 29 of 7,012 validation staves, but the XML shows these are real eighth rests in pickup bars (60 % in the first bar) or second voices; the detector finds all 86 known pilot crops (86 of 86; 0 on the fixed tokens, 0 of 785 other strong crops) and 2 hard crops of `pilot_scan_v2.txt` that still have the bug (`A13_p-11_s4`, `A10_p-12_s2`; fix in `work/tuplet/regress_*.tokens`). Converter paths: MuseScore-XML sets use `_measure_rest_rhythm` (`rest_1`, `rest_2.`, ... by bar length), kern sets write the typed kern rest; the model vocabulary has no `measureRest` token. Training staves that would change: 0. The released model reads a single bar-rest token in 170 of 190 pilot label bars that say `rest_8` (never `rest_8`); on the 29 saved test-scan pages 29 of 227 rest-only staff bars have the wrong length (21 times a whole rest in a 3/4 bar), no effect on pitch scores. Side finding: `rest_1` is written for bar rests in meters without a token (592 of 14,878 known-meter single-rest bars). Plan (not run): no regeneration of the main sets; parser rule plus tests, two pilot crops, detector gate for new sources, writer-side measure rest. Read-only on vast-homr4, nothing trained.
 
 **Status 6:45 pm Pacific 2026-11-17 (D23, `run/EXPERIMENTS.md`, `run/scan_pairs_virtuoso/PILOT_SPEC.md` section 7):** pilot label lists v2 built before launch: all passages use corrected tokens (78 + 6 stale bar-rest labels found and fixed), 34 octave-verified and 30 tuplet-fixed crops added in both arms with twins, Chopin Sonata 2 movements all on the train side, 7 printed-notation mismatches and 69 clef-label errors removed (19 of 19 checked clef flags were label errors); pilot train 881, validation 72, batch 2 train 520 / val 145; batch 2 printed-notation candidates (Op.25/8 12/8, Sonata 2 mvt 1 6/4, Ravel) listed with corrected tokens where unambiguous, none admitted. Released model on v2 validation: scan pitch F1 0.991, twin 0.996. Resolution choice still pending.
 

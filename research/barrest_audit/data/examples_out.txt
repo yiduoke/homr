@@ -1,0 +1,336 @@
+### asap | Beethoven_Piano_Sonatas_11-1-18-3.tokens | bar 0 of 1 | kind bug_rest8 | bar length 1 (inferred) | tracks lower=note_8+note_8+note_8+note_8+note_8+note_8+note_8|lower2=note_1|upper=rest_
+    clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
+    keySignature_-2 . . . . .
+    rest_8 _ _ _ _ upper&note_1 E3 b _ _ lower2&note_1 F2 _ _ _ lower2
+    note_8 E3 N _ beamStart_slurStart lower
+    note_8 F3 _ _ beamContinue lower
+    note_8 G3 _ _ beamStop lower
+    XML: Beethoven_Piano_Sonatas_11-1.musicxml part P1 m124 time 4/4: <note default-x="90.17" default-y="-100"> <rest> <display-step>G</display-step> <display-octave>2</display-octave> </rest> <duration>6</duration> <voice>1</voice> <type>eighth</type> <staff>1</staff> 
+### asap | Beethoven_Piano_Sonatas_17-3-4-1.tokens | bar 3 of 5 | kind bug_rest8 | bar length 3/8 (inferred) | tracks lower=note_8|lower2=note_8+note_16+note_16+note_16+note_16|upper=rest_8|upper2=n
+    rest_8 _ _ _ _ upper&note_8 E4 _ _ _ lower&note_8 G3 # _ _ lower&note_8 E3 _ _ _ lower2&note_8 E2 _ _ _ lower2
+    dynamic_f _ _ _ _ upper
+    note_8 F5 _ trill beamStart_slurStart upper2&note_16 D4 N _ beamStart lower2&note_16 B3 N _ _ lower2
+    note_16 E4 _ _ beamContinue lower2
+    note_8 E5 _ _ beamStop_slurStop upper2&note_16 G3 _ _ beamContinue lower2
+    note_16 E4 _ _ beamStop lower2
+    XML: Beethoven_Piano_Sonatas_17-3.musicxml no measure with a single typed eighth rest found
+### asap | Bach_Prelude_bwv_876-4-1.tokens | bar 2 of 4 | kind bug_rest8 | bar length 9/8 (inferred) | tracks lower=rest_8|upper=note_4+note_8+note_8+note_8+note_8+rest_8+note_8+note_8|upper
+    note_4 C6 _ _ _ upper&rest_8 _ _ _ _ lower
+    note_8 A4 _ _ beamStart upper2
+    note_8 B5 N _ _ upper&note_8 G4 _ _ beamStop upper2
+    note_8 C6 _ _ beamStart upper&note_8 A4 _ _ beamStart upper2
+    note_8 G5 _ _ beamContinue upper&note_8 E4 _ _ beamContinue upper2
+    note_8 A5 _ _ beamStop upper&note_8 C4 _ _ beamStop upper2
+    XML: Bach_Prelude_bwv_876.musicxml part P1 m43 time 9/8: <note default-x="12.5" default-y="-135"> <rest> <display-step>B</display-step> <display-octave>2</display-octave> </rest> <duration>2</duration> <voice>5</voice> <type>eighth</type> <staff>2</staff> <
+### kern_scans | sonata11-2_s016.tokens | bar 1 of 2 | kind bug_rest8 | bar length 9/8 (inferred) | tracks lower=rest_8|upper=note_16+note_16+note_16+note_16+note_16+note_16+note_16+note_
+    note_16 A4 _ _ beamStart upper&rest_8 _ _ _ _ lower
+    note_16 B4 N _ beamContinue upper
+    note_16 C5 _ _ beamContinue upper
+    note_16 B4 _ _ beamContinue upper
+    note_16 D5 _ _ beamContinue upper
+    note_16 C5 _ _ beamStop upper
+    XML: XML_NOT_FOUND
+### kern_scans | sonata17-1_s012.tokens | bar 3 of 8 | kind bug_rest8 | bar length 3/4 (inferred) | tracks lower=rest_8|upper=rest_8
+    rest_8 _ _ _ _ upper&rest_8 _ _ _ _ lower
+    XML: XML_NOT_FOUND
+### lieder | lc6218732-1-4.tokens | bar 0 of 5 | kind bug_rest8 | bar length 3/4 (meter_known) | tracks upper=rest_8
+    clef_F4 _ _ _ _ upper
+    keySignature_-3 . . . . .
+    timeSignature_6/8 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: lc6218732.musicxml part P2 m0 time 6/8: <note default-x="120.24" default-y="-143.29"> <rest /> <duration>1</duration> <voice>1</voice> <type>eighth</type> </note> 
+### lieder | lc5009900-vrv-1-0.tokens | bar 0 of 6 | kind bug_rest8 | bar length 1/2 (meter_known) | tracks upper=rest_8
+    clef_G2 _ _ _ _ upper
+    keySignature_-2 . . . . .
+    timeSignature_2/4 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: lc5009900.musicxml part P1 m0 time 2/4: <note default-x="111.81" default-y="-20"> <rest /> <duration>4</duration> <voice>1</voice> <type>eighth</type> </note> 
+### lieder | lc6260992-vrv-1-0.tokens | bar 0 of 6 | kind bug_rest8 | bar length 3/4 (meter_known) | tracks upper=rest_8
+    clef_G2 _ _ _ _ upper
+    keySignature_0 . . . . .
+    timeSignature_3/4 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: lc6260992.musicxml part P1 m0 time 3/4: <note default-x="81.87" default-y="-20"> <rest /> <duration>6</duration> <voice>1</voice> <type>eighth</type> </note> 
+### lieder | lc5098690-vrv-1-0.tokens | bar 0 of 6 | kind bug_rest8 | bar length 3/4 (meter_known) | tracks upper=rest_8
+    clef_G2 _ _ _ _ upper
+    keySignature_-3 . . . . .
+    timeSignature_6/8 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: lc5098690.musicxml part P1 m0 time 6/8: <note default-x="124.18" default-y="-20"> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> </note> 
+### lieder | lc6800412-1-2.tokens | bar 0 of 5 | kind bug_rest8 | bar length 3/4 (meter_known) | tracks lower=rest_8|upper=rest_8
+    clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
+    keySignature_0 . . . . .
+    timeSignature_6/8 . . . . .
+    rest_8 _ _ _ _ upper&rest_8 _ _ _ _ lower
+    XML: lc6800412.musicxml part P2 m0 time 6/8: <note default-x="81.48" default-y="-145.88"> <rest /> <duration>1</duration> <voice>1</voice> <type>eighth</type> <staff>1</staff> </note> 
+### lieder | lc6804721-vrv-1-0.tokens | bar 0 of 6 | kind bug_rest8 | bar length 1/2 (meter_known) | tracks upper=rest_8
+    clef_G2 _ _ _ _ upper
+    keySignature_-1 . . . . .
+    timeSignature_2/4 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: lc6804721.musicxml part P1 m0 time 2/4: <note default-x="101.59" default-y="-20"> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> </note> 
+### lieder | lc6164234-1-4.tokens | bar 1 of 7 | kind bug_rest8 | bar length 1/2 (inferred) | tracks lower=rest_8|upper=note_8+note_16+note_16+note_8.+note_16|upper2=note_8+note_8
+    note_8 E5 _ staccato _ upper&note_8 E4 _ _ _ upper
+    note_16 E5 _ staccato beamStart upper&note_8 B4 _ _ _ upper2&note_8 G4 _ _ _ upper2&note_8 E4 _ _ _ upper2
+    note_16 E5 _ staccato beamStop upper
+    note_8. B5 _ _ beamStart_slurStart upper&rest_8 _ _ _ _ lower
+    note_8 B4 _ _ _ upper2&note_8 E4 _ _ _ upper2&note_8 D4 _ _ _ upper2
+    note_16 G5 _ _ beamStop upper
+    XML: lc6164234.musicxml part P2 m71 time 2/4: <note default-x="182.66" default-y="-142"> <rest /> <duration>6</duration> <voice>5</voice> <type>eighth</type> <staff>2</staff> </note> 
+### lieder | lc5988388-1-1.tokens | bar 0 of 6 | kind bug_rest8 | bar length 1/2 (meter_known) | tracks upper=rest_8
+    clef_G2 _ _ _ _ upper
+    keySignature_0 . . . . .
+    timeSignature_2/4 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: lc5988388.musicxml part P1 m0 time 2/4: <note default-x="80.89" default-y="-20"> <rest /> <duration>6</duration> <voice>1</voice> <type>eighth</type> </note> 
+### lieder | lc6320420-7-6.tokens | bar 4 of 6 | kind bug_rest8 | bar length 3/4 (inferred) | tracks lower=note_4+note_4.|lower2=note_4+note_8+note_4+note_8|upper=rest_8
+    note_4 A3 _ _ slurStop lower&note_4 F3 _ _ _ lower&note_4 C3 _ _ slurStart lower2
+    rest_8 _ _ _ _ upper&note_8 A2 _ _ _ lower2
+    dynamic_pp _ _ _ _ upper
+    note_4. A3 _ _ slurStart lower&note_4. F3 _ _ _ lower&note_4 F2 _ _ _ lower2
+    note_8 A2 _ _ slurStop lower2
+    XML: lc6320420.musicxml part P3 m10 time 6/8: <note default-x="151" default-y="-348.08"> <rest /> <duration>6</duration> <voice>1</voice> <type>eighth</type> <staff>1</staff> </note> 
+### lieder | lc6205693-3-6.tokens | bar 0 of 3 | kind bug_rest8 | bar length 3/4 (inferred) | tracks lower=rest_8|upper=note_8+note_8+note_8+note_8+note_8+note_8|upper2=note_8+note_
+    clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
+    keySignature_-1 . . . . .
+    note_8 B4 _ _ beamStart upper&rest_8 _ _ _ _ lower
+    note_8 B4 _ _ beamContinue upper&note_8 A4 _ _ beamStart_slurStart upper2
+    note_8 B4 _ _ beamContinue upper&note_8 G4 _ _ beamContinue upper2
+    note_8 B4 _ _ beamContinue upper&note_8 G4 _ _ _ upper&note_8 F4 _ _ beamContinue upper2
+    XML: lc6205693.musicxml part P2 m29 time 3/4: <note default-x="78.79" default-y="-284.82"> <rest /> <duration>6</duration> <voice>5</voice> <type>eighth</type> <staff>2</staff> </note> 
+### lilypond | lc6069462oct-2-8.tokens | bar 2 of 5 | kind bug_rest8 | bar length 3/4 (inferred) | tracks lower=note_8+note_8+note_8+note_8+note_8|lower2=note_2.|upper=rest_8
+    rest_8 _ _ _ _ upper&note_2. B2 _ _ _ lower2&note_2. B1 _ _ _ lower2
+    note_8 E3 _ _ beamStart lower
+    note_8 G3 # _ beamStop lower
+    note_8 E4 _ _ beamStart lower&note_8 D4 _ _ _ lower
+    note_8 G3 N _ beamContinue lower
+    note_8 E3 _ _ beamStop lower
+    XML: lc6069462oct.musicxml part P2 m32 time 6/8: <note default-x="94.41" default-y="-272.13"> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> <staff>1</staff> </note> 
+### lilypond | QmdVwyBikS2zgPpGooCoBnC3PcTj9D2wr9kJZgLUey37xmv2-1-2.tokens | bar 0 of 4 | kind bug_rest8 | bar length 1 (meter_known) | tracks upper=rest_8
+    clef_F4 _ _ _ _ upper
+    keySignature_3 . . . . .
+    timeSignature_4/4 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: QmdVwyBikS2zgPpGooCoBnC3PcTj9D2wr9kJZgLUey37xm.musicxml part P2 m1 time 4/4: <note default-x="122.14" default-y="-125"> <rest /> <duration>6</duration> <voice>1</voice> <type>eighth</type> </note> 
+### lilypond | lc6623145v2-1-2.tokens | bar 5 of 8 | kind bug_rest8 | bar length 3/4 (meter_known) | tracks lower=rest_8|upper=rest_8
+    rest_8 _ _ _ _ upper&rest_8 _ _ _ _ lower
+    XML: lc6623145.musicxml part P1 m0 time 6/8: <note default-x="101.24" default-y="-20"> <rest /> <duration>1</duration> <voice>1</voice> <type>eighth</type> </note> 
+### lilypond | lc6649005oct-2-4.tokens | bar 2 of 8 | kind bug_rest8 | bar length 1/2 (inferred) | tracks lower=rest_8|upper=rest_8
+    rest_8 _ _ _ _ upper&rest_8 _ _ _ _ lower
+    XML: lc6649005oct.musicxml part P1 m0 time 2/4: <note default-x="114.19" default-y="-20"> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> </note> 
+### lilypond | lc6623145oct-1-1.tokens | bar 0 of 9 | kind bug_rest8 | bar length 3/4 (meter_known) | tracks upper=rest_8
+    clef_G2 _ _ _ _ upper
+    keySignature_1 . . . . .
+    timeSignature_6/8 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: lc6623145oct.musicxml part P1 m0 time 6/8: <note default-x="101.24" default-y="-20"> <rest /> <duration>1</duration> <voice>1</voice> <type>eighth</type> </note> 
+### lilypond | lc5653497oct-1-1.tokens | bar 0 of 5 | kind bug_rest8 | bar length 1 (meter_known) | tracks upper=rest_8
+    clef_G2 _ _ _ _ upper
+    keySignature_2 . . . . .
+    timeSignature_common . . . . .
+    rest_8 _ _ _ _ upper
+    XML: lc5653497oct.musicxml part P1 m0 time 4/4: <note default-x="113.19" default-y="-20"> <rest /> <duration>6</duration> <voice>1</voice> <type>eighth</type> </note> 
+### lilypond | Qmav31M7CFHc5SnwWXqDGPWnuE1mXteXLVkNdsefuq8BVs-1-4.tokens | bar 0 of 9 | kind bug_rest8 | bar length 3/4 (inferred) | tracks upper=rest_8
+    rest_8 _ _ _ _ upper
+    XML: Qmav31M7CFHc5SnwWXqDGPWnuE1mXteXLVkNdsefuq8BVs.musicxml part P2 m1 time 6/8: <note default-x="107.72" default-y="-118.49"> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> </note> 
+### lilypond | QmWMEtZAgVZ28GCTKHhs5pAj2mK7YD6ZaTx5WwZHDytk7Jv2-1-2.tokens | bar 0 of 9 | kind bug_rest8 | bar length 3/4 (meter_known) | tracks upper=rest_8
+    clef_F4 _ _ _ _ upper
+    keySignature_0 . . . . .
+    timeSignature_6/8 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: QmWMEtZAgVZ28GCTKHhs5pAj2mK7YD6ZaTx5WwZHDytk7J.musicxml part P2 m1 time 6/8: <note default-x="80.98" default-y="-118.31"> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> </note> 
+### lilypond | QmbPVgLVYpe2DTMfsGYUWtsJZVJvudVuKT9UE3DFuBRfRuv2-1-2.tokens | bar 0 of 6 | kind bug_rest8 | bar length 1 (meter_known) | tracks upper=rest_8
+    clef_G2 _ _ _ _ upper
+    keySignature_0 . . . . .
+    timeSignature_4/4 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: QmbPVgLVYpe2DTMfsGYUWtsJZVJvudVuKT9UE3DFuBRfRu.musicxml part P1 m0 time 4/4: <note default-x="82.97" default-y="-20"> <rest /> <duration>24</duration> <voice>1</voice> <type>eighth</type> <staff>1</staff> </note> 
+### lilypond | lc6150402oct-1-1.tokens | bar 0 of 5 | kind bug_rest8 | bar length 3/4 (meter_known) | tracks upper=rest_8
+    clef_G2 _ _ _ _ upper
+    keySignature_3 . . . . .
+    timeSignature_6/8 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: lc6150402oct.musicxml part P1 m0 time 6/8: <note default-x="121.55" default-y="-20"> <rest /> <duration>12</duration> <voice>1</voice> <type>eighth</type> </note> 
+### meter_arm | wgt00029-vrv-1-0.tokens | bar 7 of 10 | kind bug_rest8 | bar length 3/8 (meter_known) | tracks lower=note_8+note_8|lower2=rest_8+note_8+note_8|upper=rest_8
+    rest_8 _ _ _ _ upper&rest_8 _ _ _ _ lower2
+    dynamic_pp _ _ _ _ upper
+    note_8 C4 _ tenuto beamStart_slurStart lower&note_8 A3 _ _ _ lower&note_8 F3 # _ _ lower&note_8 D3 # _ _ lower&note_8 B2 _ _ beamStart lower2&note_8 B
+    note_8 C4 _ tenuto beamStop_slurStop lower&note_8 A3 _ _ _ lower&note_8 F3 _ _ _ lower&note_8 D3 _ _ _ lower&note_8 B2 _ _ beamStop lower2&note_8 B1 _
+    XML: wgt00029.musicxml part P1 m8 time 3/8: <note> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> <staff>1</staff> </note> 
+### meter_arm | wft01574x-1-2.tokens | bar 0 of 3 | kind bug_rest8 | bar length 1 (inferred) | tracks lower=rest_8|upper=rest_8
+    clef_F4 _ _ _ _ upper&clef_F4 _ _ _ _ lower
+    keySignature_2 . . . . .
+    rest_8 _ _ _ _ upper&rest_8 _ _ _ _ lower
+    XML: wft01574.musicxml no measure with a single typed eighth rest found
+### meter_arm | wdt02488-vrv-2-0.tokens | bar 1 of 3 | kind bug_rest8 | bar length 3/4 (inferred) | tracks lower=note_8+note_8+note_8+note_8+note_8|lower2=note_4+rest_4+note_4|upper=rest_
+    rest_8 _ _ _ _ upper&note_4 E2 _ _ _ lower2
+    note_8 B3 _ _ beamStart lower
+    note_8 C4 _ _ beamContinue lower&rest_4 _ _ _ _ lower2
+    note_8 B3 _ _ beamContinue lower
+    note_8 A3 _ _ beamContinue lower&note_4 E3 _ _ _ lower2
+    note_8 G3 _ _ beamStop lower
+    XML: wdt02488.musicxml part P1 m7 time 3/4: <note> <rest> <display-step>C</display-step> <display-octave>4</display-octave> </rest> <duration>2</duration> <voice>1</voice> <type>eighth</type> <staff>1</staff> </note> 
+### meter_arm | wet02768x-1-2.tokens | bar 3 of 4 | kind bug_rest8 | bar length 3/8 (meter_known) | tracks lower=note_16+note_16+note_8|lower2=note_8.+note_16+note_16+note_16|upper=rest_8
+    note_16 E3 N _ beamStart lower&note_8. C3 _ _ beamStart lower2
+    note_16 F3 _ _ beamContinue lower
+    note_8 G3 _ _ beamStop lower
+    note_16 B2 _ _ beamContinue lower2
+    rest_8 _ _ _ _ upper&note_16 A2 _ _ beamContinue lower2
+    note_16 G2 _ _ beamStop lower2
+    XML: wet02768.musicxml part P1 m6 time 3/8: <note> <rest> <display-step>C</display-step> <display-octave>4</display-octave> </rest> <duration>12</duration> <voice>1</voice> <type>eighth</type> <staff>1</staff> </note> 
+### meter_arm | wdt01979-vrv-1-0.tokens | bar 4 of 5 | kind bug_rest8 | bar length 3/4 (meter_known) | tracks lower=rest_8|upper=note_8+note_8+note_8+note_8+note_8+note_8|upper2=note_16+note
+    note_8 E5 _ staccato beamStart upper&note_8 C5 _ _ _ upper&note_16 F4 # _ beamStart_slurStart upper2
+    note_16 A4 _ _ beamStop_slurStop upper2
+    note_8 C5 _ staccato beamContinue upper&note_8 A4 _ _ _ upper&note_8 F4 _ _ _ upper2
+    note_8 E5 _ staccato beamStop upper&note_8 C5 _ _ _ upper&rest_8 _ _ _ _ lower
+    dynamic_f _ _ _ _ upper
+    note_8 D5 # _ beamStart upper&note_8 B4 _ _ _ upper&note_4. A4 _ _ _ upper2&note_4. D4 # _ _ upper2&note_4. B3 _ _ _ upper2
+    XML: wdt01979.musicxml part P1 m5 time 6/8: <note> <rest /> <duration>12</duration> <voice>5</voice> <type>eighth</type> <staff>2</staff> </note> 
+### musescore_octave | lc6624112-4-1.tokens | bar 0 of 7 | kind bug_rest8 | bar length 3/4 (meter_known) | tracks upper=rest_8
+    clef_G2 _ _ _ _ upper
+    keySignature_0 . . . . .
+    timeSignature_6/8 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: lc6624112.musicxml part P1 m0 time 6/8: <note default-x="81.48" default-y="-20"> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> </note> 
+### musescore_octave | sq8913219-29-17.tokens | bar 1 of 6 | kind bug_rest8 | bar length 1 (inferred) | tracks upper=rest_8
+    keySignature_0 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: sq8913219.musicxml part P1 mX5 time 2/2: <note default-x="76.97" default-y="-20"> <rest /> <duration>12</duration> <voice>1</voice> <type>eighth</type> </note> 
+### musescore_octave | lc5987667-13-8.tokens | bar 0 of 3 | kind bug_rest8 | bar length 3/4 (inferred) | tracks lower=rest_8|upper=note_8+note_8+note_8+note_8+note_8+note_8|upper2=note_16+note
+    clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
+    keySignature_0 . . . . .
+    note_8 E5 _ staccato beamStart upper&note_8 C5 _ _ _ upper&note_16 F4 # _ beamStart_slurStart upper2
+    note_16 A4 _ _ beamStop_slurStop upper2
+    note_8 C5 _ staccato beamContinue upper&note_8 A4 _ _ _ upper&note_8 F4 _ _ _ upper2
+    note_8 E5 _ staccato beamStop upper&note_8 C5 _ _ _ upper&rest_8 _ _ _ _ lower
+    XML: lc5987667.musicxml part P2 m39 time 6/8: <note default-x="188.09" default-y="-171.26"> <rest /> <duration>12</duration> <voice>5</voice> <type>eighth</type> <staff>2</staff> </note> 
+### musescore_octave | lc6766368-1-1.tokens | bar 0 of 3 | kind bug_rest8 | bar length 9/8 (meter_known) | tracks upper=rest_8
+    clef_G2 _ _ _ _ upper
+    keySignature_2 . . . . .
+    timeSignature_9/8 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: lc6766368.musicxml part P1 m0 time 9/8: <note default-x="112.19" default-y="-20"> <rest /> <duration>1</duration> <voice>1</voice> <type>eighth</type> </note> 
+### musescore_octave | lc6624112-1-1.tokens | bar 0 of 4 | kind bug_rest8 | bar length 3/4 (meter_known) | tracks upper=rest_8
+    clef_G2 _ _ _ _ upper
+    keySignature_0 . . . . .
+    timeSignature_6/8 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: lc6624112.musicxml part P1 m0 time 6/8: <note default-x="81.48" default-y="-20"> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> </note> 
+### musescore_octave | sq7249986-7-1.tokens | bar 0 of 4 | kind bug_rest8 | bar length 1 (inferred) | tracks upper=rest_8
+    rest_8 _ _ _ _ upper
+    XML: sq7249986.musicxml part P1 m38 time 4/4: <note default-x="109.57" default-y="-20"> <rest /> <duration>24</duration> <voice>1</voice> <type>eighth</type> </note> 
+### musescore_octave | lc5995356-3-8.tokens | bar 3 of 4 | kind bug_rest8 | bar length 1 (meter_known) | tracks lower=note_4+note_4+note_4+note_8|lower2=note_2+note_4+note_8+rest_8|upper=rest_
+    note_4 D4 _ _ slurStart lower&note_2 F3 _ _ _ lower2&note_2 D3 _ _ _ lower2&note_2 A2 _ _ _ lower2
+    note_4 C4 _ _ _ lower
+    dynamic_mf _ _ _ _ upper
+    note_4 B3 _ _ slurStart_slurStop lower&note_4 G3 _ _ _ lower&note_4 D3 _ _ slurStart_slurStop lower2&note_4 G2 _ _ _ lower2
+    note_8 B3 _ _ slurStop lower&note_8 G3 _ _ _ lower&note_8 D3 _ _ slurStop lower2&note_8 G2 _ _ _ lower2
+    rest_8 _ _ _ _ upper&rest_8 _ _ _ _ lower2
+    XML: lc5995356.musicxml part P2 m29 time 2/4: <note default-x="172.64" default-y="-294.54"> <rest /> <duration>6</duration> <voice>5</voice> <type>eighth</type> <staff>2</staff> </note> 
+### musescore_octave | lc6581327-1-8.tokens | bar 0 of 3 | kind bug_rest8 | bar length 1 (inferred) | tracks lower=note_8+note_8+note_8+note_8+note_8+note_8+note_8|lower2=note_1|upper=rest_
+    clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
+    keySignature_4 . . . . .
+    rest_8 _ _ _ _ upper&note_1 B2 _ _ _ lower2&note_1 E2 _ _ _ lower2
+    note_8 F3 _ _ beamStart_slurStart lower
+    note_8 A3 _ _ beamContinue lower
+    note_8 B3 _ _ beamStop lower
+    XML: lc6581327.musicxml part P2 m11 time 4/4: <note default-x="113.98" default-y="-125.92"> <rest /> <duration>12</duration> <voice>1</voice> <type>eighth</type> <staff>1</staff> </note> 
+### musescore_octave | sq7249986-37-3.tokens | bar 0 of 5 | kind bug_rest8 | bar length 3/4 (meter_known) | tracks upper=rest_8
+    clef_C3 _ _ _ _ upper
+    keySignature_1 . . . . .
+    timeSignature_6/8 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: sq7249986.musicxml part P1 m38 time 4/4: <note default-x="109.57" default-y="-20"> <rest /> <duration>24</duration> <voice>1</voice> <type>eighth</type> </note> 
+### musescore_octave | lc6202660-1-1.tokens | bar 0 of 10 | kind bug_rest8 | bar length 3/4 (meter_known) | tracks upper=rest_8
+    clef_G2 _ _ _ _ upper
+    keySignature_-5 . . . . .
+    timeSignature_6/8 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: lc6202660.musicxml part P1 m0 time 6/8: <note default-x="160.92" default-y="-20"> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> </note> 
+### pdmx | QmaVcZykfUKBTQc9CsJk7ywKbq24nkYvLm65X7enktzgzv-vrv-2-1.tokens | bar 2 of 7 | kind bug_rest8 | bar length 3/4 (inferred) | tracks upper=rest_8
+    rest_8 _ _ _ _ upper
+    XML: QmaVcZykfUKBTQc9CsJk7ywKbq24nkYvLm65X7enktzgzv.musicxml part P2 m1 time 6/8: <note default-x="98.24" default-y="-118.31"> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> </note> 
+### pdmx | QmPZmJxFNtLqhSWQNoBirB7GLXDttDqPtBkMGCEntbXGUu-1-2.tokens | bar 0 of 7 | kind bug_rest8 | bar length 3/4 (meter_known) | tracks upper=rest_8
+    clef_F4 _ _ _ _ upper
+    keySignature_3 . . . . .
+    timeSignature_6/8 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: QmPZmJxFNtLqhSWQNoBirB7GLXDttDqPtBkMGCEntbXGUu.musicxml part P2 m1 time 6/8: <note default-x="120.15" default-y="-102.95"> <rest /> <duration>1</duration> <voice>1</voice> <type>eighth</type> </note> 
+### pdmx | Qmf5GjKVLuR5fzneVpwVKoDZovZeBBfomkYAgR7acyEiVw-1-2.tokens | bar 0 of 4 | kind bug_rest8 | bar length 9/8 (meter_known) | tracks upper=rest_8
+    clef_F4 _ _ _ _ upper
+    keySignature_0 . . . . .
+    timeSignature_9/8 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: Qmf5GjKVLuR5fzneVpwVKoDZovZeBBfomkYAgR7acyEiVw.musicxml part P2 m1 time 9/8: <note default-x="80.98" default-y="-118.31"> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> </note> 
+### pdmx | QmYjtqYUJgMS65kmtiUHdrjV9qZUdHHKQNKvP68d4ohgWY-vrv-2-1.tokens | bar 4 of 6 | kind bug_rest8 | bar length 1 (inferred) | tracks upper=rest_8
+    rest_8 _ _ _ _ upper
+    XML: QmYjtqYUJgMS65kmtiUHdrjV9qZUdHHKQNKvP68d4ohgWY.musicxml part P2 m1 time 4/4: <note default-x="98.59" default-y="-118.31"> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> </note> 
+### pdmx | QmXh92qMGKfsrCMZU4tYMWwjytwH2XS7oUAxYwz8h8xE3a-vrv-2-0.tokens | bar 0 of 6 | kind bug_rest8 | bar length 1 (inferred) | tracks upper=rest_8
+    rest_8 _ _ _ _ upper
+    XML: QmXh92qMGKfsrCMZU4tYMWwjytwH2XS7oUAxYwz8h8xE3a.musicxml part P1 m6 time 4/4: <note default-x="82.05" default-y="-20"> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> </note> 
+### pdmx | QmPNSYYFNZ66JmYqPuGHGCE54wTgyCCcaTTjcE1rzYJ5bt-1-2.tokens | bar 0 of 4 | kind bug_rest8 | bar length 9/8 (meter_known) | tracks upper=rest_8
+    clef_F4 _ _ _ _ upper
+    keySignature_2 . . . . .
+    timeSignature_9/8 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: QmPNSYYFNZ66JmYqPuGHGCE54wTgyCCcaTTjcE1rzYJ5bt.musicxml part P2 m1 time 9/8: <note default-x="109.19" default-y="-147.5"> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> </note> 
+### pdmx | Qmcr5WgVhQTNz7dwrECStWNbow45NT1Ws6rnVvojXki9HQ-vrv-2-1.tokens | bar 4 of 6 | kind bug_rest8 | bar length 1 (inferred) | tracks upper=rest_8
+    rest_8 _ _ _ _ upper
+    XML: Qmcr5WgVhQTNz7dwrECStWNbow45NT1Ws6rnVvojXki9HQ.musicxml part P2 m1 time 4/4: <note default-x="82.97" default-y="-105.19"> <rest /> <duration>1</duration> <voice>1</voice> <type>eighth</type> </note> 
+### pdmx | QmbPVgLVYpe2DTMfsGYUWtsJZVJvudVuKT9UE3DFuBRfRu-1-2.tokens | bar 0 of 7 | kind bug_rest8 | bar length 1 (meter_known) | tracks upper=rest_8
+    clef_G2 _ _ _ _ upper
+    keySignature_0 . . . . .
+    timeSignature_4/4 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: QmbPVgLVYpe2DTMfsGYUWtsJZVJvudVuKT9UE3DFuBRfRu.musicxml part P1 m0 time 4/4: <note default-x="82.97" default-y="-20"> <rest /> <duration>24</duration> <voice>1</voice> <type>eighth</type> <staff>1</staff> </note> 
+### pdmx | QmbSNiWoSng9MpR8A8sMh7MSy872TjYScohDrL5E3vd7Jb-vrv-1-1.tokens | bar 0 of 4 | kind bug_rest8 | bar length 1 (meter_known) | tracks upper=rest_8
+    clef_F4 _ _ _ _ upper
+    keySignature_2 . . . . .
+    timeSignature_common . . . . .
+    rest_8 _ _ _ _ upper
+    XML: QmbSNiWoSng9MpR8A8sMh7MSy872TjYScohDrL5E3vd7Jb.musicxml part P2 m0 time 4/4: <note default-x="112.59" default-y="-109.59"> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> </note> 
+### pdmx | QmWNykxsnzNy58bnUrEZYLbbSqxKquz4zu7uTvU9EiGxh2-vrv-1-1.tokens | bar 0 of 6 | kind bug_rest8 | bar length 1 (meter_known) | tracks upper=rest_8
+    clef_F4 _ _ _ _ upper
+    keySignature_3 . . . . .
+    timeSignature_4/4 . . . . .
+    rest_8 _ _ _ _ upper
+    XML: QmWNykxsnzNy58bnUrEZYLbbSqxKquz4zu7uTvU9EiGxh2.musicxml part P2 m1 time 4/4: <note default-x="122.14" default-y="-125"> <rest /> <duration>2</duration> <voice>1</voice> <type>eighth</type> </note> 
+### pdmx_hard | QmYkpb4D51GTGkVCui2Zxj2MyvxHNccwrbp9wLXGjtzcLh-1-1.tokens | bar 3 of 6 | kind bug_rest8 | bar length 3/4 (meter_known) | tracks lower=note_8+note_4+note_4|lower2=note_2.+note_8+note_8+note_8+note_4|upper=rest
+    rest_8 _ _ _ _ upper&note_2. A2 _ _ _ lower2&note_2. A1 _ _ _ lower2
+    note_8 A3 _ _ slurStart lower&note_8 F3 _ _ _ lower2&note_8 D3 _ _ _ lower2
+    note_4 A3 _ _ slurStart_slurStop lower&note_8 G3 _ _ beamStart lower2&note_8 E3 _ _ _ lower2
+    note_8 F3 _ _ beamStop lower2&note_8 D3 _ _ _ lower2
+    note_4 A3 _ _ slurStop lower&note_4 E3 _ _ _ lower2&note_4 C3 _ _ _ lower2
+    XML: QmYkpb4D51GTGkVCui2Zxj2MyvxHNccwrbp9wLXGjtzcLh.musicxml part P1 m4 time 3/4: <note default-x="12.5" default-y="0"> <rest> <display-step>F</display-step> <display-octave>5</display-octave> </rest> <duration>2</duration> <voice>1</voice> <type>eighth</type> <staff>1</staff> </no
+### pdmx_hard | QmeDASLRDvYVeroFT8dJHMQJMGCDgzy9DRSem6y6M8jSrT-2-4.tokens | bar 2 of 5 | kind bug_rest8 | bar length 3/8 (inferred) | tracks lower=note_8|lower2=note_8+note_16+note_16+note_16+note_16|upper=rest_8|upper2=n
+    rest_8 _ _ _ _ upper&note_8 E4 _ _ _ lower&note_8 G3 # _ _ lower&note_8 E3 _ _ _ lower2&note_8 E2 _ _ _ lower2
+    dynamic_f _ _ _ _ upper
+    note_8 F5 _ trill beamStart_slurStart upper2&note_16 D4 N _ beamStart lower2&note_16 B3 N _ _ lower2
+    note_16 E4 _ _ beamContinue lower2
+    note_8 E5 _ _ beamStop_slurStop upper2&note_16 G3 _ _ beamContinue lower2
+    note_16 E4 _ _ beamStop lower2
+    XML: QmeDASLRDvYVeroFT8dJHMQJMGCDgzy9DRSem6y6M8jSrT.musicxml no measure with a single typed eighth rest found
+### pdmx_hard | QmYkpb4D51GTGkVCui2Zxj2MyvxHNccwrbp9wLXGjtzcLh-2-4.tokens | bar 5 of 6 | kind bug_rest8 | bar length 3/4 (inferred) | tracks lower=note_8+note_2|lower2=note_2.+note_8+note_8+note_8+note_4|upper=rest_8
+    rest_8 _ _ _ _ upper&note_2. A2 _ _ _ lower2&note_2. A1 _ _ _ lower2
+    note_8 A3 _ _ slurStart lower&note_8 F3 _ _ beamStart_slurStart lower2&note_8 D3 _ _ _ lower2
+    note_2 A3 _ _ slurStop lower&note_8 G3 _ _ beamContinue lower2&note_8 E3 _ _ _ lower2
+    note_8 F3 _ _ beamStop lower2&note_8 D3 _ _ _ lower2
+    note_4 E3 _ _ slurStop lower2&note_4 C3 _ _ _ lower2
+    XML: QmYkpb4D51GTGkVCui2Zxj2MyvxHNccwrbp9wLXGjtzcLh.musicxml part P1 m4 time 3/4: <note default-x="12.5" default-y="0"> <rest> <display-step>F</display-step> <display-octave>5</display-octave> </rest> <duration>2</duration> <voice>1</voice> <type>eighth</type> <staff>1</staff> </no
+### pdmx_hard | QmPZHTbLodH8sa14Sy8RN4vo4r8o9VWt1Adp6zKequJVrt-vrv-12-0.tokens | bar 1 of 5 | kind bug_rest8 | bar length 1 (inferred) | tracks upper=rest_8
+    rest_8 _ _ _ _ upper
+    XML: QmPZHTbLodH8sa14Sy8RN4vo4r8o9VWt1Adp6zKequJVrt.musicxml part P1 m19 time 2/2: <note default-x="31.36" default-y="-20"> <rest /> <duration>6</duration> <voice>1</voice> <type>eighth</type> </note> 
+### pdmx_hard | QmPZHTbLodH8sa14Sy8RN4vo4r8o9VWt1Adp6zKequJVrt-vrv-7-0.tokens | bar 2 of 5 | kind bug_rest8 | bar length 1 (inferred) | tracks upper=rest_8
+    rest_8 _ _ _ _ upper
+    XML: QmPZHTbLodH8sa14Sy8RN4vo4r8o9VWt1Adp6zKequJVrt.musicxml part P1 m19 time 2/2: <note default-x="31.36" default-y="-20"> <rest /> <duration>6</duration> <voice>1</voice> <type>eighth</type> </note> 
+### pdmx_hard | QmPZHTbLodH8sa14Sy8RN4vo4r8o9VWt1Adp6zKequJVrt-vrv-5-0.tokens | bar 2 of 5 | kind bug_rest8 | bar length 1 (inferred) | tracks upper=rest_8
+    rest_8 _ _ _ _ upper
+    XML: QmPZHTbLodH8sa14Sy8RN4vo4r8o9VWt1Adp6zKequJVrt.musicxml part P1 m19 time 2/2: <note default-x="31.36" default-y="-20"> <rest /> <duration>6</duration> <voice>1</voice> <type>eighth</type> </note> 
+### scriabin | scriabin-op58-1-6.tokens | bar 0 of 4 | kind bug_rest8 | bar length 3/4 (inferred) | tracks lower=note_8+note_8+note_8+note_8+note_8|upper=rest_8
+    clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
+    keySignature_0 . . . . .
+    rest_8 _ _ _ _ upper
+    note_8 C3 _ _ _ lower
+    note_8 A3 # _ beamStart lower
+    note_8 E4 _ _ beamContinue lower
+    XML: scriabin-op58.musicxml part P1 m1 time 3/4: <note default-x="142.57" default-y="-123.05"> <rest /> <duration>48</duration> <voice>2</voice> <type>eighth</type> <staff>1</staff> </note> 

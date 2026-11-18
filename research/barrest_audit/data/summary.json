@@ -1,0 +1,344 @@
+{
+ "train": {
+  "detector": {
+   "pdmx": {
+    "staves": 34767,
+    "flagged": 314,
+    "unk_staves": 8,
+    "bars": 148458,
+    "susp_bars": 360,
+    "bug_rest8": 234,
+    "allrest_short": 129,
+    "unknown_rest8": 8,
+    "other_short": 180,
+    "over": 58
+   },
+   "lilypond": {
+    "staves": 29695,
+    "flagged": 274,
+    "unk_staves": 0,
+    "bars": 166105,
+    "susp_bars": 289,
+    "bug_rest8": 126,
+    "allrest_short": 176,
+    "unknown_rest8": 0,
+    "other_short": 339,
+    "over": 14
+   },
+   "meter_arm": {
+    "staves": 14998,
+    "flagged": 15,
+    "unk_staves": 0,
+    "bars": 55908,
+    "susp_bars": 18,
+    "bug_rest8": 6,
+    "allrest_short": 13,
+    "unknown_rest8": 0,
+    "other_short": 72,
+    "over": 29
+   },
+   "musescore_octave": {
+    "staves": 9008,
+    "flagged": 33,
+    "unk_staves": 1,
+    "bars": 33048,
+    "susp_bars": 33,
+    "bug_rest8": 12,
+    "allrest_short": 21,
+    "unknown_rest8": 1,
+    "other_short": 80,
+    "over": 1
+   },
+   "lieder": {
+    "staves": 10914,
+    "flagged": 150,
+    "unk_staves": 1,
+    "bars": 39185,
+    "susp_bars": 156,
+    "bug_rest8": 72,
+    "allrest_short": 96,
+    "unknown_rest8": 1,
+    "other_short": 181,
+    "over": 26
+   },
+   "pdmx_hard": {
+    "staves": 31075,
+    "flagged": 11,
+    "unk_staves": 3,
+    "bars": 117090,
+    "susp_bars": 11,
+    "bug_rest8": 6,
+    "allrest_short": 5,
+    "unknown_rest8": 3,
+    "other_short": 52,
+    "over": 60
+   },
+   "scriabin": {
+    "staves": 2432,
+    "flagged": 2,
+    "unk_staves": 0,
+    "bars": 10526,
+    "susp_bars": 2,
+    "bug_rest8": 2,
+    "allrest_short": 0,
+    "unknown_rest8": 0,
+    "other_short": 86,
+    "over": 8
+   },
+   "grandstaff": {
+    "staves": 10036,
+    "flagged": 2,
+    "unk_staves": 0,
+    "bars": 47142,
+    "susp_bars": 2,
+    "bug_rest8": 0,
+    "allrest_short": 2,
+    "unknown_rest8": 0,
+    "other_short": 4,
+    "over": 0
+   },
+   "asap": {
+    "staves": 3561,
+    "flagged": 5,
+    "unk_staves": 1,
+    "bars": 11021,
+    "susp_bars": 5,
+    "bug_rest8": 3,
+    "allrest_short": 2,
+    "unknown_rest8": 1,
+    "other_short": 62,
+    "over": 1
+   },
+   "kern_scans": {
+    "staves": 3405,
+    "flagged": 14,
+    "unk_staves": 0,
+    "bars": 17510,
+    "susp_bars": 15,
+    "bug_rest8": 3,
+    "allrest_short": 13,
+    "unknown_rest8": 0,
+    "other_short": 29,
+    "over": 0
+   }
+  },
+  "xml": {
+   "pdmx": {
+    "ids": 18206,
+    "scanned": 18206,
+    "scores_typeless": 0,
+    "typeless": 0,
+    "measure_yes": 170470,
+    "typed": 622297
+   },
+   "lilypond": {
+    "ids": 5676,
+    "scanned": 5634,
+    "scores_typeless": 0,
+    "typeless": 0,
+    "measure_yes": 46248,
+    "typed": 294983,
+    "not_found": 42
+   },
+   "meter_arm": {
+    "ids": 12634,
+    "scanned": 12634,
+    "scores_typeless": 0,
+    "typeless": 0,
+    "measure_yes": 8488,
+    "typed": 117356
+   },
+   "musescore_octave": {
+    "ids": 1582,
+    "scanned": 1555,
+    "scores_typeless": 0,
+    "typeless": 0,
+    "measure_yes": 34427,
+    "typed": 218218,
+    "not_found": 27
+   },
+   "lieder": {
+    "ids": 3269,
+    "scanned": 3269,
+    "scores_typeless": 0,
+    "typeless": 0,
+    "measure_yes": 55468,
+    "typed": 345067
+   },
+   "pdmx_hard": {
+    "ids": 10490,
+    "scanned": 10490,
+    "scores_typeless": 0,
+    "typeless": 0,
+    "measure_yes": 53504,
+    "typed": 586872
+   },
+   "scriabin": {
+    "ids": 388,
+    "scanned": 388,
+    "scores_typeless": 0,
+    "typeless": 0,
+    "measure_yes": 7283,
+    "typed": 23757
+   },
+   "asap": {
+    "ids": 336,
+    "scanned": 336,
+    "scores_typeless": 0,
+    "typeless": 0,
+    "measure_yes": 5883,
+    "typed": 54366
+   }
+  }
+ },
+ "val": {
+  "detector": {
+   "pdmx_hard": {
+    "staves": 1666,
+    "flagged": 4,
+    "unk_staves": 0,
+    "bars": 6601,
+    "susp_bars": 4,
+    "bug_rest8": 1,
+    "allrest_short": 3,
+    "unknown_rest8": 0,
+    "other_short": 7,
+    "over": 4
+   },
+   "pdmx": {
+    "staves": 2005,
+    "flagged": 15,
+    "unk_staves": 0,
+    "bars": 8402,
+    "susp_bars": 19,
+    "bug_rest8": 12,
+    "allrest_short": 7,
+    "unknown_rest8": 0,
+    "other_short": 8,
+    "over": 3
+   },
+   "grandstaff": {
+    "staves": 543,
+    "flagged": 0,
+    "unk_staves": 0,
+    "bars": 2551,
+    "susp_bars": 0,
+    "bug_rest8": 0,
+    "allrest_short": 0,
+    "unknown_rest8": 0,
+    "other_short": 0,
+    "over": 0
+   },
+   "lieder": {
+    "staves": 618,
+    "flagged": 9,
+    "unk_staves": 0,
+    "bars": 2281,
+    "susp_bars": 9,
+    "bug_rest8": 4,
+    "allrest_short": 5,
+    "unknown_rest8": 0,
+    "other_short": 12,
+    "over": 2
+   },
+   "scriabin": {
+    "staves": 101,
+    "flagged": 0,
+    "unk_staves": 0,
+    "bars": 390,
+    "susp_bars": 0,
+    "bug_rest8": 0,
+    "allrest_short": 0,
+    "unknown_rest8": 0,
+    "other_short": 5,
+    "over": 0
+   },
+   "asap": {
+    "staves": 352,
+    "flagged": 0,
+    "unk_staves": 0,
+    "bars": 1274,
+    "susp_bars": 0,
+    "bug_rest8": 0,
+    "allrest_short": 0,
+    "unknown_rest8": 0,
+    "other_short": 7,
+    "over": 1
+   },
+   "meter_arm": {
+    "staves": 1500,
+    "flagged": 0,
+    "unk_staves": 0,
+    "bars": 5268,
+    "susp_bars": 0,
+    "bug_rest8": 0,
+    "allrest_short": 0,
+    "unknown_rest8": 0,
+    "other_short": 7,
+    "over": 0
+   },
+   "kern_scans": {
+    "staves": 227,
+    "flagged": 1,
+    "unk_staves": 0,
+    "bars": 1275,
+    "susp_bars": 1,
+    "bug_rest8": 0,
+    "allrest_short": 1,
+    "unknown_rest8": 0,
+    "other_short": 2,
+    "over": 0
+   }
+  },
+  "xml": {
+   "pdmx_hard": {
+    "ids": 720,
+    "scanned": 720,
+    "scores_typeless": 0,
+    "typeless": 0,
+    "measure_yes": 5291,
+    "typed": 60885
+   },
+   "pdmx": {
+    "ids": 1634,
+    "scanned": 1634,
+    "scores_typeless": 0,
+    "typeless": 0,
+    "measure_yes": 30577,
+    "typed": 102249
+   },
+   "lieder": {
+    "ids": 463,
+    "scanned": 463,
+    "scores_typeless": 0,
+    "typeless": 0,
+    "measure_yes": 10513,
+    "typed": 57195
+   },
+   "scriabin": {
+    "ids": 9,
+    "scanned": 9,
+    "scores_typeless": 0,
+    "typeless": 0,
+    "measure_yes": 245,
+    "typed": 519
+   },
+   "asap": {
+    "ids": 7,
+    "scanned": 7,
+    "scores_typeless": 0,
+    "typeless": 0,
+    "measure_yes": 486,
+    "typed": 749
+   },
+   "meter_arm": {
+    "ids": 1096,
+    "scanned": 1096,
+    "scores_typeless": 0,
+    "typeless": 0,
+    "measure_yes": 639,
+    "typed": 8864
+   }
+  }
+ }
+}

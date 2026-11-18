@@ -1,0 +1,8 @@
+{'crops': 86, 'compared_crops': 82, 'label_bars': 190, 'bar_count_differs': 4}
+  rest_2.: 110
+  rest_1: 36
+  rest_4.: 24
+  (track absent in the read): 12
+  (notes in the read): 6
+  (several rests): 2
+['A2_p-070_s0 bar 1 upper: label rest_8, read rest_1', 'A2_p-070_s0 bar 2 upper: label rest_8, read rest_1', 'A2_p-078_s0 bar 0 lower: label rest_8, read rest_1', 'A2_p-078_s1 bar 0 lower: label rest_8, read rest_1', 'A2_p-081_s4 bar 0 lower: label rest_8, read rest_1']
