@@ -1,0 +1,52 @@
+name,eye,note
+A16_p-25_s3,e,print bracket starts at system start (bar 1); ASAP starts in bar 2 and writes bar 1 at pitch: reference differs from print; read lacks a harmless stop at the system end
+A2_p-077_s3,c,previous system ends inside the same open 8va (dotted line to the edge): continuation; read opens it at the system start and never closes
+A18_p-13_s0,d,no bracket in print or label; one note read an octave off
+A10_p-03_s4,b,print and label: bracket over bar 1 end to bar 2 start; read starts it but no stop
+N11_p-16_s3,e,print writes the high notes at pitch on ledger lines (no 8va); ASAP has 8va with lowered notes; read at pitch
+N19_p-25_s3,e,print has an 8va over the whole system; ASAP has none and the written pitch; read (bracket + same written pitch) matches the print
+N1_p-03_s4,e,print and ASAP place the 8va over different halves of the bar (sounding equal); lower-staff register differences
+NR2_p-07_s1,d,no bracket; lower-staff note an octave off
+A10_p-06_s0,b,print and label: bracket bar 4 to bar 5; read starts it but no stop
+A13_p-05_s0,d,brackets identical in label and read; one lower-staff note an octave off
+A13_p-19_s1,c,print bracket starts in bar 5 and continues into the next system (next system opens with 8); read starts it only at the last bar
+N2_p-09_s0,c,previous system ends inside the same open 8va (dotted line to the edge): continuation; read opens it at the system start and never closes
+N1_p-04_s2,b,print bracket whole system; read writes its stop with the lower staff (wrong staff) so the upper bracket stays open; no note affected
+A4_p-10_s4,a,print and label: 8va over bars 2-3 inside the crop; read has no bracket
+N20_p-20_s3,e,print has a partial 8va that continues into the next system; ASAP has none; read matches the print inside the crop
+B4_p-12_s1,d,no bracket; several notes in a bass-clef passage of the upper staff an octave off (clef/register)
+A14_p-13_s4,b,print and label: short bracket over one group; read starts it (one note early) and never stops
+N8_p-04_s2,e,print writes the high notes at pitch; ASAP has 8va with lowered notes; read at pitch
+N11_p-08_s5,e,print writes the high notes at pitch; ASAP has 8va; read at pitch
+NR1_p-36_s0,c,previous system ends inside the same open 8va (dotted line to the edge): continuation; read opens it at the system start and never closes
+N3_p-06_s4,b,three brackets in print and label; read starts all three and writes no stop (plus a spurious lower-staff start)
+N1_p-04_s1,b,print and label: bracket over bar 1; read no stop
+A18_p-12_s2,d,no bracket; chord member in the left hand an octave off
+A2_p-074_s4,b,print bracket ends at the system end; read lacks the stop token only; no note affected
+A1_p-004_s3,n/a,label of Liszt TE1 is shifted by one measure (known): not assessable
+A17_p-09_s6,d,no bracket; one left-hand note an octave off
+N3_p-04_s2,e,print bracket ends inside the system (read matches it); ASAP bracket runs on into the next system: reference differs from the print
+C3_p-16_s3,d,no bracket; low left-hand notes on ledger lines read 1-2 octaves off
+A14_p-02_s4,d,no bracket; high chord on ledger lines read two octaves off
+A2_p-074_s1,a,print and label: 8va over the second arpeggio; read has none
+N6_p-26_s2,e,print writes the high notes of bar 1 at pitch on ledger lines (no 8va); ASAP has 8va with lowered notes; read at pitch
+N3_p-08_s4,c,print has an 8va that runs over several systems of the page (every system opens with 8 and the dotted line); label re-opens it at the system start; read has no start (only a stray stop at the end)
+A9_p-58_s1,b,two short brackets in print and label; read stops the first one 3 notes early and never stops the second
+N21_p-01_s4,d,no bracket; one left-hand note an octave off
+A4_p-14_s1,c,print 8va runs over the whole system and on into the next (every system of the page has it); label re-opens it at the system start; read starts it three times with no stop; no note affected
+B2_p-10_s3,c,print: first bracket ends in bar 1 (read matches) and a second one starts in bar 2 and runs into the next system; read misses the second one (partly compensated by pitch)
+A2_p-074_s3,a,print and label: two brackets over two arpeggio waves; read misses the first completely and never stops the second
+A2_p-080_s0,a,print and label: 8va over bar 1 (read matches) and an 8vb over one low left-hand note; read misses the 8vb start
+A3_p-04_s1,e,print has a short 8va over one chord and a note; ASAP lost the start (orphan stop) and writes the notes at pitch; read matches the print
+N2_p-08_s2,a,print and label: two brackets; read matches both but adds a spurious 8vb start on the lower staff that is never stopped
+A4_p-08_s1,b,print and label: bracket from bar 2 to the system end; read lacks the stop token only; no note affected
+N19_p-24_s0,b,four short brackets in print and label; read writes starts but misses the stops of two of them (and a misplaced lower-staff start)
+A16_p-16_s0,a,no 8va in print or label; the printed hand/phrase brackets under the lower staff were read as an 8vb start (spurious bracket)
+C1_p-014_s3,c,previous system ends inside the same open 8va (dotted line to the edge): continuation; read opens it at the system start and never closes
+N19_p-30_s4,e,print has a short 8va over one chord; ASAP has two orphan stops and no start (notes at pitch); read matches the print
+N11_p-10_s5,b,print and label: bracket over the first group of bar 1; read starts it and never stops
+N16_p-05_s1,d,no bracket; one note of the chord on ledger lines read an octave off
+N2_p-07_s5,c,previous system ends inside the same open 8va (dotted line to the edge): continuation; read opens it at the system start and never closes
+N13_p-08_s1,d,"no bracket; two notes (right hand high chord member, left hand low) an octave off"
+N19_p-17_s3,a,print and label: two 8 bass (8vb) brackets on the left hand; read misplaces one (start and stop on the same note) and has a stray stop; the other bracket missed
+A13_p-13_s4,c,previous system ends inside the same open 8va (dotted line to the edge): continuation; read opens it at the system start and never closes

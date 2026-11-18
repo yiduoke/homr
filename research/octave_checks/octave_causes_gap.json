@@ -1,0 +1,172 @@
+{
+ "pilot train (A+B: strong)": {
+  "crops": 864,
+  "none": 738,
+  "start": [
+   104,
+   129
+  ],
+  "stop": [
+   107,
+   129
+  ],
+  "cont_in": [
+   33,
+   33
+  ],
+  "cont_out": [
+   33,
+   33
+  ]
+ },
+ "pilot train (hard + octave-verified)": {
+  "crops": 48,
+  "none": 26,
+  "start": [
+   20,
+   22
+  ],
+  "stop": [
+   17,
+   18
+  ],
+  "cont_in": [
+   2,
+   2
+  ],
+  "cont_out": [
+   6,
+   6
+  ]
+ },
+ "pilot val (C)": {
+  "crops": 104,
+  "none": 92,
+  "start": [
+   10,
+   11
+  ],
+  "stop": [
+   10,
+   11
+  ],
+  "cont_in": [
+   2,
+   2
+  ],
+  "cont_out": [
+   2,
+   2
+  ]
+ },
+ "batch2 train (strong+hard+octave-verified)": {
+  "crops": 550,
+  "none": 477,
+  "start": [
+   49,
+   62
+  ],
+  "stop": [
+   48,
+   62
+  ],
+  "cont_in": [
+   28,
+   30
+  ],
+  "cont_out": [
+   29,
+   30
+  ]
+ },
+ "batch2 Demets (Une barque)": {
+  "crops": 47,
+  "none": 27,
+  "start": [
+   17,
+   46
+  ],
+  "stop": [
+   16,
+   45
+  ],
+  "cont_in": [
+   3,
+   3
+  ],
+  "cont_out": [
+   4,
+   4
+  ]
+ },
+ "batch2 val": {
+  "crops": 145,
+  "none": 83,
+  "start": [
+   44,
+   52
+  ],
+  "stop": [
+   41,
+   49
+  ],
+  "cont_in": [
+   30,
+   31
+  ],
+  "cont_out": [
+   33,
+   34
+  ]
+ },
+ "train_total": {
+  "crops": 1509,
+  "none": 1268,
+  "start": 190,
+  "s_start": 259,
+  "stop": 188,
+  "s_stop": 254,
+  "cont_in": 66,
+  "s_cont_in": 68,
+  "cont_out": 72,
+  "s_cont_out": 73
+ },
+ "span_stats": {
+  "starts inside, runs into next system": {
+   "spans": 78,
+   "all notes right": 59,
+   "first note right (start)": 60,
+   "_train": 56,
+   "all notes right train": 40,
+   "_val": 22,
+   "all notes right val": 19
+  },
+  "continuation from previous system": {
+   "spans": 114,
+   "all notes right": 93,
+   "first note right (start)": 99,
+   "_train": 78,
+   "all notes right train": 61,
+   "stopfail: stop missing: read bracket never closes in the crop": 19,
+   "stops evaluable": 72,
+   "stop right": 43,
+   "stopfail: read closes later than the label": 10,
+   "_val": 36,
+   "all notes right val": 32
+  },
+  "starts and stops inside": {
+   "spans": 282,
+   "all notes right": 204,
+   "first note right (start)": 212,
+   "stops evaluable": 228,
+   "stop right": 137,
+   "_train": 234,
+   "all notes right train": 167,
+   "stopfail: stop missing: read bracket never closes in the crop": 55,
+   "stopfail: read closes later than the label": 35,
+   "_val": 48,
+   "all notes right val": 37,
+   "stopfail: label state not 0 after span": 1
+  }
+ }
+}

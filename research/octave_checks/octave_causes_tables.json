@@ -1,0 +1,272 @@
+{
+ "T1": {
+  "pilot-train": [
+   948,
+   876,
+   810,
+   347,
+   3383
+  ],
+  "pilot-train(rendered)": [
+   164,
+   161,
+   152,
+   40,
+   433
+  ],
+  "pilot-val": [
+   122,
+   117,
+   114,
+   51,
+   500
+  ],
+  "b2-train": [
+   676,
+   605,
+   566,
+   209,
+   2136
+  ],
+  "b2-train(Demets)": [
+   84,
+   55,
+   48,
+   31,
+   502
+  ],
+  "b2-val": [
+   159,
+   151,
+   150,
+   62,
+   587
+  ],
+  "all": [
+   2153,
+   1965,
+   1840,
+   740,
+   7541
+  ]
+ },
+ "T2": {
+  "a": [
+   70,
+   11,
+   81,
+   1964,
+   1964
+  ],
+  "b": [
+   59,
+   14,
+   73,
+   890,
+   890
+  ],
+  "c": [
+   27,
+   7,
+   34,
+   762,
+   762
+  ],
+  "d": [
+   394,
+   61,
+   455,
+   2323,
+   2323
+  ],
+  "e": [
+   74,
+   20,
+   94,
+   1542,
+   0
+  ],
+  "x": [
+   3,
+   0,
+   3,
+   60,
+   60
+  ]
+ },
+ "T3": {
+  "x|register+bracket": [
+   19,
+   60,
+   60
+  ],
+  "a|read starts early": [
+   5,
+   45,
+   45
+  ],
+  "d|no-bracket": [
+   498,
+   2254,
+   2254
+  ],
+  "c|read stops late": [
+   23,
+   551,
+   551
+  ],
+  "a|missed bracket": [
+   23,
+   219,
+   219
+  ],
+  "b|read stops late": [
+   67,
+   870,
+   870
+  ],
+  "b|token only: stray stop in read": [
+   16,
+   0,
+   0
+  ],
+  "b|token only: read lacks a stop token (label stops at the crop end), no note affected": [
+   15,
+   0,
+   0
+  ],
+  "a|read starts late": [
+   5,
+   8,
+   8
+  ],
+  "c|token only: read closes bracket at system end, label continues": [
+   4,
+   0,
+   0
+  ],
+  "d|inside-bracket": [
+   20,
+   69,
+   69
+  ],
+  "c|missed bracket; cont_out": [
+   5,
+   61,
+   61
+  ],
+  "e|label-at-pitch,read-bracket": [
+   71,
+   731,
+   0
+  ],
+  "a|spurious bracket (label none)": [
+   69,
+   1686,
+   1686
+  ],
+  "c|read stops early; cont_in": [
+   3,
+   17,
+   17
+  ],
+  "e|label-bracket,read-at-pitch": [
+   68,
+   811,
+   0
+  ],
+  "a|token only: read has extra start token(s), no note affected": [
+   1,
+   0,
+   0
+  ],
+  "b|read stops early": [
+   3,
+   20,
+   20
+  ],
+  "c|read starts late; cont_out": [
+   1,
+   1,
+   1
+  ],
+  "c|read stops early; cont_out": [
+   2,
+   50,
+   50
+  ],
+  "c|read stops early; cont_in; cont_out": [
+   1,
+   44,
+   44
+  ],
+  "a|token only: read lacks a start token, no note affected": [
+   1,
+   0,
+   0
+  ],
+  "c|direction/size differs; cont_out": [
+   1,
+   8,
+   8
+  ],
+  "c|missed bracket; cont_in": [
+   3,
+   30,
+   30
+  ],
+  "a|direction/size differs": [
+   2,
+   6,
+   6
+  ],
+  "b|token only: read has an extra stop token, no note affected": [
+   1,
+   0,
+   0
+  ]
+ },
+ "T4": {
+  "e|e": 7,
+  "c|c": 8,
+  "d|d": 11,
+  "b|b": 9,
+  "a|e": 2,
+  "d|e": 1,
+  "e|c": 1,
+  "a|a": 6,
+  "x|b": 2,
+  "excl|n/a": 1,
+  "c|e": 1,
+  "a|c": 1,
+  "x|a": 1
+ },
+ "T4_agree": [
+  41,
+  50
+ ],
+ "calibrated": {
+  "a": 55,
+  "b": 75,
+  "c": 51,
+  "d": 417,
+  "e": 142
+ },
+ "T5": {
+  "2 label wrong, quarantined|not analysed": 4,
+  "label right|d": 5,
+  "label right|a": 22,
+  "label right|c": 5,
+  "2 label wrong, quarantined|d": 1,
+  "edition/reference|a": 8,
+  "edition/reference|d": 3,
+  "2 label wrong, quarantined|a": 1,
+  "edition/reference|e": 43,
+  "label right|b": 2,
+  "quarantine|a": 8,
+  "quarantine|not analysed": 2,
+  "quarantine|e": 4,
+  "quarantine|d": 1,
+  "quarantine|c": 1
+ }
+}
