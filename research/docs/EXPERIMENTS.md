@@ -530,6 +530,24 @@ harder data 90.1-90.4 / 91.8-92.1; run B 86.0 / 88.2 is not re-merged (only its 
 Tables: `out/testset/POOLED-table-2026-11-17-after-merger.md`, `CORRECTED-table-2026-11-17-after-merger.md`. Limits: lost bars sit mid-page and cannot be placed by the merger;
 the Schott scans still lack the grand staff (pairing handled separately; the reverted heuristic reached 84.6 / 81.6 / 93.5 on Sonata / Etude 5 / Etude 10).
 
+## D14. Staff relation model for the Schott brace: real scans, brace variations, controlled comparison (helper, 2026-11-17, 3:30-6:25 pm Pacific; `staff_rel_realbrace/README.md`; code branch `staff-relations-real`, worktree `run/rel_wt`, commit a769705)
+
+Question: can the staff-pairing model (`homr/staff_relations.py`, 5 x 96 x 96 crops, 3 classes) learn the thin, nearly straight Schott brace without any rule in the pairing?
+Data: 19 IMSLP piano PDFs (250 pages, 2,418 pairs; pages of test pieces removed by eye), 18 OpenScore-Lieder source scans (1,603 pairs, voice + piano = same-system negatives),
+386 MuseScore Lieder pages sampled from the box (9,419 pairs, SATB, duets, voice+piano), labels from the page structure checked by barlines which cross the gap (no look at the
+brace). No real edition has the Schott style; only Reichardt (1819, 23 pages) has a thin nearly straight brace, and the shipped model already reads every other real edition (Op. 31 Schirmer:
+17 of 59 grand pairs missed, staff start cut off). Brace variations (curvature, centre point, thickness, distance, connecting line kept / removed / added; brackets on systems of separate
+parts) were drawn on 327 training page images before segmentation (2,978 pairs).
+Results (two seeds, fixed budget 12 x 150 x 64, lr 1e-4): arms A0 (no variations, Reichardt held out), B (A0 + variations), C (B + Reichardt). Held-out real editions (7 editions, 890 pairs): 0 missed,
+0 false merges for all arms and the shipped model. Held-out thin edition (Reichardt): shipped misses 53 of 56 grand pairs, A0 53 / 55, B 53 / 51 (variations did not transfer there; false joins 14 vs 7-9).
+Schott scans (TEST), grand staff calls among 169 within-system pairs: shipped 1, A0 21 / 33, realbrace-1 (A0 + Reichardt) 56, B 90 / 91, C 98 / 78; opening pages 0, 1, 2, 5-6, 7 / 4 of 13; no separate pair
+joined. 25 of the other 26 scan sets: no pair changes for any model; Petrushka (3-4 staffs under one brace): 8 pair decisions on 6 pages change for realbrace-1, none a false merge, the grand pair chosen
+in 3-staff systems moves from staffs 0-1 to 1-2 on 25 of 37 pages (needs a pipeline score).
+Full pipeline (box CPU, merger as it is; staff-sensitive pitch): control 79.95 / 77.04 / 76.90 (Sonata / Etude 5 / Etude 10); realbrace-1 44.5 / 71.0 / 62.0; B0 61.5 / 43.0 / 79.9; C0 59.9 / 67.0 / 73.7. Hands in the
+same reference bar 79 / 72 / 70 % (control), best 96 % (Etude 10, B0), but pages with a mix of grand and single-staff systems lose bars (output 62-188 bars against 134-305) and give 4 parts.
+Conclusion: recall rose from 1 to about 98 of 169 pairs but not to all, and partial recognition is worse than none for the current merger; not ready to ship. Models `staff_rel_realbrace/staff_relations_realbrace-{1,2,3}.onnx`
+(`HOMR_STAFF_RELATION_MODEL`), tables `pipeline_summary.txt`, `eval_*.json`. Open: a held-out real thin-brace edition (none found), more or more varied drawn braces, a merger that tolerates mixed pages.
+
 ## D15. Octave-bracket checks: Winter Wind m. 20 and Schubert D. 899 No. 4 m. 64 (2026-11-17, 3:45 pm Pacific; `octave_checks/REPORT.md`)
 
 Procedure from the scan/render audit (D11). Encoding: reference = sounding pitch + `<octave-shift>` (`down` = 8va); the model writes the same; `score_notes.py` does not re-apply shifts.
