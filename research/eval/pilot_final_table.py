@@ -201,8 +201,8 @@ def main() -> None:
     data = {}
     if not a.no_scans:
         for t in tag_all:
-            if "schubert-impromptu-d899-4" in pieces:
-                status[t] = F.rescore_schubert(t, a.force_rescore)
+            for ep in sorted(F.EDITION & set(pieces)):
+                status[t] = F.rescore_edition_piece(ep, t, a.force_rescore)
         data = {t: {p: F.load_res_tag(t, p) for p in pieces} for t in tag_all}
         data[a.baseline] = {p: F.load_baseline(a.baseline, p, True) for p in pieces}
         present = {c: [p for p in pieces if data[c][p]] for c in cols}
