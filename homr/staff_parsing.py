@@ -14,6 +14,7 @@ from homr.hires_page import HiresPage
 from homr.image_utils import crop_image_and_return_new_top
 from homr.model import MultiStaff, Staff
 from homr.octave_bracket_rows import find_dashed_line_rows, find_top_of_content
+from homr.octave_bracket_strict import strict_region_y
 from homr.piano_staffs import STAFFS_PER_SYSTEM as STAFFS_PER_PIANO_SYSTEM
 from homr.piano_staffs import is_piano_system, merge_piano_system
 from homr.point_mapping import PointMapping, chain, identity, undo_crop, undo_resize
@@ -162,7 +163,18 @@ def _calculate_region(staff: Staff, regions: StaffRegions, image: NDArray | None
     staff_below = regions.get_start_of_closest_staff_below(staff.max_y)
     y_min = max(staff.min_y - 4 * unit, staff_above)
     y_max = min(staff.max_y + 4 * unit, staff_below)
-    if image is not None and not os.environ.get("HOMR_FIXED_MARGIN"):
+    if image is not None and os.environ.get("HOMR_STRICT_BRACKET_CUT"):
+        # opt-in: the fixed region, widened only for a verified printed octave bracket (octave_bracket_strict)
+        y_min, y_max = strict_region_y(
+            staff.min_y,
+            staff.max_y,
+            unit,
+            image,
+            (x_min, x_max),
+            (y_min, y_max),
+            (staff_above, staff_below),
+        )
+    elif image is not None and not os.environ.get("HOMR_FIXED_MARGIN"):
         y_min, y_max = _include_octave_brackets(
             staff, image, (x_min, x_max), (y_min, y_max), (staff_above, staff_below)
         )
