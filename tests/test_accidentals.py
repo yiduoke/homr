@@ -377,3 +377,49 @@ def test_state_converts_in_both_directions() -> None:
     for step, octave, alter in [("F", 4, 0), ("F", 4, 0), ("C", 4, 1), ("F", 5, 1), ("F", 4, 2)]:
         sign = labels.printed_sign("a", step, octave, alter)
         assert sounding.sounding_alter("a", step, octave, sign) == alter
+
+
+def _tie_alters(pages: list[str]) -> list[list[str | None]]:
+    from homr.music_xml_generator import TimeSignatureMemory
+
+    memory = TimeSignatureMemory()
+    out = []
+    for tokens in pages:
+        xml = generate_xml(
+            XmlGeneratorArguments(), [read_token_lines(tokens.splitlines())], "", memory
+        )
+        out.append([n.findtext("pitch/alter") for n in xml.iter("note")])
+    return out
+
+
+_HEAD = "clef_G2 _ _ _ _ upper\nkeySignature_0 . . . . .\ntimeSignature_4/4 . . . . .\n"
+
+
+def test_tie_from_the_last_bar_of_the_previous_page_keeps_the_pitch() -> None:
+    page1 = _HEAD + "note_4 C4 # _ slurStart upper\nbarline . . . . ."
+    page2 = _HEAD + "note_4 C4 _ _ slurStop upper\nnote_4 C4 _ _ _ upper\nbarline . . . . ."
+    first, second = _tie_alters([page1, page2])
+    assert first == ["1"]
+    # the tied note is C sharp, the sign is not carried to the later note of the new bar
+    assert second == ["1", None]
+
+
+def test_tie_to_another_voice_of_the_staff_keeps_the_pitch() -> None:
+    tokens = (
+        _HEAD
+        + "note_4 C4 # _ slurStart upper\nbarline . . . . .\n"
+        + "note_4 C4 _ _ slurStop upper2\nnote_4 C4 _ _ _ upper\nbarline . . . . ."
+    )
+    (alters,) = _tie_alters([tokens])
+    assert alters[1] == "1"
+    assert alters[2] is None
+
+
+def test_tie_within_a_bar_and_a_later_untied_note_in_the_next_bar() -> None:
+    tokens = (
+        _HEAD
+        + "note_4 C4 # _ slurStart upper\nnote_4 C4 _ _ slurStop upper\nbarline . . . . .\n"
+        + "note_4 C4 _ _ _ upper\nbarline . . . . ."
+    )
+    (alters,) = _tie_alters([tokens])
+    assert alters == ["1", "1", None]

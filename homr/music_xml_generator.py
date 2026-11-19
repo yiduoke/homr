@@ -38,6 +38,9 @@ class PartTimeSignature:
 
     def __init__(self, token: str | None = None) -> None:
         self.token = token
+        # The pitches (with alteration) of the last event of every staff and voice of the page,
+        # for a tie which starts on the last bar of the page and ends on the first of the next
+        self.tied_alters: dict[tuple[str, str], dict[tuple[str, int], int]] = {}
 
 
 class TimeSignatureMemory:
@@ -213,7 +216,7 @@ def build_part(
     is_first_part = index == 0
     for measure in build_measures(args, voice, is_first_part, has_two_staves, time_signature):
         part.append(measure)
-    resolve_accidentals(part)
+    resolve_accidentals(part, time_signature)
     convert_ties(part)
     add_stems(part)
     if args.beam_export:
@@ -997,19 +1000,25 @@ def _build_accidental(sign: str, note: ET.Element) -> None:
     note.insert(position, accidental)
 
 
-def resolve_accidentals(part: ET.Element) -> None:
+def resolve_accidentals(part: ET.Element, memory: PartTimeSignature | None = None) -> None:
     """
     Turns the printed accidentals of the model into the sounding <alter> of each note and the
     printed <accidental>, which is only written where the model saw a sign. See
     homr.accidentals for the rule. The carried signs are shared by the voices of a staff and
     reset by each measure; a tie from the previous measure carries the alteration of the tied
-    note. Run it before ties are converted, because they match the alteration of the notes.
+    note, also from the last bar of the previous page (memory) and also when the tied note
+    is written in another voice of the staff than the note it is tied from. The tied note
+    has the pitch of the note it is tied from and a sign carried over the barline by a tie
+    does not apply to later notes of the new bar. Run it before ties are converted, because
+    they match the alteration of the notes.
     """
     state = AccidentalState()
     # Per staff and voice: the pitches (with alteration) of the previous event, and of the
     # event being read, which is a chord if there is more than one
     previous: dict[tuple[str, str], dict[tuple[str, int], int]] = {}
-    current: dict[tuple[str, str], dict[tuple[str, int], int]] = {}
+    current: dict[tuple[str, str], dict[tuple[str, int], int]] = (
+        {voice: dict(pitches) for voice, pitches in memory.tied_alters.items()} if memory else {}
+    )
     fifths = 0
     for measure in part.findall("measure"):
         state.new_bar()
@@ -1026,7 +1035,17 @@ def resolve_accidentals(part: ET.Element) -> None:
                 current[voice] = {}
             step, octave = pitch.findtext("step", "C"), int(pitch.findtext("octave", "4"))
             has_stop = get_slur(note, "stop") is not None
-            tie_alter = previous.get(voice, {}).get((step, octave)) if has_stop else None
+            tie_alter = None
+            if has_stop:
+                tie_alter = previous.get(voice, {}).get((step, octave))
+                if tie_alter is None:
+                    others = {
+                        alters[(step, octave)]
+                        for source in (previous, current)
+                        for other, alters in source.items()
+                        if other[0] == staff and other != voice and (step, octave) in alters
+                    }
+                    tie_alter = others.pop() if len(others) == 1 else None
             alter = state.sounding_alter(staff, step, octave, sign, tie_alter)
             if get_slur(note, "start") is not None:
                 current.setdefault(voice, {})[(step, octave)] = alter
@@ -1038,6 +1057,8 @@ def resolve_accidentals(part: ET.Element) -> None:
                 _build_accidental(sign, note)
         for key in measure.findall("attributes/key/fifths"):
             fifths = int(key.text or "0")
+    if memory is not None:
+        memory.tied_alters = {voice: dict(pitches) for voice, pitches in current.items()}
 
 
 def add_stems(part: ET.Element) -> None:
