@@ -20,7 +20,10 @@ from training.omr_datasets.music_xml_parser import (
     SKIPPED_ACCIDENTALS,
     music_xml_string_to_tokens,
 )
-from training.transformer.training_vocabulary import read_token_lines, token_lines_to_str
+from training.transformer.training_vocabulary import (
+    read_token_lines,
+    token_lines_to_str,
+)
 
 
 def _note(

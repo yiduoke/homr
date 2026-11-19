@@ -1,4 +1,7 @@
+# mypy: ignore-errors
+# ruff: noqa: S101, S314, E501, E731
 """Tests of the score-level tuplet continuation pass (research_scripts/tuplet_pass.py)."""
+
 import os
 import sys
 import xml.etree.ElementTree as ET
@@ -15,22 +18,33 @@ def note(step, typ, dur, voice="1", tm=False, beam=None, rest=False, tup=None):
     parts.append("<rest/>" if rest else f"<pitch><step>{step}</step><octave>4</octave></pitch>")
     parts.append(f"<duration>{dur}</duration><voice>{voice}</voice><type>{typ}</type>")
     if tm:
-        parts.append("<time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-type>eighth</normal-type></time-modification>")
+        parts.append(
+            "<time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-type>eighth</normal-type></time-modification>"
+        )
     if beam:
         parts.append(f'<beam number="1">{beam}</beam>')
     if tup:
-        parts.append(f'<notations><tuplet type="{tup}" bracket="no" show-number="actual"/></notations>')
+        parts.append(
+            f'<notations><tuplet type="{tup}" bracket="no" show-number="actual"/></notations>'
+        )
     parts.append("</note>")
     return "".join(parts)
 
 
 def triplet(steps="CDE", voice="1"):
-    return [note(steps[0], "eighth", 4, voice, True, "begin", tup="start"), note(steps[1], "eighth", 4, voice, True, "continue"),
-            note(steps[2], "eighth", 4, voice, True, "end", tup="stop")]
+    return [
+        note(steps[0], "eighth", 4, voice, True, "begin", tup="start"),
+        note(steps[1], "eighth", 4, voice, True, "continue"),
+        note(steps[2], "eighth", 4, voice, True, "end", tup="stop"),
+    ]
 
 
 def plain(steps="CDE", voice="1"):
-    return [note(steps[0], "eighth", 6, voice, beam="begin"), note(steps[1], "eighth", 6, voice, beam="continue"), note(steps[2], "eighth", 6, voice, beam="end")]
+    return [
+        note(steps[0], "eighth", 6, voice, beam="begin"),
+        note(steps[1], "eighth", 6, voice, beam="continue"),
+        note(steps[2], "eighth", 6, voice, beam="end"),
+    ]
 
 
 def quarter(step, voice="2", dur=12):
@@ -42,12 +56,20 @@ def backup(d):
 
 
 def measure(n, body, time=None):
-    attrs = f"<attributes><divisions>{DIV}</divisions>" + (f"<time><beats>{time[0]}</beats><beat-type>{time[1]}</beat-type></time>" if time else "") + "</attributes>"
+    attrs = (
+        f"<attributes><divisions>{DIV}</divisions>"
+        + (f"<time><beats>{time[0]}</beats><beat-type>{time[1]}</beat-type></time>" if time else "")
+        + "</attributes>"
+    )
     return f'<measure number="{n}">{attrs if n == 1 else ""}{"".join(body)}</measure>'
 
 
 def score(measures):
-    return ET.fromstring('<score-partwise><part-list/><part id="P1">' + "".join(measures) + "</part></score-partwise>")
+    return ET.fromstring(
+        '<score-partwise><part-list/><part id="P1">'
+        + "".join(measures)
+        + "</part></score-partwise>"
+    )
 
 
 def voice_durs(root, voice="1", bar=0):
@@ -75,7 +97,12 @@ def test_converts_overfull_bar_when_ratio_fits_and_keeps_other_voice():
 
 def test_ordinary_bar_that_fits_is_not_touched():
     # 4/4: explicit triplets in bar 1; bar 2 has two plain groups of three eighths and a quarter = 4 quarters: it fits, so the ordinary reading stays
-    root = score([measure(1, triplet() * 4, (4, 4)), measure(2, plain() + plain() + [note("F", "quarter", 12)])])
+    root = score(
+        [
+            measure(1, triplet() * 4, (4, 4)),
+            measure(2, plain() + plain() + [note("F", "quarter", 12)]),
+        ]
+    )
     log, cnt = TP.process(root)
     assert "converted" not in cnt
     assert cnt.get("skip:bar_fits") == 1
@@ -83,7 +110,11 @@ def test_ordinary_bar_that_fits_is_not_touched():
 
 def test_compound_meter_groups_are_not_converted():
     # 6/8 after a 2/4 bar with explicit triplets: three plain groups of three eighths are the beat grouping of the meter
-    m2 = '<measure number="2"><attributes><time><beats>6</beats><beat-type>8</beat-type></time></attributes>' + "".join(plain() + plain() + plain()) + "</measure>"
+    m2 = (
+        '<measure number="2"><attributes><time><beats>6</beats><beat-type>8</beat-type></time></attributes>'
+        + "".join(plain() + plain() + plain())
+        + "</measure>"
+    )
     root = score([measure(1, triplet() + triplet(), (2, 4)), m2])
     log, cnt = TP.process(root)
     assert "converted" not in cnt
@@ -98,7 +129,9 @@ def test_no_explicit_group_earlier_nothing_happens():
 def test_ambiguous_subset_is_left_alone():
     # 4/4, explicit earlier; bar with three plain groups and the voice overfull by exactly one group's reduction: which one is a triplet is unknown
     m1 = measure(1, triplet() * 4, (4, 4))
-    m2 = measure(2, plain() + plain() + plain() + [note("F", "eighth", 6, rest=True)])  # 4.5 + 0.5 = 5 > 4; excess 1
+    m2 = measure(
+        2, plain() + plain() + plain() + [note("F", "eighth", 6, rest=True)]
+    )  # 4.5 + 0.5 = 5 > 4; excess 1
     root = score([m1, m2])
     log, cnt = TP.process(root)
     # reductions are 0.5 each: two of three groups must change, three subsets fit
@@ -106,15 +139,16 @@ def test_ambiguous_subset_is_left_alone():
     assert cnt.get("skip:ambiguous_subset") == 1
 
 
-def test_default_off(tmp_path, monkeypatch):
-    monkeypatch.delenv("HOMR_TUPLET_PASS", raising=False)
+def test_default_on_and_switch_off(tmp_path, monkeypatch):
+    monkeypatch.delenv("HOMR_COMBINED_OFF", raising=False)
+    monkeypatch.setenv("HOMR_TUPLET_PASS", "0")
     root = score([measure(1, triplet() + triplet(), (2, 4)), measure(2, plain() + plain())])
     src = tmp_path / "a.musicxml"
     dst = tmp_path / "b.musicxml"
     ET.ElementTree(root).write(src)
     log, cnt = TP.apply_if_enabled(str(src), str(dst))
     assert log == [] and src.read_bytes() == dst.read_bytes()
-    monkeypatch.setenv("HOMR_TUPLET_PASS", "1")
+    monkeypatch.delenv("HOMR_TUPLET_PASS")
     log, cnt = TP.apply_if_enabled(str(src), str(dst))
     assert cnt.get("converted") == 1 and src.read_bytes() != dst.read_bytes()
 
@@ -131,7 +165,9 @@ def test_continuation_across_bars_and_systems_uses_the_same_voice_only():
 def test_group_of_rests_alone_is_not_converted():
     rest_triplet = [note("C", "eighth", 4, rest=True, tm=True) for _ in range(3)]
     rests = [note("C", "eighth", 6, rest=True) for _ in range(3)]
-    mk = lambda: score([measure(1, rest_triplet * 2, (2, 4)), measure(2, rests + rests)])  # noqa: E731
+    mk = lambda: score(
+        [measure(1, rest_triplet * 2, (2, 4)), measure(2, rests + rests)]
+    )  # noqa: E731
     log, cnt = TP.process(mk())
     assert "converted" not in cnt
     log, cnt = TP.process(mk(), {"skip_rest_only": False})

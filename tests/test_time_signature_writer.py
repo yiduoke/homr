@@ -5,7 +5,11 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
-from homr.music_xml_generator import TimeSignatureMemory, XmlGeneratorArguments, generate_xml
+from homr.music_xml_generator import (
+    TimeSignatureMemory,
+    XmlGeneratorArguments,
+    generate_xml,
+)
 from homr.relieur import get_children_of_type, process_concat
 from homr.transformer.vocabulary import EncodedSymbol
 from training.transformer.training_vocabulary import read_token_lines

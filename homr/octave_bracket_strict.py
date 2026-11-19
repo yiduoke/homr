@@ -507,7 +507,9 @@ def find_bracket_lines(  # noqa: PLR0917
             row_y = int(ya + y + h / 2 + dy)
             xs = x_right + int(0.15 * unit)
             xe = min(width, xs + int(_LINE_CHECK_LENGTH * unit))
-            if xe - xs < 2 * unit or row_y - ya < 2 or row_y - ya >= ink.shape[0] - 2:  # noqa: PLR2004
+            if (
+                xe - xs < 2 * unit or row_y - ya < 2 or row_y - ya >= ink.shape[0] - 2
+            ):  # noqa: PLR2004
                 continue
             profile = _profile(ink, row_y - ya, xs, xe, unit)
             if _dotted(profile, unit):

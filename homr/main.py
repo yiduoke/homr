@@ -28,7 +28,11 @@ from homr.bounding_boxes import (
 from homr.debug import Debug
 from homr.hires_page import load_hires_page
 from homr.model import InputPredictions, MultiStaff, Note, Staff
-from homr.music_xml_generator import TimeSignatureMemory, XmlGeneratorArguments, generate_xml
+from homr.music_xml_generator import (
+    TimeSignatureMemory,
+    XmlGeneratorArguments,
+    generate_xml,
+)
 from homr.noise_filtering import filter_predictions
 from homr.note_detection import add_notes_to_staffs, combine_noteheads_with_stems
 from homr.onnx_providers import coreml_available, cuda_available, rocm_available

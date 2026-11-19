@@ -13,7 +13,11 @@ import os
 from pathlib import Path
 
 from homr.simple_logging import eprint
-from training.omr_datasets.convert_lieder import convert_xml_and_svg_file, dataset_root, lieder
+from training.omr_datasets.convert_lieder import (
+    convert_xml_and_svg_file,
+    dataset_root,
+    lieder,
+)
 from training.omr_datasets.convert_musetrainer import musetrainer_root
 from training.omr_datasets.convert_pdmx import pdmx_root
 

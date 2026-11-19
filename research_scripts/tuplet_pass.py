@@ -37,7 +37,7 @@ BEAMABLE = {"eighth", "16th", "32nd", "64th", "128th"}
 
 
 def enabled() -> bool:
-    """HOMR_TUPLET_PASS=1, or HOMR_COMBINED=1 (homr/combined_switches.py; HOMR_COMBINED_OFF=C leaves it off)."""
+    """On by default (homr/combined_switches.py); HOMR_TUPLET_PASS=0 or HOMR_COMBINED_OFF=C turns it off."""
     try:
         from homr.combined_switches import tuplet_pass
     except ImportError:  # the script is used without the homr package on the path
@@ -683,7 +683,7 @@ def process_file(src: str, dst: str, params: dict | None = None):
 
 
 def apply_if_enabled(src: str, dst: str, params: dict | None = None):
-    """Default OFF: copies src to dst unchanged unless HOMR_TUPLET_PASS=1."""
+    """Default ON: copies src to dst unchanged when HOMR_TUPLET_PASS=0 (or HOMR_COMBINED_OFF=C)."""
     if not enabled():
         import shutil
         if os.path.abspath(src) != os.path.abspath(dst):

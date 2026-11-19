@@ -20,7 +20,12 @@ the alteration of the tied note isn't carried further.
 from dataclasses import dataclass
 from typing import Hashable
 
-from homr.transformer.vocabulary import EncodedSymbol, empty, nonote, split_slur_and_beam
+from homr.transformer.vocabulary import (
+    EncodedSymbol,
+    empty,
+    nonote,
+    split_slur_and_beam,
+)
 
 NO_SIGN = empty
 NATURAL = "N"

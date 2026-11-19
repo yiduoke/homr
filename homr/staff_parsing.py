@@ -288,7 +288,7 @@ def prepare_staff_image(
     before_canvas_shape = staff_image.shape
     staff_image = center_image_on_canvas(staff_image, image_dimensions, canvas=canvas)
     canvas_content_shape = (int(image_dimensions[1]), int(image_dimensions[0]))
-    undo_enlarging = identity
+    undo_enlarging: PointMapping = identity
     if canvas != (tr_omr_max_height, tr_omr_max_width):
         enlarged = cv2.resize(staff_image, (tr_omr_max_width, tr_omr_max_height))
         undo_enlarging = undo_resize(staff_image.shape, enlarged.shape)
