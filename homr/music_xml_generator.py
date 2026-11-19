@@ -408,6 +408,8 @@ def build_measures(
     else:
         stop_octave_shifts(measures[-1], state)
     # A clef opens a second attributes element, so look at the whole first measure
+    is_first_page = carried_time_token is None
+    time_is_guessed = measures[0].find("attributes/time") is None and is_first_page
     if measures[0].find("attributes/time") is None:
         if carried_time_token is not None:
             # The page continues with the time signature of the previous one
@@ -419,6 +421,7 @@ def build_measures(
             ET.SubElement(time_el, "beat-type").text = "4"
         _insert_time_element(first_attributes, time_el)
     final_token = _repair_meter(measures, state.division)
+    _fill_rest_only_bars(measures, state.division, is_first_page, time_is_guessed)
     if final_token is not None:
         state.time_token = final_token
     if state.time_token is not None:
@@ -510,6 +513,95 @@ def _fill_measure_rests(measure: ET.Element, duration: int) -> None:
             duration_element = child.find("duration")
             if duration_element is not None:
                 duration_element.text = str(duration)
+
+
+def _staff_of(note: ET.Element) -> str:
+    return note.findtext("staff", "1")
+
+
+def _is_single_plain_rest(note: ET.Element) -> bool:
+    return (
+        note.find("rest") is not None
+        and note.find("chord") is None
+        and note.find("grace") is None
+        and note.find("time-modification") is None
+        and note.find("duration") is not None
+    )
+
+
+def _fill_rest_only_bars(
+    measures: list[ET.Element], division: int, is_first_page: bool, time_is_guessed: bool
+) -> None:
+    """
+    A staff which holds one rest and nothing else in a bar rests for the whole bar, whatever
+    the model read for the rest. The model has no bar rest symbol and reads one as a whole
+    rest in a 3/4 bar, or as a dotted half rest in a 2/4 bar. The rest becomes a measure rest
+    which is as long as the bar of the meter in force. Staves which hold several rests or
+    anything else are left as they are. Not touched: the first bar of a score, which may be
+    a pickup, and the bars before the first recognised time signature, as their meter is a
+    guess from the note lengths.
+    """
+    in_force = _meters_in_force(measures)
+    first = 1 if is_first_page else 0
+    if time_is_guessed:
+        first = next(
+            (i for i, m in enumerate(measures) if i > 0 and m.find("attributes/time") is not None),
+            len(measures),
+        )
+    for i in range(first, len(measures)):
+        meter = in_force[i]
+        if meter is None:
+            continue
+        bar = Fraction(*meter) * division
+        if bar.denominator != 1:
+            continue
+        measure = measures[i]
+        by_staff: dict[str, list[ET.Element]] = {}
+        for note in measure.findall("note"):
+            by_staff.setdefault(_staff_of(note), []).append(note)
+        for notes in by_staff.values():
+            if len(notes) == 1 and _is_single_plain_rest(notes[0]):
+                _make_bar_rest(measure, notes[0], int(bar))
+
+
+def _make_bar_rest(measure: ET.Element, rest: ET.Element, bar: int) -> None:
+    children = list(measure)
+    position = children.index(rest)
+    start = 0
+    for child in children[:position]:
+        duration = int(child.findtext("duration", "0"))
+        if (child.tag == "note" and child.find("chord") is None) or child.tag == "forward":
+            start += duration
+        elif child.tag == "backup":
+            start -= duration
+    duration_element = rest.find("duration")
+    rest_element = rest.find("rest")
+    if duration_element is None or rest_element is None or start != 0:
+        return
+    old = int(duration_element.text or "0")
+    delta = bar - old
+    if delta == 0 and rest_element.get("measure") == "yes":
+        return
+    # Everything after the rest has to stay where it is: the next backup or forward absorbs
+    # the change. Another note before it would be moved, then the bar is left alone.
+    shift = next((c for c in children[position + 1 :] if c.tag != "direction"), None)
+    if shift is not None and shift.tag == "note" and shift.find("chord") is None:
+        return
+    if shift is not None and shift.tag in ("backup", "forward") and delta != 0:
+        moved = int(shift.findtext("duration", "0"))
+        back = (moved if shift.tag == "backup" else -moved) + delta
+        if back == 0:
+            measure.remove(shift)
+        else:
+            shift.tag = "backup" if back > 0 else "forward"
+            shift_duration = shift.find("duration")
+            if shift_duration is not None:
+                shift_duration.text = str(abs(back))
+    duration_element.text = str(bar)
+    for tag in ("type", "dot"):
+        for element in rest.findall(tag):
+            rest.remove(element)
+    rest_element.set("measure", "yes")
 
 
 def _repair_meter(measures: list[ET.Element], division: int) -> str | None:

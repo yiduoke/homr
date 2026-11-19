@@ -25,6 +25,7 @@ from homr.bounding_boxes import (
     create_bounding_ellipses,
     create_rotated_bounding_boxes,
 )
+from homr.combined_switches import tuplet_pass as tuplet_pass_enabled
 from homr.debug import Debug
 from homr.hires_page import load_hires_page
 from homr.model import InputPredictions, MultiStaff, Note, Staff
@@ -517,6 +518,33 @@ def recognize_pages(
     )
 
 
+def continue_tuplets(xml_paths: list[str]) -> None:
+    """
+    Runs the page level tuplet pass (research_scripts/tuplet_pass.py) on the page files of a
+    score in the order of the pages, so that a ratio read on one page continues on the next.
+    A file where nothing is converted is not written. HOMR_TUPLET_PASS=0 or
+    HOMR_COMBINED_OFF=C turns it off.
+    """
+    if not tuplet_pass_enabled():
+        return
+    try:
+        from research_scripts import tuplet_pass  # noqa: PLC0415
+    except ImportError:
+        eprint("The tuplet pass is not part of this installation, it is skipped")
+        return
+    state: dict = {}
+    first_bar = 0
+    for path in xml_paths:
+        # Comments carry the image positions of the symbols
+        parser = ET.XMLParser(target=ET.TreeBuilder(insert_comments=True))  # noqa: S314
+        tree = ET.parse(path, parser=parser)  # noqa: S314
+        root = tree.getroot()
+        decisions, _ = tuplet_pass.process(root, None, state, first_bar)
+        if any(decision.status == "converted" for decision in decisions):
+            tree.write(path, encoding="utf-8", xml_declaration=True)
+        first_bar += max((len(part.findall("measure")) for part in root.findall("part")), default=0)
+
+
 def run_homr(
     images: list,
     config: ProcessingConfig,
@@ -541,6 +569,9 @@ def run_homr(
         except Exception as e:
             eprint(f"An error occurred while processing {image_file}: {e}")
             raise
+
+    if len(xml_paths) == len(images):
+        continue_tuplets(xml_paths)
 
     if len(xml_paths) == len(images) and len(xml_paths) > 1:
         m, _, _ = process_concat(xml_paths)
