@@ -24,11 +24,10 @@ A bracket which continues from the previous system starts at the left edge of th
 numeral and is not reached for (documented limit, 3 of 28 scans' failing segments).
 """
 
-import os
-
 import cv2
 import numpy as np
 
+from homr.combined_switches import strict_cut_level
 from homr.type_definitions import NDArray
 
 _SEARCH_ABOVE_IN_UNITS = 10.0
@@ -459,7 +458,7 @@ def find_bracket_lines_v2(  # noqa: PLR0917
 
 
 def _version() -> int:
-    return 2 if os.environ.get("HOMR_STRICT_BRACKET_CUT") == "2" else 1
+    return 2 if strict_cut_level() == "2" else 1
 
 
 def find_bracket_lines(  # noqa: PLR0917

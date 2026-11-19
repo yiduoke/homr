@@ -11,6 +11,7 @@ import numpy as np
 
 from homr import constants
 from homr.accidentals import NATURAL, SIGN_TO_MUSIC_XML, AccidentalState
+from homr.combined_switches import beam_export as beam_export_enabled
 from homr.simple_logging import eprint
 from homr.transformer.vocabulary import (
     OCTAVE_SHIFT_STOP,
@@ -143,14 +144,20 @@ class XmlGeneratorArguments:
         large_page: bool | None = None,
         metronome: int | None = None,
         tempo: int | None = None,
-        join_beam_voices: bool = True,
+        join_beam_voices: bool | None = None,
+        beam_export: bool | None = None,
     ):
         self.large_page = large_page
         self.metronome = metronome
         self.tempo = tempo
         # A beam which changes staff is one voice in the page file. Without it the notes
         # keep the voice of their position and the beam states alone tell the group.
-        self.join_beam_voices = join_beam_voices
+        # Opt-in (HOMR_BEAM_EXPORT=1 or HOMR_COMBINED=1): the cross-staff beam writer
+        # convert_beams. Without it convert_beams_legacy of the default pipeline runs.
+        self.beam_export = beam_export_enabled() if beam_export is None else beam_export
+        self.join_beam_voices = (
+            (not self.beam_export) if join_beam_voices is None else join_beam_voices
+        )
 
 
 def build_identification() -> ET.Element:
@@ -209,7 +216,10 @@ def build_part(
     resolve_accidentals(part)
     convert_ties(part)
     add_stems(part)
-    convert_beams(part, args.join_beam_voices)
+    if args.beam_export:
+        convert_beams(part, args.join_beam_voices)
+    else:
+        convert_beams_legacy(part)
     _remove_position_attributes(part)
     return part
 
@@ -1101,6 +1111,66 @@ def convert_beams(part: ET.Element, join_voices: bool = True) -> None:
         close(key)
     for events in groups:
         _write_beams([event.notes for event in events])
+
+
+def convert_beams_legacy(part: ET.Element) -> None:
+    """The beam conversion of the default pipeline, unchanged (HOMR_BEAM_EXPORT=1: convert_beams).
+
+    Turn the primary beam states of the model into complete beams.
+
+    The model predicts for each chord whether its primary beam starts, continues
+    or stops. Groups are formed per position of the model (e.g. upper2) rather
+    than per MusicXML voice, as voices can swap between chords. Rests don't
+    interrupt a group and it can cross a barline. A beam which continues on the
+    other staff joins the open group there, the notes then move into its voice.
+    A group with only one note, or a state which doesn't fit, is repaired rather
+    than written as it is. Secondary beams and hooks follow from the durations.
+    """
+    open_groups: dict[tuple[str, bool], list[_BeamEvent]] = {}
+    groups: list[list[_BeamEvent]] = []
+
+    def close(key: tuple[str, bool]) -> None:
+        group = open_groups.pop(key, [])
+        if len(group) >= 2:
+            groups.append(group)
+
+    for event in _beam_events(part):
+        key = (event.position, event.is_grace)
+        if event.state is None or _beam_count(event.notes[0]) == 0:
+            close(key)
+            continue
+        if event.state == "begin":
+            close(key)
+        elif key not in open_groups:
+            other = _cross_staff_group_legacy(open_groups, event)
+            if other is not None:
+                _join_voice(open_groups[other], event)
+                open_groups[other].append(event)
+                if event.state == "end":
+                    close(other)
+                continue
+        open_groups.setdefault(key, []).append(event)
+        if event.state == "end":
+            close(key)
+    for key in list(open_groups):
+        close(key)
+    for group in groups:
+        _write_beams([event.notes for event in group])
+
+
+def _cross_staff_group_legacy(
+    open_groups: dict[tuple[str, bool], list[_BeamEvent]], event: _BeamEvent
+) -> tuple[str, bool] | None:
+    """The open group on the other staff which the event can continue, if there is one."""
+    staff = event.notes[0].findtext("staff", "1")
+    candidates = [
+        key
+        for key, group in open_groups.items()
+        if key[1] == event.is_grace
+        and group[-1].notes[0].findtext("staff", "1") != staff
+        and group[-1].end <= event.start
+    ]
+    return candidates[0] if len(candidates) == 1 else None
 
 
 def _beam_events(part: ET.Element) -> list[_BeamEvent]:

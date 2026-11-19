@@ -9,6 +9,7 @@ import cv2
 import numpy as np
 
 from homr import constants
+from homr.combined_switches import strict_cut_level
 from homr.debug import Debug
 from homr.hires_page import HiresPage
 from homr.image_utils import crop_image_and_return_new_top
@@ -163,8 +164,8 @@ def _calculate_region(staff: Staff, regions: StaffRegions, image: NDArray | None
     staff_below = regions.get_start_of_closest_staff_below(staff.max_y)
     y_min = max(staff.min_y - 4 * unit, staff_above)
     y_max = min(staff.max_y + 4 * unit, staff_below)
-    if image is not None and os.environ.get("HOMR_STRICT_BRACKET_CUT"):
-        # opt-in: the fixed region, widened only for a verified printed octave bracket (octave_bracket_strict)
+    if image is not None and strict_cut_level():
+        # opt-in: the fixed region, widened only for a verified printed octave bracket
         y_min, y_max = strict_region_y(
             staff.min_y,
             staff.max_y,

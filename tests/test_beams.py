@@ -33,8 +33,10 @@ def _tokens(xml: str) -> str:
     return token_lines_to_str([s for part in parts for measure in part for s in measure])
 
 
-def _generate(tokens: str) -> ET.Element:
-    return generate_xml(XmlGeneratorArguments(), [read_token_lines(tokens.splitlines())], "")
+def _generate(tokens: str, beam_export: bool = True) -> ET.Element:
+    # The cross-staff beam writer is opt-in (HOMR_BEAM_EXPORT=1 / HOMR_COMBINED=1), the tests ask for it
+    args = XmlGeneratorArguments(beam_export=beam_export, join_beam_voices=True)
+    return generate_xml(args, [read_token_lines(tokens.splitlines())], "")
 
 
 def _beams(xml: ET.Element) -> list[list[str]]:
@@ -50,12 +52,15 @@ def test_music_xml_beam_is_on_the_chord() -> None:
         _xml_note("D", "eighth", 1, "end"),
         _xml_note("E", "quarter", 2),
     )
-    assert _tokens(xml) == """clef_G2 _ _ _ _ upper
+    assert (
+        _tokens(xml)
+        == """clef_G2 _ _ _ _ upper
 timeSignature_2/4 . . . . .
 note_8 E5 _ _ beamStart upper&note_8 C5 _ _ _ upper
 note_8 D5 _ _ beamStop upper
 note_4 E5 _ _ _ upper
 barline . . . . ."""
+    )
 
 
 def test_kern_beams_count_all_levels() -> None:
@@ -278,9 +283,41 @@ barline . . . . ."""
     joined = _staff_voice_beams(_generate(tokens))
     staffs = [read_token_lines(tokens.splitlines())]
     apart = _staff_voice_beams(
-        generate_xml(XmlGeneratorArguments(join_beam_voices=False), staffs, "")
+        generate_xml(XmlGeneratorArguments(join_beam_voices=False, beam_export=True), staffs, "")
     )
     states = ["begin", "continue", "continue", "end", ""]
     assert [r[2] for r in apart] == [r[2] for r in joined] == states
     assert len({r[1] for r in joined[:4]}) == 1
     assert apart[0][1] != apart[1][1]
+
+
+def test_default_writer_is_the_unchanged_one_and_the_switch_selects_the_new_one(
+    monkeypatch,
+) -> None:
+    tokens = f"""{_TWO_STAVES}
+note_16 A3 _ _ beamStart lower2
+note_16 C4 _ _ beamContinue upper
+note_16 E4 _ _ beamContinue upper
+note_16 C4 _ _ beamStop upper
+note_4 A3 _ _ _ lower
+barline . . . . ."""
+    staffs = [read_token_lines(tokens.splitlines())]
+    for name in ("HOMR_BEAM_EXPORT", "HOMR_COMBINED", "HOMR_COMBINED_OFF"):
+        monkeypatch.delenv(name, raising=False)
+    default = XmlGeneratorArguments()
+    assert default.beam_export is False
+    assert default.join_beam_voices is True
+    old = _staff_voice_beams(generate_xml(default, staffs, ""))
+    # the run of two notes on the second staff splits the group in the default writer
+    assert [r[2] for r in old[:4]] != ["begin", "continue", "continue", "end"]
+    monkeypatch.setenv("HOMR_BEAM_EXPORT", "1")
+    on = XmlGeneratorArguments()
+    assert on.beam_export is True
+    assert on.join_beam_voices is False
+    new = _staff_voice_beams(generate_xml(on, staffs, ""))
+    assert [r[2] for r in new[:4]] == ["begin", "continue", "continue", "end"]
+    monkeypatch.delenv("HOMR_BEAM_EXPORT")
+    monkeypatch.setenv("HOMR_COMBINED", "1")
+    assert XmlGeneratorArguments().beam_export is True
+    monkeypatch.setenv("HOMR_COMBINED_OFF", "B")
+    assert XmlGeneratorArguments().beam_export is False

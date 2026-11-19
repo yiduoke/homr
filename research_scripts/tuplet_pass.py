@@ -37,7 +37,12 @@ BEAMABLE = {"eighth", "16th", "32nd", "64th", "128th"}
 
 
 def enabled() -> bool:
-    return os.environ.get("HOMR_TUPLET_PASS") == "1"
+    """HOMR_TUPLET_PASS=1, or HOMR_COMBINED=1 (homr/combined_switches.py; HOMR_COMBINED_OFF=C leaves it off)."""
+    try:
+        from homr.combined_switches import tuplet_pass
+    except ImportError:  # the script is used without the homr package on the path
+        return os.environ.get("HOMR_TUPLET_PASS") == "1"
+    return tuplet_pass()
 
 
 # ---------------------------------------------------------------------------------------------------------------------
