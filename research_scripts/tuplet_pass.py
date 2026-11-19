@@ -331,6 +331,7 @@ DEFAULTS = dict(
     merger_voices="skip",  # a bar of a part where merge_pages split a voice (ids >= 90) is not touched
     quarter_groups=True,  # 3 quarters in the time of 2 etc.
     same_voice_only=True,
+    barfill=None,         # None: barfill_enabled() (HOMR_TUPLET_BARFILL, default on)
     skip_rest_only=True,  # D54: False reproduces the configuration of the final run (rest-only groups were converted in 3 bars of Petrushka)
 )
 EPS = Fraction(1, 192)
@@ -531,6 +532,145 @@ def _post_onsets(vb: VoiceBar, sel: list[Group], factors: list[Fraction]) -> set
     return {_new_time(s.onset, wins) for s in vb.slots}
 
 
+
+# ---------------------------------------------------------------------------------------------------------------------
+# bar fill: unnumbered tuplets deduced from the meter (branch tuplet-barfill)
+
+# n notes of one written value in the time of m of them (only reductions: the plain reading overfills the bar)
+TUPLET_NORMAL = {3: 2, 5: 4, 6: 4, 7: 4, 9: 8, 10: 8, 11: 8, 12: 8, 13: 8}
+MAX_NODES = 100000
+
+
+def barfill_enabled() -> bool:
+    """On unless HOMR_TUPLET_BARFILL=0."""
+    return os.environ.get("HOMR_TUPLET_BARFILL", "1") != "0"
+
+
+@dataclass
+class _Unit:
+    i0: int
+    i1: int
+    options: list  # [(key, [(i0, i1, (actual, normal))...])]
+
+
+def _same_shape(slots: list[Slot]) -> bool:
+    return len({(s.type, s.dots) for s in slots}) == 1
+
+
+def _contiguous(slots: list[Slot]) -> bool:
+    return all(a.onset + a.dur == b.onset for a, b in zip(slots, slots[1:]))
+
+
+def barfill_units(vb: VoiceBar) -> list[_Unit]:
+    """Candidate groups of a voice: beam groups (begin ... end) and, without beams, maximal runs of one written value, each of
+    plain slots of one written value in a row, with at least one sounding slot, all on one staff. A group has the options
+    'n in the time of m' (TUPLET_NORMAL) and, when n is a multiple of 3 and above 3, 'triplets of three'."""
+    sl = vb.slots
+    units: list[_Unit] = []
+    i = 0
+    while i < len(sl):
+        s = sl[i]
+        if not plain_slot(s):
+            i += 1
+            continue
+        j = i + 1
+        if s.beam == "begin" and s.type in BEAMABLE:
+            while j < len(sl) and plain_slot(sl[j]) and sl[j - 1].beam != "end" and (sl[j].beam in ("continue", "end") or (sl[j].beam is None and sl[j].rest)):
+                j += 1
+            if sl[j - 1].beam != "end":
+                i += 1
+                continue
+        elif s.beam is None:
+            while j < len(sl) and plain_slot(sl[j]) and sl[j].beam is None and (sl[j].type, sl[j].dots) == (s.type, s.dots):
+                j += 1
+        else:  # a beam continuation without its start in this bar
+            i = j
+            continue
+        w = sl[i:j]
+        n = len(w)
+        if (n in TUPLET_NORMAL and _same_shape(w) and _contiguous(w) and any(not x.rest for x in w)
+                and len({nn.staff for x in w for nn in x.notes}) == 1):
+            m = TUPLET_NORMAL[n]
+            options = [(("all", n, m), [(i, j, (n, m))])]
+            if n % 3 == 0 and n > 3:
+                options.append((("triples", n), [(i + k, i + k + 3, (3, 2)) for k in range(0, n, 3)]))
+            units.append(_Unit(i, j, options))
+        i = j
+    return units
+
+
+def _factors(vb: VoiceBar, segments: list) -> tuple:
+    f = {}
+    for a, b, (n, m) in segments:
+        for k in range(a, b):
+            f[k] = Fraction(m, n)
+    return tuple(sorted(f.items()))
+
+
+def barfill_solve(vb: VoiceBar, length: Fraction) -> tuple[str, list]:
+    """('ok', segments) when exactly one assignment of tuplets to the groups of the voice makes it exactly as long as the bar,
+    else ('no_fit' | 'ambiguous' | 'no_groups' | 'fits', [])."""
+    excess = vb.total - length
+    if excess < Fraction(1, 96):
+        return "fits", []
+    units = barfill_units(vb)
+    if not units:
+        return "no_groups", []
+    sl = vb.slots
+    found: dict[tuple, list] = {}
+    nodes = [0]
+
+    def red(segments) -> Fraction:
+        return sum((sl[k].dur * (1 - Fraction(m, n)) for a, b, (n, m) in segments for k in range(a, b)), Fraction(0))
+
+    def go(u: int, acc: Fraction, chosen: list) -> None:
+        nodes[0] += 1
+        if nodes[0] > MAX_NODES or len(found) > 1:
+            return
+        if acc == excess:
+            key = _factors(vb, chosen)
+            found.setdefault(key, list(chosen))
+            return
+        if u == len(units) or acc > excess:
+            return
+        go(u + 1, acc, chosen)
+        for _, segs in units[u].options:
+            go(u + 1, acc + red(segs), chosen + segs)
+
+    go(0, Fraction(0), [])
+    if nodes[0] > MAX_NODES or len(found) > 1:
+        return "ambiguous", []
+    if not found:
+        return "no_fit", []
+    return "ok", next(iter(found.values()))
+
+
+def barfill_bar(bar: Bar, skip_voices: set[str], length: Fraction | None = None) -> tuple[dict[str, list], str]:
+    """All overfull voices of the bar (those not in skip_voices) must each have exactly one fitting assignment; else nothing is
+    changed. Returns ({voice: [(Group, Known)]}, status)."""
+    length = bar.length if length is None else length  # the argument is for measurements (ceiling with the reference meter)
+    if length is None or bar.el.get("implicit") == "yes":
+        return {}, "no_length"
+    out: dict[str, list] = {}
+    for vid, vb in bar.voices.items():
+        if vid in skip_voices or is_merger_voice(vid):
+            continue
+        status, segs = barfill_solve(vb, length)
+        if status in ("fits", "no_groups") and vb.total - length < Fraction(1, 96):
+            continue
+        if status != "ok":
+            return {}, status if status != "no_groups" else "no_groups"
+        lst = []
+        for a, b, (n, m) in segs:
+            tm = ET.Element("time-modification")
+            ET.SubElement(tm, "actual-notes").text = str(n)
+            ET.SubElement(tm, "normal-notes").text = str(m)
+            g = Group(vb, a, b, tuple(slot_sig(x) for x in vb.slots[a:b]), (n, m), tm)
+            lst.append((g, Known((n, m), tm, bar.mi)))
+        out[vid] = sorted(lst, key=lambda gk: gk[0].i0)
+    return out, "ok" if out else "fits"
+
+
 def process(root: ET.Element, params: dict | None = None, state: dict | None = None, mi_offset: int = 0) -> tuple[list[Decision], dict]:
     """Apply the pass to the score in place. Returns the decision log and counters.
     `state` (voice -> last explicit groups) and `mi_offset` let a caller carry the explicit ratios over several files in order (the page XML files)."""
@@ -551,7 +691,7 @@ def process(root: ET.Element, params: dict | None = None, state: dict | None = N
             bar = bars[mi]
             has_merger = any(is_merger_voice(v) for v in bar.voices)
             for vid, vb in bar.voices.items():
-                if is_merger_voice(vid):
+                if is_merger_voice(vid) or not P.get("continuation", True):  # continuation=False: measurements of the bar-fill rule alone
                     continue
                 st = state.setdefault((pi, vid) if P["same_voice_only"] else (pi, "*"), {})
                 for sg in [sg for sg, k in st.items() if mi + mi_offset - k.last_mi > P["max_gap_bars"]]:
@@ -670,6 +810,31 @@ def process(root: ET.Element, params: dict | None = None, state: dict | None = N
                     d.windows.append(_window_record(g, bars_by_part[pi], mi, vid))
             log.append(d)
             counters[d.status] = counters.get(d.status, 0) + 1
+        if (P["barfill"] if P["barfill"] is not None else barfill_enabled()):
+            for pi, bars in enumerate(bars_by_part):
+                if mi >= len(bars):
+                    continue
+                bar = bars[mi]
+                res, status = barfill_bar(bar, set(converted_by_part.get(pi, {})), (P.get("length_override") or {}).get((pi, mi)))
+                if not res:
+                    if status not in ("fits", "no_length"):
+                        counters["skip:barfill_" + status] = counters.get("skip:barfill_" + status, 0) + 1
+                    continue
+                applied: dict[str, list] = {}
+                failed = False
+                for vid, lst in res.items():
+                    if not apply_windows(bar, [g for g, _ in lst], [k for _, k in lst]):
+                        failed = True
+                        break
+                    applied[vid] = lst
+                if failed and applied:
+                    counters["skip:barfill_non_integer_partial"] = counters.get("skip:barfill_non_integer_partial", 0) + 1
+                for vid, lst in applied.items():
+                    converted_by_part.setdefault(pi, {})[vid] = lst
+                    vb = bar.voices[vid]
+                    log.append(Decision(pi, mi, bar.number, vid, "converted", "barfill", f"{bar.beats}/{bar.beat_type}", bar.length or Fraction(0),
+                                        vb.total, lst[0][1].ratio, lst[0][0].sig, len(lst), len(lst)))
+                    counters["converted:barfill"] = counters.get("converted:barfill", 0) + 1
         for pi, conv in converted_by_part.items():
             retime_bar(bars_by_part[pi][mi], conv)
     return log, counters

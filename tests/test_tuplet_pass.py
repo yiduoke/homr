@@ -122,7 +122,7 @@ def test_compound_meter_groups_are_not_converted():
 
 def test_no_explicit_group_earlier_nothing_happens():
     root = score([measure(1, plain() + plain() + plain(), (2, 4))])
-    log, cnt = TP.process(root)
+    log, cnt = TP.process(root, {"barfill": False})
     assert cnt == {}
 
 
