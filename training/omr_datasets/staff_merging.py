@@ -40,15 +40,19 @@ def merge_upper_and_lower_staff(voices: list[list[EncodedSymbolWithPos]]) -> lis
     for key in sorted(positions):
         result.extend(create_chord_over_two_staffs(positions[key]))
 
+    # A volta mark (voltaStop, voltaDiscontinue) is written after the bar symbol it belongs to.
+    # It must not hide that bar symbol, or an empty measure gets a second barline.
+    last = len(result) - 1
+    while last >= 0 and result[last].rhythm.startswith("volta"):
+        last -= 1
     if (
-        len(result) > 0
-        and "barline" not in result[-1].rhythm
-        and not result[-1].rhythm.startswith("repeat")
+        last >= 0
+        and "barline" not in result[last].rhythm
+        and not result[last].rhythm.startswith("repeat")
     ):
         result.append(EncodedSymbol("barline"))
-    if len(result) > 0 and result[-1].rhythm == "repeatEndStart":
-        result.pop()
-        result.append(EncodedSymbol("repeatEnd"))
+    if last >= 0 and result[last].rhythm == "repeatEndStart":
+        result[last] = EncodedSymbol("repeatEnd")
     return result
 
 
