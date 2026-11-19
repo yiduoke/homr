@@ -9,7 +9,16 @@ from fractions import Fraction
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "research_scripts"))
 import tuplet_pass as TP  # noqa: E402
-from test_tuplet_pass import backup, measure, note, plain, quarter, score, triplet, voice_durs  # noqa: E402
+from test_tuplet_pass import (
+    backup,
+    measure,
+    note,
+    plain,
+    quarter,
+    score,
+    triplet,
+    voice_durs,
+)  # noqa: E402
 
 
 def sixteenths(steps="CDEFGA"):
@@ -29,7 +38,10 @@ def test_triplet_eighths_in_2_4():
     assert durs(root) == [Fraction(1, 3)] * 6
     assert TP.parse_score(root)[0][0].voices["1"].total == Fraction(2)
     assert len(list(root.iter("tuplet"))) == 0  # unnumbered: no numeral, no bracket
-    assert [tm.findtext("actual-notes") + ":" + tm.findtext("normal-notes") for tm in root.iter("time-modification")] == ["3:2"] * 6
+    assert [
+        tm.findtext("actual-notes") + ":" + tm.findtext("normal-notes")
+        for tm in root.iter("time-modification")
+    ] == ["3:2"] * 6
 
 
 def test_sextuplets():
@@ -38,7 +50,10 @@ def test_sextuplets():
     log, cnt = TP.process(root)
     assert cnt.get("converted:barfill") == 1
     assert durs(root) == [Fraction(1, 6)] * 12
-    assert {tm.findtext("actual-notes") + ":" + tm.findtext("normal-notes") for tm in root.iter("time-modification")} == {"6:4"}
+    assert {
+        tm.findtext("actual-notes") + ":" + tm.findtext("normal-notes")
+        for tm in root.iter("time-modification")
+    } == {"6:4"}
 
 
 def test_mixed_bar_one_numbered_one_unnumbered_group():
@@ -88,7 +103,15 @@ def test_other_voice_keeps_its_onsets():
 
 def test_unbeamed_quarters_three_in_the_time_of_two():
     # 2/4: three plain quarters without beams are overfull by 1: a quarter triplet
-    root = score([measure(1, [note("C", "quarter", 12), note("D", "quarter", 12), note("E", "quarter", 12)], (2, 4))])
+    root = score(
+        [
+            measure(
+                1,
+                [note("C", "quarter", 12), note("D", "quarter", 12), note("E", "quarter", 12)],
+                (2, 4),
+            )
+        ]
+    )
     log, cnt = TP.process(root)
     assert cnt.get("converted:barfill") == 1
     assert durs(root) == [Fraction(2, 3)] * 3
