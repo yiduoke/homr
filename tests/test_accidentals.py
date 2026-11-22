@@ -423,3 +423,24 @@ def test_tie_within_a_bar_and_a_later_untied_note_in_the_next_bar() -> None:
     )
     (alters,) = _tie_alters([tokens])
     assert alters == ["1", "1", None]
+
+
+_FLATS = "clef_G2 _ _ _ _ upper\nkeySignature_-6 . . . . .\ntimeSignature_4/4 . . . . .\n"
+
+
+def test_marked_tie_over_a_page_turn_keeps_sharp_and_an_unmarked_one_is_not_guessed() -> None:
+    # Six flats: C is C flat unless a sign or a tie says otherwise. The upper C is sharp at two
+    # starts in a row and has a marked stop on the next page. The lower C of the next page has
+    # no marked stop and is not guessed.
+    page1 = (
+        _FLATS
+        + "note_4 C5 # _ slurStart upper\n"
+        + "note_4 C5 # _ slurStart upper\nbarline . . . . ."
+    )
+    page2 = _FLATS + "note_4 C5 _ _ slurStop upper\n" + "note_4 C4 _ _ _ upper\nbarline . . . . ."
+    first, second = _tie_alters([page1, page2])
+    assert first == ["1", "1"]
+    assert second == ["1", "-1"]
+    # the pages written one by one, as when no memory is passed, lose the sharp
+    (alone,) = _tie_alters([page2])
+    assert alone == ["-1", "-1"]
