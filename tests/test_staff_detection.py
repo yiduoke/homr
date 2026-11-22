@@ -1,3 +1,5 @@
+import json
+import os
 import unittest
 
 import cv2
@@ -12,6 +14,7 @@ from homr.staff_detection import (
     connect_staff_lines,
     estimate_unit_size_from_clefs,
     filter_neighbor_page,
+    filter_unusual_anchors,
     find_horizontal_lines,
     merge_staffs_in_same_row,
 )
@@ -37,6 +40,32 @@ def make_raw_staff(min_x: float, max_x: float, top: float) -> RawStaff:
         lines.append(StaffLineSegment(i, [RotatedBoundingBox(box, contour)]))
     clef = RotatedBoundingBox(((min_x + 10, top + 20), (20, 40), 0), np.array([]))
     return RawStaff(0, lines, [StaffAnchor(lines, clef)])
+
+
+def make_anchor(x: float, line_ys: list[float]) -> StaffAnchor:
+    """An anchor at a bar line at x, with straight staff lines at line_ys."""
+    lines = [
+        StaffLineSegment(i, [RotatedBoundingBox(((x, y), (200.0, 2.0), 0.0), np.array([]))])
+        for i, y in enumerate(line_ys)
+    ]
+    height = line_ys[-1] - line_ys[0]
+    bar_line = RotatedBoundingBox(((x, line_ys[0] + height / 2), (3.0, height), 0.0), np.array([]))
+    return StaffAnchor(lines, bar_line)
+
+
+def make_anchors(top: float, unit_size: float, xs: list[float]) -> list[StaffAnchor]:
+    return [make_anchor(x, [top + unit_size * i for i in range(5)]) for x in xs]
+
+
+# The anchors which enter the spacing filter on page 7 of Liszt's Grosses Konzertsolo
+# (IMSLP56095, Schott), a real scan with three ossias in small print above its systems.
+# The x of each anchor's symbol and the y of its five lines there, on the 1920 px wide
+# detector input. Written by run/round5_prep/ossia_fix/make_fixture.py of the research repo.
+konzertsolo_anchors = os.path.join(
+    os.path.dirname(__file__), "data", "staff_anchors_konzertsolo_p7.json"
+)
+# The y ranges of the three ossia staffs on that page
+konzertsolo_ossias = [(220, 275), (728, 783), (1217, 1270)]
 
 
 class TestStaffDetection(unittest.TestCase):
@@ -106,3 +135,40 @@ class TestStaffDetection(unittest.TestCase):
 
         self.assertAlmostEqual(10, estimate_unit_size_from_clefs(lines, [clef]) or 0, delta=0.5)
         self.assertIsNone(estimate_unit_size_from_clefs(lines, []))
+
+    def test_filter_unusual_anchors_removes_anchors_which_contradict_their_staff(self) -> None:
+        xs = [200.0 + 150 * i for i in range(10)]
+        page = [a for top in (100, 300, 500, 700) for a in make_anchors(top, 15, xs)]
+        # Five lines connected over a ledger line, on the staff at y=300
+        wrong = make_anchor(1000, [300, 319, 338, 357, 376])
+
+        result = filter_unusual_anchors([*page, wrong])
+
+        self.assertEqual(page, result)
+
+    def test_filter_unusual_anchors_keeps_staffs_in_small_print(self) -> None:
+        xs = [200.0 + 75 * i for i in range(20)]
+        page = [a for top in (300, 500, 900, 1100) for a in make_anchors(top, 15, xs)]
+        ossia = make_anchors(200, 9, [400, 700, 1000])
+        lone_ossia_anchor = make_anchors(800, 9, [1500])
+        wrong_on_page_staff = make_anchor(1000, [500, 519, 538, 557, 576])
+
+        result = filter_unusual_anchors([*page, *ossia, *lone_ossia_anchor, wrong_on_page_staff])
+
+        self.assertEqual([*page, *ossia, *lone_ossia_anchor], result)
+
+    def test_filter_unusual_anchors_on_real_scan_with_ossias(self) -> None:
+        with open(konzertsolo_anchors) as f:
+            anchors = [make_anchor(x, ys) for x, ys in json.load(f)["anchors"]]
+
+        def on_ossia(anchor: StaffAnchor) -> bool:
+            center = (anchor.min_y + anchor.max_y) / 2
+            return any(top < center < bottom for top, bottom in konzertsolo_ossias)
+
+        result = filter_unusual_anchors(anchors)
+
+        self.assertEqual(350, len(anchors))
+        self.assertEqual(30, sum(on_ossia(anchor) for anchor in anchors))
+        # The page-wide spacing alone rejects all 30 anchors of the ossias
+        self.assertEqual(30, sum(on_ossia(anchor) for anchor in result))
+        self.assertEqual(anchors, result)
