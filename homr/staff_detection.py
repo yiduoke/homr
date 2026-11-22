@@ -112,6 +112,9 @@ class StaffAnchor(DebugDrawable):
         else:
             self.average_unit_size = float(np.mean(y_deltas))
         self.symbol = symbol
+        # Set by filter_unusual_anchors: the anchor is on a staff printed in another size
+        # than the staffs of the page, e.g. an ossia in small print
+        self.other_print_size = False
         self.max_y = max([line.max_y for line in staff_lines])
         self.min_y = min([line.min_y for line in staff_lines])
         max_number_of_ledger_lines = 5
@@ -556,7 +559,9 @@ def resample_staff(staff: RawStaff) -> Staff:
         grid.extend(reversed(list(resample_staff_segment(anchor, staff, reversed(to_left)))))
         grid.extend(resample_staff_segment(anchor, staff, to_right))
 
-    return Staff(grid)
+    result = Staff(grid)
+    result.other_print_size = all(anchor.other_print_size for anchor in staff.anchors)
+    return result
 
 
 def resample_staffs(staffs: list[RawStaff]) -> list[Staff]:
@@ -699,7 +704,8 @@ def filter_unusual_anchors(anchors: list[StaffAnchor]) -> list[StaffAnchor]:
     it then contradicts the spacing of its own staff. Anchors which don't fit and are
     away from all fitting anchors belong to a staff printed in another size, e.g. an
     ossia or cue staff in small print. Their spacing is compared with the spacing in
-    their own row instead.
+    their own row instead, and the anchors which are kept are marked with
+    other_print_size.
     """
     if len(anchors) == 0:
         return anchors
@@ -711,7 +717,9 @@ def filter_unusual_anchors(anchors: list[StaffAnchor]) -> list[StaffAnchor]:
         if id(anchor) not in kept and not any(_overlap_vertically(anchor, u) for u in usual)
     ]
     for row in _rows_of_anchors(other_size):
-        kept.update(id(anchor) for anchor in _anchors_with_usual_unit_size(row))
+        for anchor in _anchors_with_usual_unit_size(row):
+            anchor.other_print_size = True
+            kept.add(id(anchor))
     return [anchor for anchor in anchors if id(anchor) in kept]
 
 

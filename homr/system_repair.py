@@ -399,22 +399,33 @@ ossia_unit_share = 0.78
 max_ossia_share = 0.4
 
 
+def _small_staffs(all_staffs: list[Staff]) -> list[Staff]:
+    """
+    The staffs printed smaller than the staffs of the page. Staffs which the staff
+    detection found in another print size (Staff.other_print_size) are no staffs of the
+    page; they are small if they are smaller than the page's median at all. The other
+    staffs are small below ossia_unit_share of the median, and only if fewer than
+    max_ossia_share of them are that small.
+    """
+    page = [staff for staff in all_staffs if not staff.other_print_size] or all_staffs
+    median_unit = float(np.median([_staff_unit_size(staff) for staff in page]))
+    small = [staff for staff in page if _staff_unit_size(staff) < ossia_unit_share * median_unit]
+    if len(page) < 3 or len(small) >= max_ossia_share * len(page):  # noqa: PLR2004
+        small = []
+    other_size = [staff for staff in all_staffs if staff.other_print_size and staff not in page]
+    return small + [staff for staff in other_size if _staff_unit_size(staff) < median_unit]
+
+
 def drop_ossia_staffs(staffs: list[MultiStaff]) -> list[MultiStaff]:
     """
     Removes the ossia staffs of a page. An ossia is a small staff, usually above a system, which
     offers an alternative to the notes of the main staffs. It is no part of its own and would
     otherwise become a voice of the system (or a system of its own) with extra bars. A staff is
-    an ossia if its unit size is clearly smaller than the median of the page and fewer than
-    max_ossia_share of the staffs are that small. At least one staff stays.
+    an ossia if it is printed smaller than the staffs of the page, see _small_staffs. At least
+    one staff stays.
     """
-    all_staffs = _flatten_staffs(staffs)
-    if len(all_staffs) < 3:  # noqa: PLR2004
-        return staffs
-    median_unit = float(np.median([_staff_unit_size(staff) for staff in all_staffs]))
-    small = [
-        staff for staff in all_staffs if _staff_unit_size(staff) < ossia_unit_share * median_unit
-    ]
-    if len(small) == 0 or len(small) >= max_ossia_share * len(all_staffs):
+    small = _small_staffs(_flatten_staffs(staffs))
+    if len(small) == 0:
         return staffs
     small_ids = {id(staff) for staff in small}
     result: list[MultiStaff] = []

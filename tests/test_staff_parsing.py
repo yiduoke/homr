@@ -385,3 +385,41 @@ class TestOssias(unittest.TestCase):
         rows = [MultiStaff([_sized_staff(0, 10)], []), MultiStaff([_sized_staff(1, 5)], [])]
 
         self.assertEqual(rows, drop_ossia_staffs(rows))
+
+    def test_drops_staff_found_in_another_print_size(self) -> None:
+        # The short bass ossia of a real scan (Liszt, Réminiscences de Don Juan, IMSLP415304
+        # p20) is printed at 78 percent of the normal size: the staff detection found it as a
+        # staff of another size, but it isn't below ossia_unit_share
+        rows = [MultiStaff([_sized_staff(i, 15.5, True)], []) for i in range(5)]
+        ossia = _sized_staff(2.5, 12.1)
+        ossia.other_print_size = True
+        rows.insert(3, MultiStaff([ossia], []))
+
+        result = drop_ossia_staffs(rows)
+
+        self.assertEqual(5, len(result))
+        self.assertNotIn(ossia, [staff for row in result for staff in row.staffs])
+
+    def test_keeps_staff_of_78_percent_size_without_other_print_size(self) -> None:
+        rows = [MultiStaff([_sized_staff(i, 15.5, True)], []) for i in range(5)]
+        rows.insert(3, MultiStaff([_sized_staff(2.5, 12.1)], []))
+
+        self.assertEqual(rows, drop_ossia_staffs(rows))
+
+    def test_drops_staffs_found_in_another_print_size_over_every_system(self) -> None:
+        rows = []
+        for i in range(4):
+            ossia = _sized_staff(i - 0.4, 10)
+            ossia.other_print_size = True
+            rows.append(MultiStaff([ossia, _sized_staff(i, 15, True)], []))
+
+        result = drop_ossia_staffs(rows)
+
+        self.assertEqual([[True]] * 4, _layouts(result))
+
+    def test_drops_staff_found_in_another_print_size_on_page_of_one_system(self) -> None:
+        ossia = _sized_staff(-0.4, 10)
+        ossia.other_print_size = True
+        rows = [MultiStaff([ossia, _sized_staff(0, 15, True)], [])]
+
+        self.assertEqual([[True]], _layouts(drop_ossia_staffs(rows)))

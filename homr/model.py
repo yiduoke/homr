@@ -275,6 +275,9 @@ class Staff(DebugDrawable):
         self.average_unit_size = np.median([p.average_unit_size for p in grid])
         self.symbols: list[SymbolOnStaff] = []
         self.is_grandstaff = False
+        # A staff printed in another size than the other staffs of the page, as found by
+        # the staff detection, e.g. an ossia in small print
+        self.other_print_size = False
         self._y_tolerance = constants.max_number_of_ledger_lines * self.average_unit_size
 
     def is_on_staff_zone(self, item: AngledBoundingBox) -> bool:
@@ -354,7 +357,9 @@ class Staff(DebugDrawable):
         if max_x >= 0 and max_x > grid[-1].x:
             grid.append(StaffPoint(max_x, grid[-1].y, grid[-1].angle))
 
-        return Staff(grid)
+        result = Staff(grid)
+        result.other_print_size = self.other_print_size
+        return result
 
     def __str__(self) -> str:
         return "Staff(" + str.join(", ", [str(s) for s in self.symbols]) + ")"
@@ -363,7 +368,9 @@ class Staff(DebugDrawable):
         return str(self)
 
     def copy(self) -> "Staff":
-        return Staff(self.grid)
+        result = Staff(self.grid)
+        result.other_print_size = self.other_print_size
+        return result
 
     def transform_coordinates(
         self, transformation: Callable[[tuple[float, float]], tuple[float, float]]
@@ -371,6 +378,7 @@ class Staff(DebugDrawable):
         copy = Staff([point.transform_coordinates(transformation) for point in self.grid])
         copy.symbols = [symbol.transform_coordinates(transformation) for symbol in self.symbols]
         copy.is_grandstaff = self.is_grandstaff
+        copy.other_print_size = self.other_print_size
         return copy
 
 

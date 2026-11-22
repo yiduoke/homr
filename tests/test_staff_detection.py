@@ -156,6 +156,9 @@ class TestStaffDetection(unittest.TestCase):
         result = filter_unusual_anchors([*page, *ossia, *lone_ossia_anchor, wrong_on_page_staff])
 
         self.assertEqual([*page, *ossia, *lone_ossia_anchor], result)
+        self.assertEqual(
+            [False] * len(page) + [True] * 4, [anchor.other_print_size for anchor in result]
+        )
 
     def test_filter_unusual_anchors_on_real_scan_with_ossias(self) -> None:
         with open(konzertsolo_anchors) as f:
