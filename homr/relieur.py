@@ -28,21 +28,32 @@ def clef_attributes(clef) -> dict[str]:  # type ignore
     return attributes
 
 
-def time_attributes(time) -> dict[str]:  # type ignore
-    # take an ElementTree <time> element
-    attributes = {}
-    if time.get("symbol") is not None:
-        # C and cut C are a different signature than the numbers of 4/4 and 2/2
-        attributes["Symbol"] = time.get("symbol")
-    for a in get_children_of_type(time, "beats"):
-        attributes["Beats"] = a.text
-    for a in get_children_of_type(time, "beat-type"):
-        attributes["BeatType"] = a.text
-    for a in get_children_of_type(time, "interchangeable"):
-        attributes["Interchangeable"] = a.text
-    for a in get_children_of_type(time, "senza-misura"):
-        attributes["SenzaMisura"] = a.text
-    return attributes
+def meter_signature(element: ET.Element) -> tuple:
+    # Preserve ordered beat pairs, unmeasured time and nested interchangeable meters.
+    layout = {"number", "id", "default-x", "default-y", "relative-x", "relative-y"}
+    attrs = tuple(sorted((k, v) for k, v in element.attrib.items() if k not in layout))
+    return element.tag, attrs, (element.text or "").strip(), tuple(map(meter_signature, element))
+
+
+def update_meters(in_force: dict, measure: ET.Element, page_start: bool = False) -> None:
+    meters = in_force.setdefault("Meters", {})
+    for child in measure:
+        if child.tag in {"note", "forward", "backup"}:
+            # A later attributes element may change meter within the same measure.
+            page_start = False
+        if child.tag != "attributes":
+            continue
+        for time in child.findall("time"):
+            staff = time.get("number")
+            signature = meter_signature(time)
+            if staff is None:
+                repeated = None in meters and all(value == signature for value in meters.values())
+                meters.clear()  # An unnumbered time applies to all staves.
+            else:
+                repeated = meters.get(staff, meters.get(None)) == signature
+            meters[staff] = signature
+            if page_start and repeated:
+                child.remove(time)
 
 
 def key_attributes(key) -> dict[str]:  # type ignore
@@ -63,8 +74,6 @@ def update_attributes_in_force(part_attributes: dict, measure) -> None:  # type:
             part_attributes["Divisions"] = div.text
         for key in get_children_of_type(attrib, "key"):
             part_attributes["Key"] = key_attributes(key)
-        for xtime in get_children_of_type(attrib, "time"):
-            part_attributes["Time"] = time_attributes(xtime)
         for clef in get_children_of_type(attrib, "clef"):
             part_attributes["Clef"] = clef_attributes(clef)
 
@@ -87,6 +96,7 @@ def process_concat(
     for part1 in get_children_of_type(m, "part"):
         part_attributes: dict = {}
         for measure in get_children_of_type(part1, "measure"):
+            update_meters(part_attributes, measure)
             update_attributes_in_force(part_attributes, measure)
         last_parts_attributes.append(part_attributes)
     for f in sorted_list[1:]:
@@ -105,7 +115,8 @@ def process_concat(
                 if ib == ip:
                     # we add the part of the new file having the same order
                     # as the part from the main score, else we pass
-                    for measure in get_children_of_type(part, "measure"):
+                    for index, measure in enumerate(get_children_of_type(part, "measure")):
+                        update_meters(last_parts_attributes[ib], measure, page_start=index == 0)
                         new_number = str(int(measure.get("number")) + current_len)
                         if int(measure.get("number")) == 1:
                             in_force = last_parts_attributes[ib]
@@ -124,13 +135,6 @@ def process_concat(
                                                 f"Remove key at measure {new_number} part {ib + 1}"
                                             )
                                         attrib.remove(key)
-                                for xtime in get_children_of_type(attrib, "time"):
-                                    if in_force.get("Time") == time_attributes(xtime):
-                                        attrib.remove(xtime)
-                                        if debug:
-                                            eprint(
-                                                f"Remove time at measure {new_number} part {ib + 1}"
-                                            )
                                 for clef in get_children_of_type(attrib, "clef"):
                                     if in_force.get("Clef") == clef_attributes(clef):
                                         attrib.remove(clef)
