@@ -54,7 +54,7 @@ from homr.staff_detection import (
 from homr.staff_parsing import parse_staffs
 from homr.staff_position_save_load import load_staff_positions, save_staff_positions
 from homr.system_repair import repair_systems
-from homr.title_detection import detect_title, download_ocr_weights
+from homr.title_detection import TitleAndTempo, detect_title, download_ocr_weights
 from homr.transformer.configs import Config, default_config
 from homr.transformer.vocabulary import EncodedSymbol
 from homr.type_definitions import NDArray
@@ -199,6 +199,7 @@ class RecognizedPage:
     xml_file: str
     result_staffs: list[list[EncodedSymbol]]
     title: str
+    tempo_text: str = ""
 
 
 def recognize_page(image_path: str, config: ProcessingConfig) -> RecognizedPage:
@@ -222,7 +223,7 @@ def recognize_page(image_path: str, config: ProcessingConfig) -> RecognizedPage:
             multi_staffs = load_staff_positions(
                 debug, image, staff_position_files, config.selected_staff
             )
-            title = ""
+            title, tempo_text = "", ""
             # parse_staffs() expects a grayscale image (cv2.findContours requires it),
             # matching what the normal detect_staffs_in_image() path hands it
             # (predictions.preprocessed). Apply the same CLAHE preprocessing here so the
@@ -250,8 +251,10 @@ def recognize_page(image_path: str, config: ProcessingConfig) -> RecognizedPage:
         )
 
         if not config.read_staff_positions:
-            title = title_future.result(60)
+            title, tempo_text = title_future.result(60)
         eprint("Found title:", title)
+        if tempo_text:
+            eprint("Found tempo marking:", tempo_text)
 
         teaser_file = replace_extension(image_path, "_teaser.png")
         if config.write_staff_positions:
@@ -266,7 +269,7 @@ def recognize_page(image_path: str, config: ProcessingConfig) -> RecognizedPage:
     finally:
         if debug_cleanup is not None:
             debug_cleanup.clean_debug_files_from_previous_runs()
-    return RecognizedPage(xml_file, result_staffs, title)
+    return RecognizedPage(xml_file, result_staffs, title, tempo_text)
 
 
 def write_page(
@@ -281,7 +284,13 @@ def write_page(
     """
     try:
         eprint("Writing XML", page.result_staffs)
-        xml = generate_xml(xml_generator_args, page.result_staffs, page.title, time_signatures)
+        xml = generate_xml(
+            xml_generator_args,
+            page.result_staffs,
+            page.title,
+            time_signatures,
+            tempo_text=page.tempo_text,
+        )
         ET.ElementTree(xml).write(page.xml_file, encoding="unicode", xml_declaration=True)
         eprint("Finished parsing " + str(len(page.result_staffs)) + " staves")
         eprint("Result was written to", page.xml_file)
@@ -393,14 +402,14 @@ def group_staffs(predictions: InputPredictions, staffs: list[Staff]) -> list[Mul
 
 def detect_staffs_in_image(
     image_path: str, config: ProcessingConfig
-) -> tuple[list[MultiStaff], NDArray, Debug, Future[str], int, PointMapping]:
+) -> tuple[list[MultiStaff], NDArray, Debug, Future[TitleAndTempo], int, PointMapping]:
     single = detect_single_staffs(image_path, config)
     debug, staffs = single.debug, single.staffs
     if config.title_detection:
         title_future = detect_title(debug, staffs[0])
     else:
         title_future = Future()
-        title_future.set_result("")
+        title_future.set_result(TitleAndTempo("", ""))
 
     multi_staffs = group_staffs(single.predictions, staffs)
     eprint(

@@ -1,6 +1,8 @@
 # flake8: noqa: S101
 
+import re
 from concurrent.futures import Future, ThreadPoolExecutor
+from typing import NamedTuple
 
 import numpy as np
 from rapidocr import RapidOCR
@@ -13,6 +15,45 @@ from homr.simple_logging import eprint
 # Globals
 _reader: RapidOCR | None = None
 _executor = ThreadPoolExecutor(max_workers=1)
+
+
+# Words which mark the text above a staff as a tempo indication rather than a title.
+# Only used to tell the two apart, no beats per minute are derived from them: the
+# conventional BPM for a given term differs between sources, so guessing one here
+# would put a number into the MusicXML which isn't in the score.
+TEMPO_TERMS = frozenset(
+    {
+        # Italian
+        "grave", "largo", "larghissimo", "larghetto", "largamente", "lento",
+        "adagio", "adagietto", "andante", "andantino", "moderato", "allegretto",
+        "allegro", "allegrissimo", "vivace", "vivacissimo", "presto",
+        "prestissimo", "maestoso", "animato", "sostenuto", "tempo",
+        # German
+        "langsam", "schnell", "lebhaft", "bewegt", "breit", "massig",
+        # French
+        "lent", "vif", "large", "modere", "anime",
+        # English
+        "slow", "fast", "moderate",
+    }
+)  # fmt: skip
+
+
+class TitleAndTempo(NamedTuple):
+    """Text found above the first staff, split into a title and a tempo marking."""
+
+    title: str
+    tempo: str
+
+
+def is_tempo_text(text: str) -> bool:
+    """
+    True if the text reads as a tempo indication, e.g. "Allegro di molto e con brio".
+
+    A piece actually named after a tempo ("Adagio") is misread as a tempo marking
+    here. That is preferred over every tempo marking competing for the title.
+    """
+    words = re.sub(r"[^a-zA-Z0-9]+", " ", text).lower().split()
+    return any(word in TEMPO_TERMS for word in words)
 
 
 class TextBox:
@@ -67,6 +108,12 @@ def _merge_texts(texts: list[TextBox]) -> list[TextBox]:
             # Merge when vertical overlap is large enough (>50%) and
             # horizontal gap is small enough (<50%).
             if y_overlap > 0.5 * min_height and x_distance < 0.5 * min_height:
+                # A second line of expression text can overlap a tempo heading's OCR box.
+                # Only join fragments beside each other into the tempo direction.
+                if x_distance < -0.5 * min_height and (
+                    is_tempo_text(previous.text) or is_tempo_text(current.text)
+                ):
+                    continue
                 previous.merge(current)
                 break
         else:
@@ -74,11 +121,11 @@ def _merge_texts(texts: list[TextBox]) -> list[TextBox]:
     return merged
 
 
-def _detect_title_task(debug: Debug, top_staff: Staff) -> str:
+def _detect_title_task(debug: Debug, top_staff: Staff) -> TitleAndTempo:
     assert _reader, "reader is not initialized"
 
     if top_staff.min_y < 30:
-        return ""
+        return TitleAndTempo("", "")
 
     image = debug.original_image
     above_staff = image[: int(top_staff.min_y), :]
@@ -88,12 +135,20 @@ def _detect_title_task(debug: Debug, top_staff: Staff) -> str:
         or ocr_results.boxes is None
         or ocr_results.txts is None
     ):
-        return ""
+        return TitleAndTempo("", "")
 
     texts = [
         TextBox(text, box) for box, text in zip(ocr_results.boxes, ocr_results.txts, strict=True)
     ]
     texts = _merge_texts(texts)
+
+    tempo_texts = [text for text in texts if is_tempo_text(text.text)]
+    # Topmost first: a tempo marking sits at the start of the first system, while
+    # later "a tempo" or "Tempo I" style words, if any, would be lower down.
+    tempo = min(tempo_texts, key=lambda text: text.top).text.strip() if tempo_texts else ""
+    texts = [text for text in texts if not is_tempo_text(text.text)]
+    if not texts:
+        return TitleAndTempo("", tempo)
 
     largest = max(text.height for text in texts)
     page_center = image.shape[1] // 2
@@ -108,7 +163,7 @@ def _detect_title_task(debug: Debug, top_staff: Staff) -> str:
     if debug.debug:
         for text in ranked:
             text.print_score()
-    return ranked[0].text
+    return TitleAndTempo(ranked[0].text, tempo)
 
 
 def download_ocr_weights() -> None:
@@ -120,7 +175,7 @@ def download_ocr_weights() -> None:
     _reader = RapidOCR()
 
 
-def detect_title(debug: Debug, top_staff: Staff) -> Future[str]:
+def detect_title(debug: Debug, top_staff: Staff) -> Future[TitleAndTempo]:
     """
     Runs the title detection in a separate thread and returns a Future.
     """
