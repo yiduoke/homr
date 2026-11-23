@@ -1,8 +1,11 @@
+import os
 import unittest
+import unittest.mock
 from fractions import Fraction
 
 from homr.transformer.bar_fill import (
     Hypothesis,
+    choose,
     closed_bars,
     last_printed_meter,
     misfit_bars,
@@ -74,6 +77,44 @@ class BarFillTest(unittest.TestCase):
         no_bars = [s for s in bad if s.rhythm != "barline"]
         chosen = rerank([Hypothesis(no_bars, -1.0), Hypothesis(bad, -2.0)])
         self.assertIs(chosen.symbols, bad)
+
+
+class ChooseTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.good = _symbols(THREE_FOUR)
+        self.bad = _symbols(THREE_FOUR.replace("note_4 D5", "note_8 D5", 1))
+        self.env = unittest.mock.patch.dict(os.environ, {}, clear=False)
+        self.env.start()
+        for key in ("HOMR_BEAM_RERANK", "HOMR_BEAM_MARGIN"):
+            os.environ.pop(key, None)
+
+    def tearDown(self) -> None:
+        self.env.stop()
+
+    def test_anchored_takes_a_hypothesis_whose_bars_fill_better(self) -> None:
+        greedy = Hypothesis(self.bad, -5.0)
+        chosen = choose([Hypothesis(self.bad, -4.0), Hypothesis(self.good, -6.0)], None, greedy)
+        self.assertIs(chosen.symbols, self.good)
+
+    def test_anchored_keeps_greedy_when_the_bars_are_no_better(self) -> None:
+        greedy = Hypothesis(self.good, -5.0)
+        other = Hypothesis(list(self.good), -4.0)
+        self.assertIs(choose([other, Hypothesis(self.good, -5.0)], None, greedy), greedy)
+
+    def test_a_decisive_lead_of_the_model_replaces_greedy(self) -> None:
+        greedy = Hypothesis(self.good, -50.0)
+        top = Hypothesis(list(self.good), -30.0)
+        self.assertIs(choose([top], None, greedy), top)
+        os.environ["HOMR_BEAM_MARGIN"] = "none"
+        self.assertIs(choose([top], None, greedy), greedy)
+
+    def test_fill_and_most_likely_modes(self) -> None:
+        greedy = Hypothesis(self.good, -5.0)
+        hyps = [Hypothesis(self.bad, -1.0), Hypothesis(self.good, -2.0)]
+        os.environ["HOMR_BEAM_RERANK"] = "fill"
+        self.assertIs(choose(hyps, None, greedy), hyps[1])
+        os.environ["HOMR_BEAM_RERANK"] = "0"
+        self.assertIs(choose(hyps, None, greedy), hyps[0])
 
 
 if __name__ == "__main__":

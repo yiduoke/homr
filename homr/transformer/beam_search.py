@@ -373,14 +373,21 @@ def decode(
                 stored = pickle.load(f)  # noqa: S301 (our own files)
             if os.environ.get("HOMR_BEAM_RERANK") == "greedy":
                 return stored["greedy"]
-            greedy = Hypothesis(stored["greedy"], 0.0)
+            greedy = Hypothesis(stored["greedy"], stored.get("greedy_log_prob", 0.0))
             return choose(stored["hyps"], meter, greedy).symbols
     result = beam_search(decoder, start_tokens, nonote_tokens, width, context)
     if path is not None:
         path.parent.mkdir(parents=True, exist_ok=True)
         tmp = path.with_suffix(".tmp")
         with open(tmp, "wb") as f:
-            pickle.dump({"greedy": result.greedy.symbols, "hyps": result.hypotheses}, f)
+            pickle.dump(
+                {
+                    "greedy": result.greedy.symbols,
+                    "greedy_log_prob": result.greedy.log_prob,
+                    "hyps": result.hypotheses,
+                },
+                f,
+            )
         tmp.rename(path)
     if os.environ.get("HOMR_BEAM_RERANK") == "greedy":
         return result.greedy.symbols

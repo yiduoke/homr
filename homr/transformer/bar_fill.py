@@ -165,6 +165,20 @@ def _fill(h: Hypothesis, meter: Fraction | None) -> tuple[int, int]:
     return bars - misfits, -misfits
 
 
+def likelihood_margin() -> float | None:
+    """
+    HOMR_BEAM_MARGIN: the lead in log probability (nats) over the greedy reading at which the
+    most likely hypothesis replaces it even without better bar fill; "none": never. Default 10
+    (odds of about 20,000 to 1): a greedy reading that is that much less likely than the best beam
+    has gone astray (a loop, lost bar lines), while the near ties below it are rewrites of chords,
+    staffs or octave lines that bar fill cannot judge.
+    """
+    import os  # noqa: PLC0415
+
+    value = os.environ.get("HOMR_BEAM_MARGIN", "10")
+    return None if value in ("", "none") else float(value)
+
+
 def choose(
     hypotheses: list[Hypothesis],
     meter: Fraction | None = None,
@@ -172,11 +186,12 @@ def choose(
 ) -> Hypothesis:
     """
     The reading a beam search returns. The hypotheses come most likely first; greedy is the
-    greedy reading of the same staff. HOMR_BEAM_RERANK:
+    greedy reading of the same staff, with its log probability. HOMR_BEAM_RERANK:
     - "anchored" (default): the greedy reading, unless the bar-fill rerank finds a hypothesis
       whose bars add up better (more bars that fill their meter, or as many and fewer that
-      don't). The model's own reading stands wherever the bar arithmetic gives no reason to
-      change it; the beam's likelihood alone never replaces it.
+      don't), or the most likely hypothesis leads the greedy reading by more than
+      HOMR_BEAM_MARGIN nats. The model's own reading stands wherever neither the bar arithmetic
+      nor a decisive lead of the model's own score gives a reason to change it.
     - "fill": the bar-fill rerank among the beam's hypotheses (the first version).
     - "0": the most likely hypothesis.
     """
@@ -188,4 +203,9 @@ def choose(
     best = rerank(hypotheses, meter)
     if mode in {"fill", "1"} or greedy is None:
         return best
-    return best if _fill(best, meter) > _fill(greedy, meter) else greedy
+    if _fill(best, meter) > _fill(greedy, meter):
+        return best
+    margin = likelihood_margin()
+    if margin is not None and hypotheses[0].log_prob - greedy.log_prob > margin:
+        return hypotheses[0]
+    return greedy
