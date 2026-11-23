@@ -175,6 +175,8 @@ def generate_xml(
     staffs: list[list[EncodedSymbol]],
     title: str,
     time_signatures: TimeSignatureMemory | None = None,
+    *,
+    tempo_text: str = "",
 ) -> ET.Element:
     """
     time_signatures: Pass the same object for the pages of a score. A page continues
@@ -195,6 +197,7 @@ def generate_xml(
                 index,
                 has_two_staves_by_part[index],
                 time_signatures.part(index),
+                tempo_text=tempo_text,
             )
         )
     return root
@@ -211,10 +214,14 @@ def build_part(
     index: int,
     has_two_staves: bool,
     time_signature: PartTimeSignature | None = None,
+    *,
+    tempo_text: str = "",
 ) -> ET.Element:
     part = ET.Element("part", id=get_part_id(index))
     is_first_part = index == 0
-    for measure in build_measures(args, voice, is_first_part, has_two_staves, time_signature):
+    for measure in build_measures(
+        args, voice, is_first_part, has_two_staves, time_signature, tempo_text=tempo_text
+    ):
         part.append(measure)
     resolve_accidentals(part, time_signature)
     convert_ties(part)
@@ -233,6 +240,8 @@ def build_measures(
     is_first_part: bool,
     has_two_staves: bool = False,
     time_signature: PartTimeSignature | None = None,
+    *,
+    tempo_text: str = "",
 ) -> list[ET.Element]:
     """
     time_signature: The time signature in force at the start, it is updated to the one in
@@ -284,6 +293,10 @@ def build_measures(
         ET.SubElement(first_attributes, "staves").text = "2"
         ET.SubElement(first_attributes, "part-symbol").text = "brace"
     if is_first_part:
+        if tempo_text:
+            marking = ET.SubElement(current_measure, "direction", placement="above")
+            kind = ET.SubElement(marking, "direction-type")
+            ET.SubElement(kind, "words", {"font-weight": "bold"}).text = tempo_text
         direction = build_add_time_direction(args)
         if direction is not None:
             current_measure.append(direction)
