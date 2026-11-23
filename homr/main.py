@@ -448,18 +448,56 @@ def get_all_image_files_in_folder(folder: str) -> list[str]:
     return sorted(without_teasers)
 
 
+# SHA-256 of the transformer archives on the fork's releases (their SHA256SUMS assets). A
+# download which does not match is deleted and homr stops.
+RELEASE_SHA256 = {
+    "decoder_pytorch_model_comb6-s7-ema-b918469.zip": (
+        "edfe21c92b731828fec9f55edac4569cc704803f9781a0b5c299d52e84b476eb"
+    ),
+    "decoder_pytorch_model_comb6-s7-ema-b918469_fp16.zip": (
+        "2044ff56066c2266ab5d7a40156d789da237ea226b7ee814282ceb796ec3943e"
+    ),
+    "decoder_pytorch_model_meteracc-r2s7-afae0e3.zip": (
+        "f1f2766646205d116fe03a79c13761abd5f2ff57d5fbda3cdfa86d070b47ccfb"
+    ),
+    "decoder_pytorch_model_meteracc-r2s7-afae0e3_fp16.zip": (
+        "58a78a3e6c834f0f9732dbe2dc9dccd41bd4c0757627d74337a0d1fa16148033"
+    ),
+    "encoder_pytorch_model_comb6-s7-ema-b918469.zip": (
+        "25731bf2389db45fd0d680b94c32a07e7f7c9304cce168639d01fa98697fccf5"
+    ),
+    "encoder_pytorch_model_comb6-s7-ema-b918469_fp16.zip": (
+        "f9777e260fbc91ee4d1e5af151e471bd912e553cb46da39f00b429b59b2a51be"
+    ),
+    "encoder_pytorch_model_meteracc-r2s7-afae0e3.zip": (
+        "f67a9bbfea54caf129b605506897fbd6e0e38551234632a198213434252dd5bf"
+    ),
+    "encoder_pytorch_model_meteracc-r2s7-afae0e3_fp16.zip": (
+        "de7824d5ff80119e6f2cc9792e76762ed9727c4e8ea02bb59788c105a8667fa2"
+    ),
+}
+
+
+UPSTREAM_RELEASE_URL = "https://github.com/liebharc/homr/releases/download/onnx_checkpoints/"
+# The fork's own fine-tuned models are on the fork's releases, upstream models (like 566)
+# on upstream's.
+FORK_RELEASES = {
+    "pytorch_model_octave": "octave_checkpoints",
+    "pytorch_model_meteracc": "meteracc_checkpoints",
+    "pytorch_model_comb6": "comb6-s7-ema",
+}
+
+
+def transformer_release_url(decoder_path: str) -> str:
+    for prefix, release in FORK_RELEASES.items():
+        if prefix in os.path.basename(decoder_path):
+            return f"https://github.com/yiduoke/homr/releases/download/{release}/"
+    return UPSTREAM_RELEASE_URL
+
+
 def download_weights(segnet_use_gpu: bool, transformer_use_gpu: bool, coreml_encoder: bool) -> None:
-    base_url = "https://github.com/liebharc/homr/releases/download/onnx_checkpoints/"
-    # The fork's own fine-tuned models are on the fork's releases, upstream models (like 566)
-    # on upstream's.
-    fork_releases = {
-        "pytorch_model_octave": "octave_checkpoints",
-        "pytorch_model_meteracc": "meteracc_checkpoints",
-    }
-    transformer_url = base_url
-    for prefix, release in fork_releases.items():
-        if prefix in default_config.filepaths.decoder_path:
-            transformer_url = f"https://github.com/yiduoke/homr/releases/download/{release}/"
+    base_url = UPSTREAM_RELEASE_URL
+    transformer_url = transformer_release_url(default_config.filepaths.decoder_path)
     models = [segnet_path_onnx_fp16 if segnet_use_gpu else segnet_path_onnx]
     if transformer_use_gpu:
         # CUDA runs the whole transformer on the fp16 models.
@@ -495,6 +533,7 @@ def download_weights(segnet_use_gpu: bool, transformer_use_gpu: bool, coreml_enc
                 os.makedirs(os.path.dirname(model), exist_ok=True)
                 downloaded_zip = os.path.join(os.path.dirname(model), zip_name)
                 download_utils.download_file(download_url, downloaded_zip)
+                download_utils.verify_sha256(downloaded_zip, RELEASE_SHA256.get(zip_name))
 
                 destination_dir = os.path.dirname(model)
                 download_utils.unzip_file(downloaded_zip, destination_dir)

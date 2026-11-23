@@ -7,7 +7,12 @@ import onnxruntime as ort
 from homr.onnx_providers import gpu_providers
 from homr.simple_logging import eprint
 from homr.transformer.configs import Config
-from homr.transformer.vocabulary import EncodedSymbol
+from homr.transformer.vocabulary import (
+    NOTE_OCTAVE_CLASSES,
+    OCTAVE_SHIFT_STOP,
+    OCTAVE_SHIFTS,
+    EncodedSymbol,
+)
 from homr.type_definitions import NDArray
 
 # A staff never holds a long run of one repeating cycle: the longest in the test references is 24
@@ -61,6 +66,19 @@ class ScoreDecoder:
         self.inv_slur_vocab = {v: k for k, v in config.slur_vocab.items()}
         self.inv_position_vocab = {v: k for k, v in config.position_vocab.items()}
 
+        # Newer decoders (since comb6) read the position of the previous symbol as an extra
+        # input and some have a per-note octave head. Both are read from the model, so the
+        # older released models keep working unchanged.
+        self.has_position_feedback = "positions" in {item.name for item in self.net.get_inputs()}
+        self.per_note_octaves = "out_octaves" in {item.name for item in self.net.get_outputs()}
+        # With the octave head the brackets come from the notes, the legacy octave direction
+        # symbols are never generated
+        self.legacy_octave_rhythms = (
+            [config.rhythm_vocab[token] for token in (*OCTAVE_SHIFTS, OCTAVE_SHIFT_STOP)]
+            if self.per_note_octaves
+            else []
+        )
+
         self.fp16 = fp16
         self.use_gpu = use_gpu
         self.device = "cuda" if use_gpu else "cpu"
@@ -72,6 +90,7 @@ class ScoreDecoder:
             "out_positions",
             "out_articulations",
             "out_slurs",
+            *(["out_octaves"] if self.per_note_octaves else []),
             "attention",
         ]
 
@@ -100,6 +119,7 @@ class ScoreDecoder:
         out_lift = nonote_tokens
         out_articulations = nonote_tokens
         out_slurs = nonote_tokens
+        previous_position = nonote_tokens[:, -1:]
         cache, kv_input_names, kv_output_names = self.init_cache()
         output_names = self.output_names + kv_output_names
         context = kwargs["context"]
@@ -127,6 +147,8 @@ class ScoreDecoder:
             self.io_binding.bind_cpu_input("lifts", x_lift)
             self.io_binding.bind_cpu_input("articulations", x_articulations)
             self.io_binding.bind_cpu_input("slurs", x_slurs)
+            if self.has_position_feedback:
+                self.io_binding.bind_cpu_input("positions", previous_position)
             self.io_binding.bind_cpu_input("context", context)
             self.io_binding.bind_cpu_input("cache_len", np.array([step], dtype=np.int64))
             for name, cache_val in zip(kv_input_names, cache, strict=True):
@@ -141,7 +163,7 @@ class ScoreDecoder:
 
             # Get outputs
             outputs = self.io_binding.get_outputs()
-            cache = outputs[7:]
+            cache = outputs[len(self.output_names) :]
 
             # Greedy decoding: pick the highest logit directly for each output
             rhythmsp = outputs[0].numpy()
@@ -150,9 +172,13 @@ class ScoreDecoder:
             positionsp = outputs[3].numpy()
             articulationsp = outputs[4].numpy()
             slursp = outputs[5].numpy()
-            attention = outputs[6].numpy()
+            attention = outputs[self.output_names.index("attention")].numpy()
 
-            rhythm_sample = np.array([[rhythmsp[:, -1, :].argmax()]])
+            rhythm_logits = rhythmsp[:, -1, :]
+            if self.per_note_octaves:
+                rhythm_logits = rhythm_logits.copy()
+                rhythm_logits[:, self.legacy_octave_rhythms] = -np.inf
+            rhythm_sample = np.array([[rhythm_logits.argmax()]])
             pitch_sample = np.array([[pitchsp[:, -1, :].argmax()]])
             lift_sample = np.array([[liftsp[:, -1, :].argmax()]])
             articulation_sample = np.array([[articulationsp[:, -1, :].argmax()]])
@@ -169,6 +195,10 @@ class ScoreDecoder:
             if rhythm_sample[0][0] == self.eos_token:
                 break
 
+            octave_mark = None
+            if self.per_note_octaves and rhythm_token[0].startswith("note_"):
+                octave_logits = outputs[self.output_names.index("out_octaves")].numpy()
+                octave_mark = NOTE_OCTAVE_CLASSES[octave_logits[0, -1, :].argmax()]
             symbol = EncodedSymbol(
                 rhythm=rhythm_token[0],
                 pitch=pitch_token[0],
@@ -177,6 +207,7 @@ class ScoreDecoder:
                 slur=slur_token[0],
                 position=position_token[0],
                 coordinates=attention,
+                octave_mark=octave_mark,
             )
             symbols.append(symbol)
             cut = _loop_cut(symbols, runs) if LOOP_GUARD else None
@@ -190,6 +221,7 @@ class ScoreDecoder:
             out_rhythm = np.concatenate((out_rhythm, rhythm_sample), axis=-1)
             out_articulations = np.concatenate((out_articulations, articulation_sample), axis=-1)
             out_slurs = np.concatenate((out_slurs, slur_sample), axis=-1)
+            previous_position = position_sample
 
         return symbols
 

@@ -5,7 +5,13 @@ import torch.nn.functional as F
 from torch import nn
 
 from homr.transformer.configs import Config
-from homr.transformer.vocabulary import EncodedSymbol, has_rhythm_symbol_a_position
+from homr.transformer.vocabulary import (
+    NOTE_OCTAVE_CLASSES,
+    OCTAVE_SHIFT_STOP,
+    OCTAVE_SHIFTS,
+    EncodedSymbol,
+    has_rhythm_symbol_a_position,
+)
 from training.architecture.transformer.custom_x_transformer import (
     AbsolutePositionalEmbedding,
     AttentionLayers,
@@ -66,7 +72,27 @@ class ScoreTransformerWrapper(nn.Module):
         self.to_logits_position = nn.Linear(dim, config.num_position_tokens)
         self.to_logits_articulations = nn.Linear(dim, config.num_articulation_tokens)
         self.to_logits_slurs = nn.Linear(dim, config.num_slur_tokens)
+        # Per-note octave head (HOMR_PER_NOTE_OCTAVES=1): no bracket, 8va or 8vb per note
+        self.to_logits_octave = (
+            nn.Linear(dim, len(NOTE_OCTAVE_CLASSES)) if config.per_note_octaves else None
+        )
         self.init_()
+        # Position feedback: the staff position of the previous symbol is an input. Supplying
+        # an initial weight avoids drawing from the RNG for the new table, and a checkpoint
+        # without the table loads with zeros, which gives the outputs of the older models.
+        self.position_emb = nn.Embedding(
+            config.num_position_tokens,
+            config.decoder_dim,
+            _weight=torch.zeros(config.num_position_tokens, config.decoder_dim),
+        )
+        self.register_load_state_dict_pre_hook(self._load_legacy_position_emb)
+
+    def _load_legacy_position_emb(
+        self, module: nn.Module, state_dict: dict[str, torch.Tensor], prefix: str, *args: Any
+    ) -> None:
+        key = prefix + "position_emb.weight"
+        if key not in state_dict:
+            state_dict[key] = torch.zeros_like(self.position_emb.weight)
 
     def init_(self) -> None:
         if self.l2norm_embed:
@@ -97,6 +123,7 @@ class ScoreTransformerWrapper(nn.Module):
         cache_len: torch.Tensor | None = None,
         mask: torch.Tensor | None = None,
         return_center_of_attention: bool = False,
+        positions: torch.Tensor | None = None,
         **kwargs: torch.Tensor,
     ) -> Any:
         cache = kwargs.pop("cache", None)
@@ -110,6 +137,8 @@ class ScoreTransformerWrapper(nn.Module):
                 + self.pos_emb(rhythms)
             )
 
+            if positions is not None:
+                x = x + self.position_emb(positions)
             x = self.post_emb_norm(x)
 
             if return_center_of_attention:
@@ -135,6 +164,7 @@ class ScoreTransformerWrapper(nn.Module):
                 x,
                 attention,
                 None,
+                *self._octave_logits(x),
             )
 
         else:
@@ -147,6 +177,8 @@ class ScoreTransformerWrapper(nn.Module):
                 + self.pos_emb(rhythms, offset=cache_len)
             )
 
+            if positions is not None:
+                x = x + self.position_emb(positions)
             x = self.post_emb_norm(x)
 
             # reconstruct x_transformers LayerIntermediates from the input_cache
@@ -193,7 +225,14 @@ class ScoreTransformerWrapper(nn.Module):
                 x,
                 attention,
                 cache_out,
+                *self._octave_logits(x),
             )
+
+    def _octave_logits(self, x: torch.Tensor) -> tuple[torch.Tensor, ...]:
+        """The logits of the per-note octave head as the tenth output, nothing without it."""
+        if self.to_logits_octave is None:
+            return ()
+        return (self.to_logits_octave(x),)
 
     def get_center_of_attention(self, intermediates: list[Any]) -> torch.Tensor:
         """
@@ -259,6 +298,12 @@ class ScoreDecoder(nn.Module):
         self.inv_articulation_vocab = {v: k for k, v in config.articulation_vocab.items()}
         self.inv_slur_vocab = {v: k for k, v in config.slur_vocab.items()}
         self.inv_position_vocab = {v: k for k, v in config.position_vocab.items()}
+        self.per_note_octaves = config.per_note_octaves
+        self.legacy_octave_rhythms = (
+            [config.rhythm_vocab[token] for token in (*OCTAVE_SHIFTS, OCTAVE_SHIFT_STOP)]
+            if self.per_note_octaves
+            else []
+        )
 
         note_mask = torch.zeros(config.num_rhythm_tokens)
         for index, rhythm_symbol in enumerate(config.rhythm_vocab.keys()):
@@ -290,6 +335,7 @@ class ScoreDecoder(nn.Module):
         out_lift = nonote_tokens
         out_articulations = nonote_tokens
         out_slurs = nonote_tokens
+        previous_position = nonote_tokens[:, -1:]
         mask = kwargs.pop("mask", None)
         context_first = kwargs.pop("context")
         context_later = context_first[:, :0]
@@ -316,12 +362,13 @@ class ScoreDecoder(nn.Module):
             else:
                 context = context_later
 
-            rhythmsp, pitchsp, liftsp, positionsp, articulationsp, slursp, _, _, cache = self.net(
+            outputs = self.net(
                 rhythms=x_rhythm,
                 pitchs=x_pitch,
                 lifts=x_lift,
                 articulations=x_articulations,
                 slurs=x_slurs,
+                positions=previous_position,
                 context=context,
                 cache_len=torch.Tensor([step]).to(self.device).long(),
                 mask=mask,
@@ -330,8 +377,13 @@ class ScoreDecoder(nn.Module):
                 **kwargs,
             )
 
+            rhythmsp, pitchsp, liftsp, positionsp, articulationsp, slursp, _, _, cache = outputs[:9]
+
             # Greedy decoding: pick the highest logit directly for each output
-            rhythm_sample = rhythmsp[:, -1, :].argmax(dim=-1, keepdim=True)
+            rhythm_logits = rhythmsp[:, -1, :]
+            if self.per_note_octaves:
+                rhythm_logits[:, self.legacy_octave_rhythms] = -torch.inf
+            rhythm_sample = rhythm_logits.argmax(dim=-1, keepdim=True)
             pitch_sample = pitchsp[:, -1, :].argmax(dim=-1, keepdim=True)
             lift_sample = liftsp[:, -1, :].argmax(dim=-1, keepdim=True)
             articulation_sample = articulationsp[:, -1, :].argmax(dim=-1, keepdim=True)
@@ -355,6 +407,11 @@ class ScoreDecoder(nn.Module):
                 articulation=articulation_token[0],
                 slur=slur_token[0],
                 position=position_token[0],
+                octave_mark=(
+                    NOTE_OCTAVE_CLASSES[outputs[9][0, -1, :].argmax().item()]
+                    if self.per_note_octaves and rhythm_token[0].startswith("note_")
+                    else None
+                ),
             )
             symbols.append(symbol)
 
@@ -363,6 +420,7 @@ class ScoreDecoder(nn.Module):
             out_rhythm = torch.cat((out_rhythm, rhythm_sample), dim=-1)
             out_articulations = torch.cat((out_articulations, articulation_sample), dim=-1)
             out_slurs = torch.cat((out_slurs, slur_sample), dim=-1)
+            previous_position = position_sample
             mask = F.pad(mask, (0, 1), value=True)
 
         self.net.train(was_training)
@@ -378,6 +436,7 @@ class ScoreDecoder(nn.Module):
         positions: torch.Tensor,
         mask: torch.Tensor,
         sampling_prob: float | torch.Tensor = 1.0,
+        octaves: torch.Tensor | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         liftsi = lifts[:, :-1]
@@ -393,7 +452,12 @@ class ScoreDecoder(nn.Module):
         positionsi = positions[:, :-1]
         positionso = positions[:, 1:]
 
+        if self.per_note_octaves != (octaves is not None):
+            raise ValueError("Octave labels are required exactly when the model has an octave head")
+
+        octave_mask = mask
         if mask.shape[1] == rhythms.shape[1]:
+            octave_mask = mask[:, 1:]
             mask = mask[:, :-1]
         mask = mask.bool()
 
@@ -416,6 +480,7 @@ class ScoreDecoder(nn.Module):
                     lifts=liftsi,
                     articulations=articulationsi,
                     slurs=slursi,
+                    positions=positionsi,
                     mask=attention_mask,
                     cache=None,
                     return_center_of_attention=False,
@@ -426,6 +491,9 @@ class ScoreDecoder(nn.Module):
                 # Greedy sampling (excluding BOS at index 0)
                 # logits[:, t] predicts tokens[:, t+1] (which is input[:, t+1])
                 # So logits[:, :-1] corresponds to inputs[:, 1:]
+                if self.per_note_octaves:
+                    r_logits = r_logits.clone()
+                    r_logits[..., self.legacy_octave_rhythms] = -torch.inf
                 r_sample = r_logits[:, :-1].argmax(dim=-1)
                 p_sample = p_logits[:, :-1].argmax(dim=-1)
                 l_sample = l_logits[:, :-1].argmax(dim=-1)
@@ -458,19 +526,21 @@ class ScoreDecoder(nn.Module):
                 positionsi[:, 1:] = (1 - mix_mask) * positionsi[:, 1:] + mix_mask * pos_sample
 
         # Second pass (or standard pass) with (possibly mixed) inputs
-        rhythmsp, pitchsp, liftsp, positionsp, articulationsp, slursp, x, _attention, _cache = (
-            self.net(
-                rhythms=rhythmsi,
-                pitchs=pitchsi,
-                lifts=liftsi,
-                articulations=articulationsi,
-                slurs=slursi,
-                mask=attention_mask,
-                cache=None,
-                return_center_of_attention=False,
-                **kwargs,
-            )
+        outputs = self.net(
+            rhythms=rhythmsi,
+            pitchs=pitchsi,
+            lifts=liftsi,
+            articulations=articulationsi,
+            slurs=slursi,
+            positions=positionsi,
+            mask=attention_mask,
+            cache=None,
+            return_center_of_attention=False,
+            **kwargs,
         )  # this calls ScoreTransformerWrapper.forward
+        rhythmsp, pitchsp, liftsp, positionsp, articulationsp, slursp, x, _attention, _cache = (
+            outputs[:9]
+        )
 
         # From the TR OMR paper equation 2, we use however different values for alpha and beta
         alpha = 1
@@ -500,7 +570,7 @@ class ScoreDecoder(nn.Module):
             + loss_consist
         )
 
-        return {
+        result = {
             "loss_rhythm": loss_rhythm,
             "loss_pitch": loss_pitch,
             "loss_lift": loss_lift,
@@ -511,6 +581,24 @@ class ScoreDecoder(nn.Module):
             "loss": loss,
             "logits": (rhythmsp, pitchsp, liftsp, positionsp, articulationsp, slursp),
         }
+        if octaves is not None:
+            # The octave loss is averaged over the notes, the targets of other symbols are -100
+            octave_logits = outputs[9]
+            octave_target = self._mask_padding_tokens(octaves[:, 1:], octave_mask.bool())
+            note_count = (octave_target != self.ignore_index).sum().clamp_min(1)
+            loss_octave = (
+                F.cross_entropy(
+                    octave_logits.transpose(1, 2),
+                    octave_target,
+                    reduction="sum",
+                    ignore_index=self.ignore_index,
+                )
+                / note_count
+            )
+            result["loss_octave"] = loss_octave
+            result["loss"] = result["loss"] + loss_octave
+            result["logits"] = (*result["logits"], octave_logits)
+        return result
 
     def calConsistencyLoss(
         self,

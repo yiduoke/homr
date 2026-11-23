@@ -2,7 +2,7 @@ import json
 import os
 from typing import Any
 
-from homr.transformer.vocabulary import Vocabulary
+from homr.transformer.vocabulary import Vocabulary, per_note_octaves_enabled
 
 workspace = os.path.join(os.path.dirname(__file__))
 root_dir = os.getcwd()
@@ -29,9 +29,11 @@ def _scaled_canvas(scale: float) -> tuple[int, int]:
 
 class FilePaths:
     def __init__(self) -> None:
-        # Upstream 566 fine-tuned for complete time signatures and printed accidentals,
-        # released on the fork (see download_weights in homr/main.py)
-        model_name = os.environ.get("HOMR_MODEL_NAME", "pytorch_model_meteracc-r2s7-afae0e3")
+        # COMB6 seed 7 (EMA weights), an interim prerelease on the fork; its decoder has
+        # position feedback and a per-note octave head, which decoder_inference reads from
+        # the model. HOMR_MODEL_NAME=pytorch_model_meteracc-r2s7-afae0e3 selects the latest
+        # stable release. Both are downloaded from the fork, see download_weights in main.py.
+        model_name = os.environ.get("HOMR_MODEL_NAME", "pytorch_model_comb6-s7-ema-b918469")
         self.encoder_path = os.path.join(
             workspace,
             f"encoder_{model_name}.onnx",
@@ -116,6 +118,9 @@ class Config:
         self.num_articulation_tokens = len(self.vocab.articulation)
         self.num_slur_tokens = len(self.vocab.slur)
         self.num_position_tokens = len(self.vocab.position)
+        # Training: whether the decoder gets the per-note octave head. Inference reads it
+        # from the decoder model instead (output `out_octaves`).
+        self.per_note_octaves = per_note_octaves_enabled()
         self.encoder_structure = "convnext"
         self.encoder_depth = 8
         self.backbone_layers = [3, 4, 6, 3]
@@ -168,6 +173,7 @@ class Config:
             "decoder_depth": self.decoder_depth,
             "decoder_heads": self.decoder_heads,
             "decoder_args": self.decoder_args.to_dict(),
+            "per_note_octaves": self.per_note_octaves,
         }
 
     def to_json_string(self) -> str:

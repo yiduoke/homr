@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 import torch
 from torch.export import Dim
@@ -27,19 +28,11 @@ class DecoderWrapper(torch.nn.Module):
         lifts: torch.Tensor,
         articulations: torch.Tensor,
         slurs: torch.Tensor,
+        positions: torch.Tensor,
         context: torch.Tensor,
         cache_len: torch.Tensor,
         *cache: torch.Tensor,
-    ) -> tuple[
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        tuple[torch.Tensor, ...],
-    ]:
+    ) -> tuple[Any, ...]:
         (
             out_rhythms,
             out_pitchs,
@@ -49,13 +42,15 @@ class DecoderWrapper(torch.nn.Module):
             out_slurs,
             _x,
             attention,
-            *cache,
+            cache_out,
+            *extra_logits,
         ) = self.model(
             rhythms=rhythms,
             pitchs=pitchs,
             lifts=lifts,
             articulations=articulations,
             slurs=slurs,
+            positions=positions,
             context=context,
             cache_len=cache_len,
             mask=None,
@@ -69,9 +64,34 @@ class DecoderWrapper(torch.nn.Module):
             out_positions,
             out_articulations,
             out_slurs,
+            *extra_logits,
             attention,
-            *cache,
+            cache_out,
         )
+
+
+def decoder_io_names(config: Config) -> tuple[list[str], list[str]]:
+    """
+    The names of the inputs and outputs of the decoder graph. The input `positions` (the
+    position of the previous symbol) comes after `slurs`; with the per-note octave head
+    (HOMR_PER_NOTE_OCTAVES=1) the output `out_octaves` comes after `out_slurs`.
+    """
+    _cache, kv_input_names, kv_output_names, _dynamic, _length = init_cache(0, torch.device("cpu"))
+    inputs = ["rhythms", "pitchs", "lifts", "articulations", "slurs", "positions"]
+    outputs = [
+        "out_rhythms",
+        "out_pitchs",
+        "out_lifts",
+        "out_positions",
+        "out_articulations",
+        "out_slurs",
+    ]
+    if config.per_note_octaves:
+        outputs.append("out_octaves")
+    return (
+        [*inputs, "context", "cache_len", *kv_input_names],
+        [*outputs, "attention", *kv_output_names],
+    )
 
 
 def convert_encoder(overwrite: bool) -> str | None:
@@ -145,14 +165,16 @@ def convert_decoder(overwrite: bool) -> str | None:
 
     # Create input data
     # Mask is not used since it caused problems with the tensor size
-    kv_cache, kv_input_names, kv_output_names, dynamic_axes, cache_length = init_cache(
+    kv_cache, _kv_input_names, _kv_output_names, dynamic_axes, cache_length = init_cache(
         0, torch.device("cpu")
     )
+    input_names, output_names = decoder_io_names(config)
     rhythms = torch.randint(0, config.num_rhythm_tokens, (1, 1)).long()
     pitchs = torch.randint(0, config.num_pitch_tokens, (1, 1)).long()
     lifts = torch.randint(0, config.num_lift_tokens, (1, 1)).long()
     articulations = torch.randint(0, config.num_articulation_tokens, (1, 1)).long()
     slurs = torch.randint(0, config.num_slur_tokens, (1, 1)).long()
+    positions = torch.zeros((1, 1), dtype=torch.int64)
     cache_len = torch.tensor([cache_length]).long()
     cache = kv_cache
     image_tokens = config.max_height // config.patch_size * (config.max_width // config.patch_size)
@@ -162,28 +184,10 @@ def convert_decoder(overwrite: bool) -> str | None:
 
     torch.onnx.export(
         wrapped_model,
-        (rhythms, pitchs, lifts, articulations, slurs, context, cache_len, *cache),
+        (rhythms, pitchs, lifts, articulations, slurs, positions, context, cache_len, *cache),
         path_out,
-        input_names=[
-            "rhythms",
-            "pitchs",
-            "lifts",
-            "articulations",
-            "slurs",
-            "context",
-            "cache_len",
-            *kv_input_names,
-        ],
-        output_names=[
-            "out_rhythms",
-            "out_pitchs",
-            "out_lifts",
-            "out_positions",
-            "out_articulations",
-            "out_slurs",
-            "attention",
-            *kv_output_names,
-        ],
+        input_names=input_names,
+        output_names=output_names,
         dynamic_axes=dynamic_axes,
         opset_version=18,
         do_constant_folding=True,

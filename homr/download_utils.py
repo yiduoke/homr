@@ -1,3 +1,4 @@
+import hashlib
 import os
 import tarfile
 import zipfile
@@ -50,6 +51,21 @@ def _download_file(url: str, filename: str) -> None:
         eprint(f"\rDownloaded {totalMb} of {totalMb} MB (100%)")
     else:
         eprint()  # Add newline after download progress
+
+
+def verify_sha256(filename: str, expected: str | None) -> None:
+    """Raises if the file does not have the expected SHA-256; None means nothing to check."""
+    if expected is None:
+        return
+    digest = hashlib.sha256()
+    with open(filename, "rb") as f:
+        for block in iter(lambda: f.read(1 << 20), b""):
+            digest.update(block)
+    if digest.hexdigest() != expected:
+        raise ValueError(
+            f"Checksum mismatch for {os.path.basename(filename)}: "
+            f"expected {expected}, got {digest.hexdigest()}"
+        )
 
 
 def unzip_file(filename: str, output_folder: str, flatten_root_entry: bool = False) -> None:
