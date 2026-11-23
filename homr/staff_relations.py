@@ -388,6 +388,7 @@ def join_pieces(left: Staff, right: Staff) -> Staff:
     grid = list(left.grid) + [p for p in right.grid if p.x > left.max_x]
     joined = Staff(grid)
     joined.symbols = left.symbols + right.symbols
+    joined.other_print_size = left.other_print_size and right.other_print_size
     return joined
 
 

@@ -112,6 +112,9 @@ class StaffAnchor(DebugDrawable):
         else:
             self.average_unit_size = float(np.mean(y_deltas))
         self.symbol = symbol
+        # Set by filter_unusual_anchors: the anchor is on a staff printed in another size
+        # than the staffs of the page, e.g. an ossia in small print
+        self.other_print_size = False
         self.max_y = max([line.max_y for line in staff_lines])
         self.min_y = min([line.min_y for line in staff_lines])
         max_number_of_ledger_lines = 5
@@ -556,7 +559,9 @@ def resample_staff(staff: RawStaff) -> Staff:
         grid.extend(reversed(list(resample_staff_segment(anchor, staff, reversed(to_left)))))
         grid.extend(resample_staff_segment(anchor, staff, to_right))
 
-    return Staff(grid)
+    result = Staff(grid)
+    result.other_print_size = all(anchor.other_print_size for anchor in staff.anchors)
+    return result
 
 
 def resample_staffs(staffs: list[RawStaff]) -> list[Staff]:
@@ -659,18 +664,63 @@ def sort_staffs_top_to_bottom(staffs: list[Staff]) -> list[Staff]:
     return sorted(staffs, key=lambda staff: staff.min_y)
 
 
-def filter_unusual_anchors(anchors: list[StaffAnchor]) -> list[StaffAnchor]:
-    if len(anchors) == 0:
-        return anchors
+def _anchors_with_usual_unit_size(anchors: list[StaffAnchor]) -> list[StaffAnchor]:
+    """The anchors whose line spacing is within three standard deviations of the mean."""
     unit_sizes = [anchor.average_unit_size for anchor in anchors]
     average_unit_size = np.mean(unit_sizes)
     unit_size_deviation = np.std(unit_sizes)
-    result = []
-    for anchor in anchors:
-        if abs(anchor.average_unit_size - average_unit_size) > 3 * unit_size_deviation:
-            continue
-        result.append(anchor)
-    return result
+    return [
+        anchor
+        for anchor in anchors
+        if abs(anchor.average_unit_size - average_unit_size) <= 3 * unit_size_deviation
+    ]
+
+
+def _overlap_vertically(anchor: StaffAnchor, other: StaffAnchor) -> bool:
+    return anchor.min_y <= other.max_y and other.min_y <= anchor.max_y
+
+
+def _rows_of_anchors(anchors: list[StaffAnchor]) -> list[list[StaffAnchor]]:
+    """Groups anchors whose lines overlap vertically, directly or through other anchors."""
+    rows: list[list[StaffAnchor]] = []
+    row_max_y = 0.0
+    for anchor in sorted(anchors, key=lambda a: a.min_y):
+        if len(rows) > 0 and anchor.min_y <= row_max_y:
+            rows[-1].append(anchor)
+            row_max_y = max(row_max_y, anchor.max_y)
+        else:
+            rows.append([anchor])
+            row_max_y = anchor.max_y
+    return rows
+
+
+def filter_unusual_anchors(anchors: list[StaffAnchor]) -> list[StaffAnchor]:
+    """
+    Removes anchors whose line spacing doesn't fit the other anchors, e.g. five lines
+    connected over a ledger line or across two staffs.
+
+    The spacing of an anchor is compared with the spacing on the page. An anchor which
+    doesn't fit is only removed if its lines overlap a staff row with anchors that fit:
+    it then contradicts the spacing of its own staff. Anchors which don't fit and are
+    away from all fitting anchors belong to a staff printed in another size, e.g. an
+    ossia or cue staff in small print. Their spacing is compared with the spacing in
+    their own row instead, and the anchors which are kept are marked with
+    other_print_size.
+    """
+    if len(anchors) == 0:
+        return anchors
+    usual = _anchors_with_usual_unit_size(anchors)
+    kept = {id(anchor) for anchor in usual}
+    other_size = [
+        anchor
+        for anchor in anchors
+        if id(anchor) not in kept and not any(_overlap_vertically(anchor, u) for u in usual)
+    ]
+    for row in _rows_of_anchors(other_size):
+        for anchor in _anchors_with_usual_unit_size(row):
+            anchor.other_print_size = True
+            kept.add(id(anchor))
+    return [anchor for anchor in anchors if id(anchor) in kept]
 
 
 def init_zone(clef_anchors: list[StaffAnchor], image_shape: tuple[int, ...]) -> list[range]:
