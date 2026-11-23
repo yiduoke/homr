@@ -2,7 +2,7 @@ import json
 import os
 from typing import Any
 
-from homr.transformer.vocabulary import Vocabulary
+from homr.transformer.vocabulary import Vocabulary, per_note_octaves_enabled
 
 workspace = os.path.join(os.path.dirname(__file__))
 root_dir = os.getcwd()
@@ -116,6 +116,7 @@ class Config:
         self.num_articulation_tokens = len(self.vocab.articulation)
         self.num_slur_tokens = len(self.vocab.slur)
         self.num_position_tokens = len(self.vocab.position)
+        self.per_note_octaves = per_note_octaves_enabled()
         self.encoder_structure = "convnext"
         self.encoder_depth = 8
         self.backbone_layers = [3, 4, 6, 3]
@@ -168,6 +169,7 @@ class Config:
             "decoder_depth": self.decoder_depth,
             "decoder_heads": self.decoder_heads,
             "decoder_args": self.decoder_args.to_dict(),
+            "per_note_octaves": self.per_note_octaves,
         }
 
     def to_json_string(self) -> str:

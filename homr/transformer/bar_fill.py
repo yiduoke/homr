@@ -157,3 +157,35 @@ def rerank(hypotheses: list[Hypothesis], meter: Fraction | None = None) -> Hypot
         return (-(bars - misfits), misfits, -h.log_prob)
 
     return min(hypotheses, key=key)
+
+
+def _fill(h: Hypothesis, meter: Fraction | None) -> tuple[int, int]:
+    """(bars that fill their meter, -bars that don't): higher is better."""
+    misfits, bars = misfit_bars(h.symbols, meter)
+    return bars - misfits, -misfits
+
+
+def choose(
+    hypotheses: list[Hypothesis],
+    meter: Fraction | None = None,
+    greedy: Hypothesis | None = None,
+) -> Hypothesis:
+    """
+    The reading a beam search returns. The hypotheses come most likely first; greedy is the
+    greedy reading of the same staff. HOMR_BEAM_RERANK:
+    - "anchored" (default): the greedy reading, unless the bar-fill rerank finds a hypothesis
+      whose bars add up better (more bars that fill their meter, or as many and fewer that
+      don't). The model's own reading stands wherever the bar arithmetic gives no reason to
+      change it; the beam's likelihood alone never replaces it.
+    - "fill": the bar-fill rerank among the beam's hypotheses (the first version).
+    - "0": the most likely hypothesis.
+    """
+    import os  # noqa: PLC0415
+
+    mode = os.environ.get("HOMR_BEAM_RERANK", "anchored")
+    if mode == "0":
+        return hypotheses[0]
+    best = rerank(hypotheses, meter)
+    if mode in {"fill", "1"} or greedy is None:
+        return best
+    return best if _fill(best, meter) > _fill(greedy, meter) else greedy

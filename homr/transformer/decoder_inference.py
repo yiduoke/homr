@@ -1,6 +1,4 @@
 import os
-from dataclasses import dataclass
-from fractions import Fraction
 from typing import Any
 
 import numpy as np
@@ -8,9 +6,14 @@ import onnxruntime as ort
 
 from homr.onnx_providers import gpu_providers
 from homr.simple_logging import eprint
-from homr.transformer.bar_fill import Hypothesis, rerank
+from homr.transformer.beam_search import beam_width, decode
 from homr.transformer.configs import Config
-from homr.transformer.vocabulary import EncodedSymbol
+from homr.transformer.vocabulary import (
+    NOTE_OCTAVE_CLASSES,
+    OCTAVE_SHIFT_STOP,
+    OCTAVE_SHIFTS,
+    EncodedSymbol,
+)
 from homr.type_definitions import NDArray
 
 # A staff never holds a long run of one repeating cycle: the longest in the test references is 24
@@ -21,19 +24,6 @@ LOOP_GUARD = os.environ.get("HOMR_LOOP_GUARD", "1") != "0"
 LOOP_MAX_PERIOD = 4
 LOOP_RUN = 64
 LOOP_KEEP = 24
-
-# Beam search over the rhythm head (HOMR_BEAM=<width>, default 1: the greedy decoding as it was).
-# With a width above one the final hypotheses are reranked by exact bar fill (bar_fill.py):
-# most bars that fill their meter first, the model's log probability last.
-# HOMR_BEAM_RERANK=0 takes the most likely hypothesis instead.
-
-
-def beam_width() -> int:
-    return max(1, int(os.environ.get("HOMR_BEAM", "1") or "1"))
-
-
-def beam_rerank_enabled() -> bool:
-    return os.environ.get("HOMR_BEAM_RERANK", "1") != "0"
 
 
 def _loop_key(symbol: EncodedSymbol) -> tuple[str, str, str, str]:
@@ -51,22 +41,6 @@ def _loop_cut(symbols: list[EncodedSymbol], runs: list[int]) -> int | None:
         else:
             runs[period] = 0
     return None
-
-
-@dataclass
-class _Beam:
-    # Last rhythm, pitch, lift, articulation and slur token: the next step's input
-    inputs: list[int]
-    cache: list[Any]
-    log_prob: float
-    symbols: list[EncodedSymbol]
-    runs: list[int]
-
-
-def _log_softmax(logits: NDArray) -> NDArray:
-    x = logits.astype(np.float64)
-    x = x - x.max()
-    return x - np.log(np.exp(x).sum())
 
 
 class ScoreDecoder:
@@ -92,8 +66,21 @@ class ScoreDecoder:
         self.inv_articulation_vocab = {v: k for k, v in config.articulation_vocab.items()}
         self.inv_slur_vocab = {v: k for k, v in config.slur_vocab.items()}
         self.inv_position_vocab = {v: k for k, v in config.position_vocab.items()}
-
-        self._masks: dict[str, list[NDArray]] = {}
+        # Models trained with position feedback take the previous position as an input
+        inputs = {item.name for item in self.net.get_inputs()}
+        self.has_position_feedback = "positions" in inputs
+        # Models with a per-note octave head (HOMR_PER_NOTE_OCTAVES=1) read the octave line of
+        # every note there and never emit the legacy octave-line rhythms
+        self.per_note_octaves = config.per_note_octaves
+        if self.per_note_octaves != any(
+            output.name == "out_octaves" for output in self.net.get_outputs()
+        ):
+            raise ValueError("HOMR_PER_NOTE_OCTAVES must match the decoder model's octave head")
+        self.legacy_octave_rhythms = (
+            [config.rhythm_vocab[token] for token in (*OCTAVE_SHIFTS, OCTAVE_SHIFT_STOP)]
+            if self.per_note_octaves
+            else []
+        )
         self.fp16 = fp16
         self.use_gpu = use_gpu
         self.device = "cuda" if use_gpu else "cpu"
@@ -105,6 +92,7 @@ class ScoreDecoder:
             "out_positions",
             "out_articulations",
             "out_slurs",
+            *(["out_octaves"] if self.per_note_octaves else []),
             "attention",
         ]
 
@@ -128,11 +116,9 @@ class ScoreDecoder:
         width = kwargs.get("beam_width") or beam_width()
         if width <= 1:
             return self.generate_greedy(start_tokens, nonote_tokens, **kwargs)
-        hypotheses = self.generate_beams(start_tokens, nonote_tokens, width, kwargs["context"])
-        meter: Fraction | None = kwargs.get("meter")
-        if beam_rerank_enabled():
-            return rerank(hypotheses, meter).symbols
-        return hypotheses[0].symbols
+        return decode(
+            self, start_tokens, nonote_tokens, width, kwargs["context"], kwargs.get("meter")
+        )
 
     def generate_greedy(
         self,
@@ -152,6 +138,7 @@ class ScoreDecoder:
         out_lift = nonote_tokens
         out_articulations = nonote_tokens
         out_slurs = nonote_tokens
+        previous_position = nonote_tokens[:, -1:]
         cache, kv_input_names, kv_output_names = self.init_cache()
         output_names = self.output_names + kv_output_names
         context = kwargs["context"]
@@ -179,6 +166,8 @@ class ScoreDecoder:
             self.io_binding.bind_cpu_input("lifts", x_lift)
             self.io_binding.bind_cpu_input("articulations", x_articulations)
             self.io_binding.bind_cpu_input("slurs", x_slurs)
+            if self.has_position_feedback:
+                self.io_binding.bind_cpu_input("positions", previous_position)
             self.io_binding.bind_cpu_input("context", context)
             self.io_binding.bind_cpu_input("cache_len", np.array([step], dtype=np.int64))
             for name, cache_val in zip(kv_input_names, cache, strict=True):
@@ -193,7 +182,7 @@ class ScoreDecoder:
 
             # Get outputs
             outputs = self.io_binding.get_outputs()
-            cache = outputs[7:]
+            cache = outputs[len(self.output_names) :]
 
             # Greedy decoding: pick the highest logit directly for each output
             rhythmsp = outputs[0].numpy()
@@ -202,9 +191,13 @@ class ScoreDecoder:
             positionsp = outputs[3].numpy()
             articulationsp = outputs[4].numpy()
             slursp = outputs[5].numpy()
-            attention = outputs[6].numpy()
+            attention = outputs[self.output_names.index("attention")].numpy()
 
-            rhythm_sample = np.array([[rhythmsp[:, -1, :].argmax()]])
+            rhythm_logits = rhythmsp[:, -1, :]
+            if self.per_note_octaves:
+                rhythm_logits = rhythm_logits.copy()
+                rhythm_logits[:, self.legacy_octave_rhythms] = -np.inf
+            rhythm_sample = np.array([[rhythm_logits.argmax()]])
             pitch_sample = np.array([[pitchsp[:, -1, :].argmax()]])
             lift_sample = np.array([[liftsp[:, -1, :].argmax()]])
             articulation_sample = np.array([[articulationsp[:, -1, :].argmax()]])
@@ -221,6 +214,10 @@ class ScoreDecoder:
             if rhythm_sample[0][0] == self.eos_token:
                 break
 
+            octave_mark = None
+            if self.per_note_octaves and rhythm_token[0].startswith("note_"):
+                octave_logits = outputs[self.output_names.index("out_octaves")].numpy()
+                octave_mark = NOTE_OCTAVE_CLASSES[octave_logits[0, -1, :].argmax()]
             symbol = EncodedSymbol(
                 rhythm=rhythm_token[0],
                 pitch=pitch_token[0],
@@ -229,6 +226,7 @@ class ScoreDecoder:
                 slur=slur_token[0],
                 position=position_token[0],
                 coordinates=attention,
+                octave_mark=octave_mark,
             )
             symbols.append(symbol)
             cut = _loop_cut(symbols, runs) if LOOP_GUARD else None
@@ -242,191 +240,9 @@ class ScoreDecoder:
             out_rhythm = np.concatenate((out_rhythm, rhythm_sample), axis=-1)
             out_articulations = np.concatenate((out_articulations, articulation_sample), axis=-1)
             out_slurs = np.concatenate((out_slurs, slur_sample), axis=-1)
+            previous_position = position_sample
 
         return symbols
-
-    def _field_masks(self) -> dict[str, list[NDArray]]:
-        """
-        Per kind of rhythm token, an additive mask (0 or -inf) for the pitch, lift,
-        articulation, slur and position heads: the values that the labels pair with that kind.
-        Notes have a pitch, a lift, an articulation, a slur and a position; rests, clefs,
-        dynamics and octave lines have "_" for pitch and lift; everything else (bar lines,
-        key and time signatures, chord) has "." in the four fed-back fields.
-        """
-        if self._masks:
-            return self._masks
-        vocabs = [
-            self.config.pitch_vocab,
-            self.config.lift_vocab,
-            self.config.articulation_vocab,
-            self.config.slur_vocab,
-            self.config.position_vocab,
-        ]
-
-        def mask(vocab: dict[str, int], allowed: Any) -> NDArray:
-            m = np.full(len(vocab), -np.inf)
-            for token, index in vocab.items():
-                if allowed(token):
-                    m[index] = 0.0
-            return m
-
-        def not_in(*tokens: str) -> Any:
-            return lambda t: t not in tokens
-
-        def only(*tokens: str) -> Any:
-            return lambda t: t in tokens
-
-        anything = not_in()
-        self._masks = {
-            "note": [
-                mask(v, a)
-                for v, a in zip(vocabs, [not_in(".", "_")] + [not_in(".")] * 4, strict=True)
-            ],
-            "plain": [
-                mask(v, a)
-                for v, a in zip(
-                    vocabs,
-                    [only("_"), only("_"), not_in("."), not_in("."), not_in(".")],
-                    strict=True,
-                )
-            ],
-            "nonote": [
-                mask(v, a) for v, a in zip(vocabs, [only(".")] * 4 + [anything], strict=True)
-            ],
-        }
-        return self._masks
-
-    def _rhythm_kind(self, rhythm_index: int) -> str:
-        rhythm = self.inv_rhythm_vocab[rhythm_index]
-        if rhythm.startswith("note"):
-            return "note"
-        if rhythm.startswith(("rest", "clef", "dynamic", "octaveShift")):
-            return "plain"
-        return "nonote"
-
-    def _run_step(
-        self, inputs: list[int], cache: list[Any], context: NDArray, step: int
-    ) -> list[Any]:
-        """
-        One decoder step for one hypothesis. A fresh IO binding each time: a binding writes
-        its outputs into the buffers of its previous run, which would overwrite the cache of
-        the other hypotheses.
-        """
-        binding = self.net.io_binding()
-        names = ["rhythms", "pitchs", "lifts", "articulations", "slurs"]
-        for name, value in zip(names, inputs, strict=True):
-            binding.bind_cpu_input(name, np.array([[value]], dtype=np.int64))
-        binding.bind_cpu_input("context", context)
-        binding.bind_cpu_input("cache_len", np.array([step], dtype=np.int64))
-        layers = range(self.config.decoder_depth * 4)
-        for i, cache_val in zip(layers, cache, strict=True):
-            binding.bind_ortvalue_input(f"cache_in{i}", cache_val)
-        for name in self.output_names + [f"cache_out{i}" for i in layers]:
-            binding.bind_output(name, self.device, self.device_id)
-        self.net.run_with_iobinding(iobinding=binding)
-        return list(binding.get_outputs())
-
-    def generate_beams(
-        self,
-        start_tokens: NDArray,
-        nonote_tokens: NDArray,
-        width: int,
-        context: NDArray,
-    ) -> list[Hypothesis]:
-        """
-        Beam search over the rhythm head. The six heads read the same decoder state and only
-        rhythm, pitch, lift, articulation and slur are fed back, so a step's distribution is
-        the product of the heads. Every beam proposes its `width` most likely rhythm tokens.
-        The model's own top rhythm keeps the argmax of every other head, exactly as the greedy
-        decoder does; another rhythm takes the argmax of each other head among the values the
-        labels pair with its kind (_field_masks). A hypothesis scores the summed log
-        probabilities of everything it emits. Returns at most `width` finished hypotheses,
-        most likely first. Width 1 is the greedy decoding token for token.
-        """
-        cache, _, _ = self.init_cache()
-        context_reduced = context[:, :1]
-        masks = self._field_masks()
-        start = int(start_tokens.reshape(-1)[-1])
-        nonote = int(nonote_tokens.reshape(-1)[-1])
-        field_vocabs = [
-            self.inv_pitch_vocab,
-            self.inv_lift_vocab,
-            self.inv_articulation_vocab,
-            self.inv_slur_vocab,
-            self.inv_position_vocab,
-        ]
-        beams = [
-            _Beam(
-                [start, nonote, nonote, nonote, nonote], cache, 0.0, [], [0] * (LOOP_MAX_PERIOD + 1)
-            )
-        ]
-        finished: list[Hypothesis] = []
-        for step in range(self.max_seq_len):
-            candidates: list[tuple[float, int, _Beam, int, list[int], list[Any], Any]] = []
-            for beam in beams:
-                outputs = self._run_step(
-                    beam.inputs, beam.cache, context if step == 0 else context_reduced, step
-                )
-                heads = [_log_softmax(outputs[i].numpy()[0, -1, :]) for i in range(6)]
-                rhythm_lp = heads[0]
-                # heads[1..5]: pitch, lift, position, articulation, slur in output order
-                fields_lp = [heads[1], heads[2], heads[4], heads[5], heads[3]]
-                attention = outputs[6].numpy()
-                new_cache = outputs[7:]
-                top = int(rhythm_lp.argmax())
-                order = [top] + [int(i) for i in np.argsort(-rhythm_lp, kind="stable") if i != top]
-                for r in order[:width]:
-                    score = beam.log_prob + float(rhythm_lp[r])
-                    if r == self.eos_token:
-                        candidates.append(
-                            (score, len(candidates), beam, r, [], new_cache, attention)
-                        )
-                        continue
-                    if r == top:
-                        fields = [int(lp.argmax()) for lp in fields_lp]
-                    else:
-                        kind_masks = masks[self._rhythm_kind(r)]
-                        fields = [
-                            int((lp + m).argmax())
-                            for lp, m in zip(fields_lp, kind_masks, strict=True)
-                        ]
-                    score += sum(float(lp[f]) for lp, f in zip(fields_lp, fields, strict=True))
-                    candidates.append(
-                        (score, len(candidates), beam, r, fields, new_cache, attention)
-                    )
-            candidates.sort(key=lambda c: (-c[0], c[1]))
-            beams = []
-            for score, _, parent, r, fields, new_cache, attention in candidates:
-                if len(beams) >= width:
-                    break
-                if r == self.eos_token:
-                    finished.append(Hypothesis(parent.symbols, score))
-                    continue
-                symbol = EncodedSymbol(
-                    rhythm=self.inv_rhythm_vocab[r],
-                    pitch=field_vocabs[0][fields[0]],
-                    lift=field_vocabs[1][fields[1]],
-                    articulation=field_vocabs[2][fields[2]],
-                    slur=field_vocabs[3][fields[3]],
-                    position=field_vocabs[4][fields[4]],
-                    coordinates=attention,
-                )
-                symbols = [*parent.symbols, symbol]
-                runs = list(parent.runs)
-                cut = _loop_cut(symbols, runs) if LOOP_GUARD else None
-                if cut is not None:
-                    finished.append(Hypothesis(symbols[:cut], score))
-                    continue
-                beams.append(_Beam([r, *fields[:4]], new_cache, score, symbols, runs))
-            if not beams:
-                break
-            if len(finished) >= width:
-                kth = sorted((h.log_prob for h in finished), reverse=True)[width - 1]
-                if all(b.log_prob <= kth for b in beams):
-                    break
-        finished.extend(Hypothesis(b.symbols, b.log_prob) for b in beams)
-        finished.sort(key=lambda h: -h.log_prob)
-        return finished[:width]
 
     def init_cache(self, cache_len: int = 0) -> tuple[list[NDArray], list[str], list[str]]:
         cache = []

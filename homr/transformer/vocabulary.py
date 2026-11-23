@@ -1,5 +1,6 @@
 import copy
 import itertools
+import os
 import random
 import re
 from fractions import Fraction
@@ -9,6 +10,14 @@ from homr.simple_logging import eprint
 
 nonote = "."
 empty = "_"  # used for decorations on note, if there is no decoration
+
+NOTE_OCTAVE_IDS = {"_": 0, "8va": 1, "8vb": 2}
+NOTE_OCTAVE_CLASSES = tuple(NOTE_OCTAVE_IDS)
+
+
+def per_note_octaves_enabled() -> bool:
+    return os.environ.get("HOMR_PER_NOTE_OCTAVES") == "1"
+
 
 # The time signatures the model can read: the 34 numeric ones which have at least 50
 # occurrences in the training data (99.7% of all printed ones), plus the symbols.
@@ -514,6 +523,7 @@ class EncodedSymbol:
         slur: str = nonote,
         position: str = nonote,
         coordinates: tuple[float, float] | None = None,
+        octave_mark: str | None = None,
     ) -> None:
         self.rhythm = rhythm
         self.pitch = pitch
@@ -521,6 +531,9 @@ class EncodedSymbol:
         self.articulation = articulation
         self.slur = slur
         self.position = position
+        # The per-note octave arm supplies "_", "8va" or "8vb".
+        # Legacy symbols have no per-note field.
+        self.octave_mark = octave_mark
 
         # These coordinates are derived from transformer attention and are inherently imprecise,
         # since the model is optimized for predictive accuracy rather than spatial localization.

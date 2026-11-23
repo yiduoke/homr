@@ -29,6 +29,9 @@ from homr.transformer.vocabulary import (
     transpose_octaves,
 )
 
+_NOTE_OCTAVES = {empty: 0, "8va": 1, "8vb": -1}
+_OCTAVE_MARK_ATTRIBUTE = "homr-octave-mark"
+
 
 class PartTimeSignature:
     """
@@ -75,8 +78,11 @@ class ConversionState:
         self.nominator = Fraction(beats, beat_type)
         self.beats = beats
 
-    def sounding_pitch(self, written_pitch: str, staff: int) -> str:
-        octaves = self.clef_octaves.get(staff, 0) + self.shift_octaves.get(staff, 0)
+    def sounding_pitch(self, written_pitch: str, staff: int, octave_mark: str | None = None) -> str:
+        bracket_octaves = (
+            self.shift_octaves.get(staff, 0) if octave_mark is None else _NOTE_OCTAVES[octave_mark]
+        )
+        octaves = self.clef_octaves.get(staff, 0) + bracket_octaves
         return transpose_octaves(written_pitch, octaves)
 
     def start_volta(self, measure_no: int) -> int:
@@ -240,6 +246,9 @@ def build_measures(
     where none was recognised so far they are estimated from the notes.
     """
     time_signature = time_signature or PartTimeSignature()
+    has_note_octaves = any(symbol.octave_mark is not None for symbol in voice)
+    if has_note_octaves and any(symbol.rhythm.startswith("octaveShift") for symbol in voice):
+        raise ValueError("Per-note octave marks cannot be combined with legacy octave directions")
     clock = GroupClock()
     measure_number = 1
     # Measures a multi-measure rest still covers after the current one
@@ -429,6 +438,8 @@ def build_measures(
         state.time_token = final_token
     if state.time_token is not None:
         time_signature.token = state.time_token
+    if has_note_octaves:
+        write_note_octave_shifts(measures)
     return measures
 
 
@@ -850,16 +861,63 @@ def stop_octave_shifts(measure: ET.Element, state: ConversionState) -> None:
 def _build_octave_shift_direction(
     measure: ET.Element, staff: int, shift_type: str, placement: str
 ) -> None:
-    direction = ET.Element("direction", placement=placement)
-    direction_type = ET.SubElement(direction, "direction-type")
-    ET.SubElement(direction_type, "octave-shift", type=shift_type, size="8", number=str(staff))
-    ET.SubElement(direction, "staff").text = str(staff)
+    direction = _octave_shift_direction(staff, shift_type, placement)
     children = list(measure)
     # Stop after the last note: a trailing backup would move it before that note
     if shift_type == "stop" and children and children[-1].tag == "backup":
         measure.insert(len(children) - 1, direction)
     else:
         measure.append(direction)
+
+
+def _octave_shift_direction(staff: int, shift_type: str, placement: str) -> ET.Element:
+    direction = ET.Element("direction", placement=placement)
+    direction_type = ET.SubElement(direction, "direction-type")
+    ET.SubElement(direction_type, "octave-shift", type=shift_type, size="8", number=str(staff))
+    ET.SubElement(direction, "staff").text = str(staff)
+    return direction
+
+
+def write_note_octave_shifts(measures: list[ET.Element]) -> None:
+    """Reconstruct each staff's printed bracket runs after the pitches have been written."""
+    before: dict[ET.Element, list[ET.Element]] = defaultdict(list)
+    after: dict[ET.Element, list[ET.Element]] = defaultdict(list)
+    open_runs: dict[int, tuple[str, ET.Element]] = {}
+
+    def close(staff: int, marker: str, last: ET.Element) -> None:
+        placement = "above" if marker == "8va" else "below"
+        after[last].append(_octave_shift_direction(staff, "stop", placement))
+
+    for measure in measures:
+        for chord in group_into_events(measure):
+            for note in chord:
+                if note.find("pitch") is None:
+                    continue
+                staff = int(note.findtext("staff", "1"))
+                marker = note.attrib.pop(_OCTAVE_MARK_ATTRIBUTE, empty)
+                current = open_runs.get(staff)
+                if current is not None and current[0] != marker:
+                    close(staff, *open_runs.pop(staff))
+                    current = None
+                if marker != empty:
+                    if current is None:
+                        shift_type, placement = (
+                            ("down", "above") if marker == "8va" else ("up", "below")
+                        )
+                        before[chord[0]].append(
+                            _octave_shift_direction(staff, shift_type, placement)
+                        )
+                    # Directions must never split a chord's anchor from its other notes.
+                    open_runs[staff] = (marker, chord[-1])
+    for staff, (marker, last) in open_runs.items():
+        close(staff, marker, last)
+    for measure in measures:
+        children = []
+        for child in measure:
+            children.extend(before.get(child, ()))
+            children.append(child)
+            children.extend(after.get(child, ()))
+        measure[:] = children
 
 
 def build_key(model_key: EncodedSymbol, attributes: ET.Element) -> None:
@@ -1642,7 +1700,10 @@ def build_note_or_rest(
         eprint("WARNING note without pitch", model_note)
         ET.SubElement(note, "rest")
     else:
-        sounding_pitch = state.sounding_pitch(model_pitch, get_staff(model_note))
+        octave_mark = model_note.octave_mark
+        sounding_pitch = state.sounding_pitch(model_pitch, get_staff(model_note), octave_mark)
+        if octave_mark in ("8va", "8vb"):
+            note.set(_OCTAVE_MARK_ATTRIBUTE, octave_mark)
         pitch = ET.SubElement(note, "pitch")
         ET.SubElement(pitch, "step").text = sounding_pitch[0]
         ET.SubElement(pitch, "octave").text = sounding_pitch[1:]
