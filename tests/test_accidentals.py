@@ -444,3 +444,38 @@ def test_marked_tie_over_a_page_turn_keeps_sharp_and_an_unmarked_one_is_not_gues
     # the pages written one by one, as when no memory is passed, lose the sharp
     (alone,) = _tie_alters([page2])
     assert alone == ["-1", "-1"]
+
+
+def test_slur_stop_does_not_take_the_alteration_of_a_voice_silent_in_the_bar_before() -> None:
+    # The sharp C of the lower voice in the first bar is not tied into the third bar: the voice
+    # was not sounding in the second one. The slur stop on the C of the third bar is a slur.
+    tokens = (
+        _HEAD
+        + "note_4 C4 # _ slurStart upper2\nbarline . . . . .\n"
+        + "note_4 C4 _ _ _ upper\nbarline . . . . .\n"
+        + "note_4 C4 _ _ slurStop upper\nbarline . . . . ."
+    )
+    (alters,) = _tie_alters([tokens])
+    assert alters == ["1", None, None]
+
+
+def test_slur_stop_does_not_take_the_alteration_of_the_same_voice_two_bars_ago() -> None:
+    tokens = (
+        _HEAD
+        + "note_4 C4 # _ slurStart upper\nbarline . . . . .\n"
+        + "note_4 D4 _ _ _ upper2\nbarline . . . . .\n"
+        + "note_4 C4 _ _ slurStop upper\nbarline . . . . ."
+    )
+    (alters,) = _tie_alters([tokens])
+    assert alters == ["1", None, None]
+
+
+def test_memory_of_a_page_keeps_only_the_voices_of_its_last_bar() -> None:
+    page1 = (
+        _HEAD
+        + "note_4 C4 # _ slurStart upper\nbarline . . . . .\n"
+        + "note_4 D4 _ _ _ upper2\nbarline . . . . ."
+    )
+    page2 = _HEAD + "note_4 C4 _ _ slurStop upper\nbarline . . . . ."
+    _, second = _tie_alters([page1, page2])
+    assert second == [None]

@@ -1209,19 +1209,30 @@ def resolve_accidentals(part: ET.Element, memory: PartTimeSignature | None = Non
     note, also from the last bar of the previous page (memory) and also when the tied note
     is written in another voice of the staff than the note it is tied from. The tied note
     has the pitch of the note it is tied from and a sign carried over the barline by a tie
-    does not apply to later notes of the new bar. Run it before ties are converted, because
-    they match the alteration of the notes.
+    does not apply to later notes of the new bar. A tie comes from the event before the note
+    in its voice, or on the first event of a voice in a bar from the last event of a bar
+    before in which the voice sounded, never from a voice which was silent there. Run it before
+    ties are converted, because they match the alteration of the notes.
     """
     state = AccidentalState()
-    # Per staff and voice: the pitches (with alteration) of the previous event, and of the
-    # event being read, which is a chord if there is more than one
-    previous: dict[tuple[str, str], dict[tuple[str, int], int]] = {}
-    current: dict[tuple[str, str], dict[tuple[str, int], int]] = (
-        {voice: dict(pitches) for voice, pitches in memory.tied_alters.items()} if memory else {}
+    # Per staff and voice: the pitches (with alteration) of the last event written and the
+    # bar it is in (-1: the last bar of the previous page). A tie only comes from the event
+    # before the note in the same voice or, on the first event of a bar, from the last event
+    # of the bar before. A voice which was silent in the bar before has no tie to give.
+    last: dict[tuple[str, str], tuple[int, dict[tuple[str, int], int]]] = (
+        {voice: (-1, dict(pitches)) for voice, pitches in memory.tied_alters.items()}
+        if memory
+        else {}
     )
     fifths = 0
-    for measure in part.findall("measure"):
+    index = -1
+    for index, measure in enumerate(part.findall("measure")):
         state.new_bar()
+        # The events a tie into this bar can come from, per voice
+        into_bar = {voice: pitches for voice, (bar, pitches) in last.items() if bar == index - 1}
+        started: set[tuple[str, str]] = set()
+        first_event: set[tuple[str, str]] = set()
+        previous: dict[tuple[str, str], dict[tuple[str, int], int]] = {}
         for note, note_fifths in _notes_in_time_order(measure, fifths):
             sign = note.attrib.pop(_LIFT_ATTRIBUTE, None)
             pitch = note.find("pitch")
@@ -1231,24 +1242,31 @@ def resolve_accidentals(part: ET.Element, memory: PartTimeSignature | None = Non
             staff = note.findtext("staff", "1")
             voice = (staff, note.findtext("voice", "1"))
             if note.find("chord") is None:
-                previous[voice] = current.get(voice, {})
-                current[voice] = {}
+                if voice in started:
+                    previous[voice] = last[voice][1]
+                    first_event.discard(voice)
+                else:
+                    previous[voice] = into_bar.get(voice, {})
+                    started.add(voice)
+                    first_event.add(voice)
+                last[voice] = (index, {})
             step, octave = pitch.findtext("step", "C"), int(pitch.findtext("octave", "4"))
             has_stop = get_slur(note, "stop") is not None
             tie_alter = None
             if has_stop:
                 tie_alter = previous.get(voice, {}).get((step, octave))
-                if tie_alter is None:
+                if tie_alter is None and voice in first_event:
+                    # The tie is written in another voice of the staff than the note it is
+                    # tied from, which is only possible over a barline
                     others = {
                         alters[(step, octave)]
-                        for source in (previous, current)
-                        for other, alters in source.items()
+                        for other, alters in into_bar.items()
                         if other[0] == staff and other != voice and (step, octave) in alters
                     }
                     tie_alter = others.pop() if len(others) == 1 else None
             alter = state.sounding_alter(staff, step, octave, sign, tie_alter)
             if get_slur(note, "start") is not None:
-                current.setdefault(voice, {})[(step, octave)] = alter
+                last[voice][1][(step, octave)] = alter
             if alter != 0 or sign == NATURAL:
                 element = ET.Element("alter")
                 element.text = str(alter)
@@ -1258,7 +1276,9 @@ def resolve_accidentals(part: ET.Element, memory: PartTimeSignature | None = Non
         for key in measure.findall("attributes/key/fifths"):
             fifths = int(key.text or "0")
     if memory is not None:
-        memory.tied_alters = {voice: dict(pitches) for voice, pitches in current.items()}
+        memory.tied_alters = {
+            voice: dict(pitches) for voice, (bar, pitches) in last.items() if bar == index
+        }
 
 
 def add_stems(part: ET.Element) -> None:
