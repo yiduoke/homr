@@ -448,8 +448,10 @@ def build_measures(
             ET.SubElement(time_el, "beats").text = str(beats)
             ET.SubElement(time_el, "beat-type").text = "4"
         _insert_time_element(first_attributes, time_el)
-    _join_bars_split_at_system_breaks(measures, state.division)
     final_token = _repair_meter(measures, state.division)
+    # After the meter repair: a misread time signature (12/8 for 6/8) would make two full
+    # bars on both sides of a system break look like the halves of one bar
+    _join_bars_split_at_system_breaks(measures, state.division)
     _fill_rest_only_bars(measures, state.division, is_first_page, time_is_guessed)
     if final_token is not None:
         state.time_token = final_token

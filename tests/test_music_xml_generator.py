@@ -1191,3 +1191,18 @@ note_2 G4 _ _ _ upper
 rest_2 . _ _ _ upper
 barline . . . . .""")
         self.assertEqual(len(measures), 2)
+
+    def test_full_bars_under_a_misread_meter_stay_apart(self) -> None:
+        # 12/8 was misread for 6/8: the bars are full 6/8 bars, two of them on both
+        # sides of a system break must not be joined into one 12/8 bar
+        bar = """note_4. C4 _ _ _ upper
+note_4. D4 _ _ _ upper
+barline . . . . ."""
+        measures = self._measures(
+            "clef_G2 . . . . upper\ntimeSignature_12/8 . . . . .\n"
+            + "\n".join([bar] * 3)
+            + "\nnewline . . . . .\nclef_G2 . . . . upper\n"
+            + "\n".join([bar] * 3)
+        )
+        self.assertEqual(len(measures), 6)
+
