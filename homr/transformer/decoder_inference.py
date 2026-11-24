@@ -6,6 +6,7 @@ import onnxruntime as ort
 
 from homr.onnx_providers import gpu_providers
 from homr.simple_logging import eprint
+from homr.transformer.beam_search import beam_width, decode
 from homr.transformer.configs import Config
 from homr.transformer.vocabulary import (
     NOTE_OCTAVE_CLASSES,
@@ -102,6 +103,23 @@ class ScoreDecoder:
         return ScoreDecoder(self.net, self.fp16, self.use_gpu, self.config, self.ignore_index)
 
     def generate(
+        self,
+        start_tokens: NDArray,
+        nonote_tokens: NDArray,
+        **kwargs: Any,
+    ) -> list[EncodedSymbol]:
+        """
+        kwargs: context (encoder output), optionally beam_width (default HOMR_BEAM) and
+        meter (length of the time signature in force before the staff, for the reranking).
+        """
+        width = kwargs.get("beam_width") or beam_width()
+        if width <= 1:
+            return self.generate_greedy(start_tokens, nonote_tokens, **kwargs)
+        return decode(
+            self, start_tokens, nonote_tokens, width, kwargs["context"], kwargs.get("meter")
+        )
+
+    def generate_greedy(
         self,
         start_tokens: NDArray,
         nonote_tokens: NDArray,
