@@ -451,6 +451,18 @@ def get_all_image_files_in_folder(folder: str) -> list[str]:
 # SHA-256 of the transformer archives on the fork's releases (their SHA256SUMS assets). A
 # download which does not match is deleted and homr stops.
 RELEASE_SHA256 = {
+    "decoder_pytorch_model_comb7-s7-ema-c882f6e.zip": (
+        "4f8c935da901990be75f6bef2b77429eeef593adb9d9169e57eaaed13d71b496"
+    ),
+    "decoder_pytorch_model_comb7-s7-ema-c882f6e_fp16.zip": (
+        "e00907a36b9e58e7e5f2994c14bd9a1abf2ef0d11bcd458d0f99d08db9a14f0c"
+    ),
+    "encoder_pytorch_model_comb7-s7-ema-c882f6e.zip": (
+        "5127724509994b122df57816b3aed247ecfe628c3533f026c60bf551a29ea5ab"
+    ),
+    "encoder_pytorch_model_comb7-s7-ema-c882f6e_fp16.zip": (
+        "18581d84a13ea17d5a5b0ce83e2871812b0d390c843cf4d1e3d974fec46a7803"
+    ),
     "decoder_pytorch_model_comb6-s7-ema-b918469.zip": (
         "edfe21c92b731828fec9f55edac4569cc704803f9781a0b5c299d52e84b476eb"
     ),
@@ -485,6 +497,7 @@ FORK_RELEASES = {
     "pytorch_model_octave": "octave_checkpoints",
     "pytorch_model_meteracc": "meteracc_checkpoints",
     "pytorch_model_comb6": "comb6-s7-ema",
+    "pytorch_model_comb7": "comb7-s7-ema",
 }
 
 

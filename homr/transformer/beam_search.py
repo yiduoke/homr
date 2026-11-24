@@ -36,7 +36,11 @@ FIELD_INPUTS = ["pitchs", "lifts", "articulations", "slurs", "positions"]
 
 
 def beam_width() -> int:
-    return max(1, int(os.environ.get("HOMR_BEAM", "1") or "1"))
+    """
+    HOMR_BEAM: the beam width, 3 by default (the setting COMB7 was tested with).
+    HOMR_BEAM=1 decodes greedily: faster, slightly less accurate.
+    """
+    return max(1, int(os.environ.get("HOMR_BEAM", "3") or "3"))
 
 
 @dataclass

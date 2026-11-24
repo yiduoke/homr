@@ -29,11 +29,12 @@ def _scaled_canvas(scale: float) -> tuple[int, int]:
 
 class FilePaths:
     def __init__(self) -> None:
-        # COMB6 seed 7 (EMA weights), an interim prerelease on the fork; its decoder has
-        # position feedback and a per-note octave head, which decoder_inference reads from
-        # the model. HOMR_MODEL_NAME=pytorch_model_meteracc-r2s7-afae0e3 selects the latest
-        # stable release. Both are downloaded from the fork, see download_weights in main.py.
-        model_name = os.environ.get("HOMR_MODEL_NAME", "pytorch_model_comb6-s7-ema-b918469")
+        # COMB7: the COMB6 recipe trained 3 more passes (seed 7, EMA weights), an interim
+        # prerelease on the fork; its decoder has position feedback and a per-note octave
+        # head, which decoder_inference reads from the model. HOMR_MODEL_NAME=
+        # pytorch_model_meteracc-r2s7-afae0e3 selects the latest stable release. Both are
+        # downloaded from the fork, see download_weights in main.py.
+        model_name = os.environ.get("HOMR_MODEL_NAME", "pytorch_model_comb7-s7-ema-c882f6e")
         self.encoder_path = os.path.join(
             workspace,
             f"encoder_{model_name}.onnx",

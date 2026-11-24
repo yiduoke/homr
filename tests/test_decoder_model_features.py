@@ -11,6 +11,7 @@ import pytest
 
 from homr import download_utils
 from homr.main import RELEASE_SHA256, transformer_release_url
+from homr.transformer.beam_search import beam_width
 from homr.transformer.configs import Config
 from homr.transformer.decoder_inference import ScoreDecoder
 
@@ -113,7 +114,10 @@ class _FakeSession:
 
 def _decode(session: _FakeSession, config: Config) -> list[Any]:
     decoder = ScoreDecoder(session, fp16=False, use_gpu=False, config=config)  # type: ignore
-    return decoder.generate(np.array([[1]]), np.array([[0]]), context=np.zeros((1, 4, 512)))
+    # The greedy reading (HOMR_BEAM=1): these tests check what the decoder feeds back and reads
+    return decoder.generate(
+        np.array([[1]]), np.array([[0]]), context=np.zeros((1, 4, 512)), beam_width=1
+    )
 
 
 def test_legacy_model_is_decoded_as_before() -> None:
@@ -147,17 +151,28 @@ def test_comb6_model_feeds_back_positions_and_reads_octaves() -> None:
     assert [int(step["positions"][0, 0]) for step in session.steps] == [0] + [position_1] * 3
 
 
-def test_default_model_is_comb6_on_the_fork() -> None:
+def test_default_model_is_comb7_on_the_fork() -> None:
     config = Config()
-    assert config.filepaths.decoder_path.endswith("decoder_pytorch_model_comb6-s7-ema-b918469.onnx")
+    assert config.filepaths.decoder_path.endswith("decoder_pytorch_model_comb7-s7-ema-c882f6e.onnx")
     url = transformer_release_url(config.filepaths.decoder_path)
-    assert url == "https://github.com/yiduoke/homr/releases/download/comb6-s7-ema/"
+    assert url == "https://github.com/yiduoke/homr/releases/download/comb7-s7-ema/"
+    assert transformer_release_url("decoder_pytorch_model_comb6-s7-ema-b918469.onnx").endswith(
+        "/comb6-s7-ema/"
+    )
     assert transformer_release_url("decoder_pytorch_model_meteracc-r2s7-afae0e3.onnx").endswith(
         "/meteracc_checkpoints/"
     )
     for name in ("encoder", "decoder"):
         for suffix in ("", "_fp16"):
-            assert f"{name}_pytorch_model_comb6-s7-ema-b918469{suffix}.zip" in RELEASE_SHA256
+            for model in ("comb7-s7-ema-c882f6e", "comb6-s7-ema-b918469"):
+                assert f"{name}_pytorch_model_{model}{suffix}.zip" in RELEASE_SHA256
+
+
+def test_beam_3_is_the_default_and_beam_1_is_greedy(monkeypatch: Any) -> None:
+    monkeypatch.delenv("HOMR_BEAM", raising=False)
+    assert beam_width() == 3
+    monkeypatch.setenv("HOMR_BEAM", "1")
+    assert beam_width() == 1
 
 
 def test_checksum_mismatch_is_an_error(tmp_path: Any) -> None:
