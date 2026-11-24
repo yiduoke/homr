@@ -1076,3 +1076,118 @@ note_8 C4 _ _ _ upper
 barline . . . . ."""
         xml = generate_xml(XmlGeneratorArguments(), [read_token_lines(tokens.splitlines())], "")
         self.assertEqual(_times(xml), [("4", "4"), ("2", "4"), ("3", "4"), ("3", "8")])
+
+
+class TestBarSplitAtSystemBreak(unittest.TestCase):
+    """A bar which runs over a system break is read as the end of one staff and the start of
+    the next. When the two parts together fill the meter, they are one bar."""
+
+    def _measures(self, tokens_str: str) -> list[ET.Element]:
+        tokens = read_token_lines(tokens_str.splitlines())
+        xml = generate_xml(XmlGeneratorArguments(), [tokens], "")
+        return xml.findall("part/measure")
+
+    def _split(
+        self,
+        end_barline: str = "barline",
+        second_half: str = "note_4 G4 _ _ _ upper\nnote_4 A4 _ _ _ upper",
+    ) -> str:
+        return f"""clef_G2 . . . . upper
+timeSignature_4/4 . . . . .
+note_1 C4 _ _ _ upper
+barline . . . . .
+note_4 D4 _ _ _ upper
+note_4 E4 _ _ _ upper
+{end_barline} . . . . .
+newline . . . . .
+clef_G2 . . . . upper
+{second_half}
+barline . . . . .
+note_1 B4 _ _ _ upper
+barline . . . . ."""
+
+    def test_bar_split_at_a_system_break_is_joined(self) -> None:
+        measures = self._measures(self._split())
+        self.assertEqual(len(measures), 3)
+        self.assertEqual([_pitch(n) for n in _notes(measures[1])], ["D", "E", "G", "A"])
+        self.assertEqual([m.get("number") for m in measures], ["1", "2", "3"])
+
+    def test_joined_bar_keeps_the_onsets(self) -> None:
+        measures = self._measures(self._split())
+        divisions = int(measures[0].findtext("attributes/divisions", "1"))
+        time, onsets = 0, []
+        for element in measures[1]:
+            if element.tag == "backup":
+                time -= int(element.findtext("duration", "0"))
+            elif element.tag == "forward":
+                time += int(element.findtext("duration", "0"))
+            elif element.tag == "note" and element.find("chord") is None:
+                onsets.append(time / divisions)
+                time += _duration(element)
+        self.assertEqual(onsets, [0.0, 1.0, 2.0, 3.0])
+
+    def test_parts_which_do_not_fill_the_meter_stay_apart(self) -> None:
+        measures = self._measures(self._split(second_half="note_4 G4 _ _ _ upper"))
+        self.assertEqual(len(measures), 4)
+
+    def test_double_barline_before_the_break_is_kept(self) -> None:
+        measures = self._measures(self._split(end_barline="doublebarline"))
+        self.assertEqual(len(measures), 4)
+
+    def test_full_bars_on_both_sides_of_a_break_stay_apart(self) -> None:
+        measures = self._measures("""clef_G2 . . . . upper
+timeSignature_4/4 . . . . .
+note_1 C4 _ _ _ upper
+barline . . . . .
+newline . . . . .
+clef_G2 . . . . upper
+note_1 D4 _ _ _ upper
+barline . . . . .""")
+        self.assertEqual(len(measures), 2)
+
+    def test_grand_staff_bar_split_at_a_system_break_is_joined(self) -> None:
+        measures = self._measures("""clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
+timeSignature_3/4 . . . . .
+note_2 C5 _ _ _ upper&note_2 C3 _ _ _ lower
+barline . . . . .
+newline . . . . .
+clef_G2 _ _ _ _ upper&clef_F4 _ _ _ _ lower
+note_4 D5 _ _ _ upper&note_4 D3 _ _ _ lower
+barline . . . . .""")
+        self.assertEqual(len(measures), 1)
+        self.assertEqual(
+            sorted((_staff(n), _pitch(n)) for n in _notes(measures[0])),
+            [("1", "C"), ("1", "D"), ("2", "C"), ("2", "D")],
+        )
+
+    def test_halves_filled_up_with_rests_are_joined(self) -> None:
+        # Each half is read as a full bar: its notes, then rests to the end of the bar
+        measures = self._measures("""clef_G2 . . . . upper
+timeSignature_4/4 . . . . .
+note_4 D4 _ _ _ upper
+note_4 E4 _ _ _ upper
+rest_2 . _ _ _ upper
+barline . . . . .
+newline . . . . .
+clef_G2 . . . . upper
+note_4 G4 _ _ _ upper
+note_4 A4 _ _ _ upper
+rest_2 . _ _ _ upper
+barline . . . . .""")
+        self.assertEqual(len(measures), 1)
+        self.assertEqual([_pitch(n) for n in _notes(measures[0])], ["D", "E", "G", "A"])
+
+    def test_bars_ending_in_printed_rests_which_overfill_stay_apart(self) -> None:
+        # The notes of both bars together are longer than a bar
+        measures = self._measures("""clef_G2 . . . . upper
+timeSignature_4/4 . . . . .
+note_2 D4 _ _ _ upper
+note_4 E4 _ _ _ upper
+rest_4 . _ _ _ upper
+barline . . . . .
+newline . . . . .
+clef_G2 . . . . upper
+note_2 G4 _ _ _ upper
+rest_2 . _ _ _ upper
+barline . . . . .""")
+        self.assertEqual(len(measures), 2)

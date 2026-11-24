@@ -448,6 +448,7 @@ def build_measures(
             ET.SubElement(time_el, "beats").text = str(beats)
             ET.SubElement(time_el, "beat-type").text = "4"
         _insert_time_element(first_attributes, time_el)
+    _join_bars_split_at_system_breaks(measures, state.division)
     final_token = _repair_meter(measures, state.division)
     _fill_rest_only_bars(measures, state.division, is_first_page, time_is_guessed)
     if final_token is not None:
@@ -527,6 +528,127 @@ def _set_meter(measure: ET.Element, beats: int, beat_type: int) -> None:
     ET.SubElement(time, "beats").text = str(beats)
     ET.SubElement(time, "beat-type").text = str(beat_type)
     _insert_time_element(attributes, time)
+
+
+def _starts_a_system(measure: ET.Element) -> bool:
+    return any(p.get("new-system") == "yes" for p in measure.findall("print"))
+
+
+def _timed_children(measure: ET.Element) -> list[tuple[Fraction, ET.Element]]:
+    """Every child but backup and forward, with the time (in divisions) at which it starts."""
+    cursor = Fraction(0)
+    result: list[tuple[Fraction, ET.Element]] = []
+    last_onset = Fraction(0)
+    for child in measure:
+        duration = int(child.findtext("duration", "0"))
+        if child.tag == "backup":
+            cursor -= duration
+        elif child.tag == "forward":
+            cursor += duration
+        elif child.tag == "note":
+            if child.find("chord") is not None:
+                result.append((last_onset, child))
+            else:
+                result.append((cursor, child))
+                last_onset = cursor
+                cursor += duration
+        else:
+            result.append((cursor, child))
+    return result
+
+
+def _is_rest(note: ET.Element) -> bool:
+    return note.tag == "note" and note.find("rest") is not None
+
+
+def _sounding_end(timed: list[tuple[Fraction, ET.Element]]) -> Fraction:
+    """When the last note which isn't a rest ends."""
+    end = Fraction(0)
+    for onset, child in timed:
+        if child.tag == "note" and not _is_rest(child):
+            end = max(end, onset + int(child.findtext("duration", "0")))
+    return end
+
+
+def _without_trailing_rests(
+    timed: list[tuple[Fraction, ET.Element]], end: Fraction
+) -> list[tuple[Fraction, ET.Element]]:
+    """Drops the rests from end on and shortens those which last beyond it."""
+    result = []
+    for onset, child in timed:
+        if _is_rest(child):
+            if onset >= end:
+                continue
+            duration = child.find("duration")
+            if duration is not None and onset + int(duration.text or "0") > end:
+                duration.text = str(int(end - onset))
+                for kind in ("type", "dot"):
+                    for element in child.findall(kind):
+                        child.remove(element)
+        result.append((onset, child))
+    return result
+
+
+def _write_timed(measure: ET.Element, timed: list[tuple[Fraction, ET.Element]]) -> None:
+    for child in list(measure):
+        measure.remove(child)
+    cursor = Fraction(0)
+    for onset, child in timed:
+        is_chord_note = child.tag == "note" and child.find("chord") is not None
+        if not is_chord_note and onset != cursor:
+            move = ET.SubElement(measure, "forward" if onset > cursor else "backup")
+            ET.SubElement(move, "duration").text = str(int(abs(onset - cursor)))
+            cursor = onset
+        measure.append(child)
+        if child.tag == "note" and not is_chord_note:
+            cursor += int(child.findtext("duration", "0"))
+
+
+def _join_bars_split_at_system_breaks(measures: list[ET.Element], division: int) -> None:
+    """
+    Every staff ends with a barline token, also where the printed bar runs on over the
+    system break. Such a bar comes out as two short bars, the last one of a system and the
+    first one of the next, each of which may be filled up with rests. They are joined if
+    their notes together fill the meter in force, nothing but rests follows the notes in
+    either part, and nothing printed separates them (a styled barline, a repeat, a volta or
+    a new meter).
+    """
+    in_force = _meters_in_force(measures)
+    i = 0
+    while i + 1 < len(measures):
+        first, second = measures[i], measures[i + 1]
+        meter = in_force[i]
+        if (
+            meter is None
+            or not _starts_a_system(second)
+            or in_force[i + 1] != meter
+            or second.find("attributes/time") is not None
+            or first.find("barline") is not None
+            or second.find("barline") is not None
+            or _content_length(first, division) is None
+            or _content_length(second, division) is None
+        ):
+            i += 1
+            continue
+        full = Fraction(*meter) * division
+        first_timed, second_timed = _timed_children(first), _timed_children(second)
+        first_end, second_end = _sounding_end(first_timed), _sounding_end(second_timed)
+        if not (0 < first_end < full and 0 < second_end < full and first_end + second_end == full):
+            i += 1
+            continue
+        joined = _without_trailing_rests(first_timed, first_end) + [
+            (onset + first_end, child)
+            for onset, child in _without_trailing_rests(second_timed, second_end)
+            if not (child.tag == "print" and child.get("new-system") == "yes")
+        ]
+        _write_timed(first, joined)
+        rebalance_measure_voices(first)
+        del measures[i + 1]
+        del in_force[i + 1]
+        i += 1
+    first_number = int(measures[0].get("number", "1")) if measures else 1
+    for offset, measure in enumerate(measures):
+        measure.set("number", str(first_number + offset))
 
 
 def _remove_meter(measure: ET.Element) -> None:
