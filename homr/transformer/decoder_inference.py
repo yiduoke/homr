@@ -8,6 +8,7 @@ from homr.onnx_providers import gpu_providers
 from homr.simple_logging import eprint
 from homr.transformer.beam_search import beam_width, decode
 from homr.transformer.configs import Config
+from homr.transformer.octave_crf import apply_octave_crf, octave_crf_enabled
 from homr.transformer.vocabulary import (
     NOTE_OCTAVE_CLASSES,
     OCTAVE_SHIFT_STOP,
@@ -114,10 +115,14 @@ class ScoreDecoder:
         """
         width = kwargs.get("beam_width") or beam_width()
         if width <= 1:
-            return self.generate_greedy(start_tokens, nonote_tokens, **kwargs)
-        return decode(
-            self, start_tokens, nonote_tokens, width, kwargs["context"], kwargs.get("meter")
-        )
+            symbols = self.generate_greedy(start_tokens, nonote_tokens, **kwargs)
+        else:
+            symbols = decode(
+                self, start_tokens, nonote_tokens, width, kwargs["context"], kwargs.get("meter")
+            )
+        if self.per_note_octaves and octave_crf_enabled():
+            apply_octave_crf(symbols)
+        return symbols
 
     def generate_greedy(
         self,
@@ -214,9 +219,11 @@ class ScoreDecoder:
                 break
 
             octave_mark = None
+            note_octave_logits = None
             if self.per_note_octaves and rhythm_token[0].startswith("note_"):
                 octave_logits = outputs[self.output_names.index("out_octaves")].numpy()
-                octave_mark = NOTE_OCTAVE_CLASSES[octave_logits[0, -1, :].argmax()]
+                note_octave_logits = octave_logits[0, -1, :].astype(np.float32)
+                octave_mark = NOTE_OCTAVE_CLASSES[note_octave_logits.argmax()]
             symbol = EncodedSymbol(
                 rhythm=rhythm_token[0],
                 pitch=pitch_token[0],
@@ -227,6 +234,8 @@ class ScoreDecoder:
                 coordinates=attention,
                 octave_mark=octave_mark,
             )
+            # the head's logits, for the octave CRF (HOMR_OCTAVE_CRF)
+            symbol.octave_logits = note_octave_logits
             symbols.append(symbol)
             cut = _loop_cut(symbols, runs) if LOOP_GUARD else None
             if cut is not None:

@@ -235,12 +235,12 @@ def beam_search(  # noqa: C901, PLR0912, PLR0915
             return Hypothesis(parent.symbols, score)
         rhythm = decoder.inv_rhythm_vocab[r]
         extra = {}
+        octave_logits = None
         if per_note_octaves:
             octave_mark = None
             if rhythm.startswith("note_"):
-                octave_mark = NOTE_OCTAVE_CLASSES[
-                    int(out["out_octaves"].numpy()[0, -1, :].argmax())
-                ]
+                octave_logits = out["out_octaves"].numpy()[0, -1, :].astype(np.float32)
+                octave_mark = NOTE_OCTAVE_CLASSES[int(octave_logits.argmax())]
             extra = {"octave_mark": octave_mark}
         symbol = EncodedSymbol(
             rhythm=rhythm,
@@ -252,6 +252,8 @@ def beam_search(  # noqa: C901, PLR0912, PLR0915
             coordinates=out["attention"].numpy(),
             **extra,
         )
+        # the head's logits, for the octave CRF (HOMR_OCTAVE_CRF)
+        symbol.octave_logits = octave_logits
         symbols = [*parent.symbols, symbol]
         runs = list(parent.runs)
         cut = _loop_cut(symbols, runs) if LOOP_GUARD else None
