@@ -464,6 +464,94 @@ def _assign_parts(staffs: list[MultiStaff]) -> list[tuple[int, ...]] | None:
     return result
 
 
+# An ossia system is printed at the right of the page and starts further inside: its left edge
+# is at least this share of the typical staff width to the right of the typical left edge.
+late_start_share = 0.3
+# Its right edge stays within this share of the typical width of the typical right edge.
+late_start_right_tolerance = 0.1
+# The inner bar lines of a printed variant sit where those of its main staff are, this close
+# as a share of the position of the last bar line.
+variant_bar_tolerance = 0.03
+
+
+def _starts_late(row: MultiStaff, left: float, right: float) -> bool:
+    return all(
+        staff.min_x - left > late_start_share * (right - left)
+        and abs(staff.max_x - right) < late_start_right_tolerance * (right - left)
+        for staff in row.staffs
+    )
+
+
+def _drop_ossias(staffs: list[MultiStaff]) -> list[tuple[int, MultiStaff]]:
+    """
+    For a page of grand staffs whose layout can't be resolved: drops the systems which start far
+    right of the others and end with them, they are ossias and would become extra bars. Returns
+    the kept systems with their index in the given list. A page where a staff isn't a grand
+    staff is left as it is, a second staff could be a voice there.
+    """
+    kept = list(enumerate(staffs))
+    flat = [staff for row in staffs for staff in row.staffs]
+    if len(flat) < 3 or not all(staff.is_grandstaff for staff in flat):  # noqa: PLR2004
+        return kept
+    left = float(np.median([staff.min_x for staff in flat]))
+    right = float(np.median([staff.max_x for staff in flat]))
+    if right > left:
+        late = [(i, row) for i, row in kept if _starts_late(row, left, right)]
+        if 0 < len(late) < len(kept) / 2:
+            eprint("Dropping", len(late), "systems which start far right, they are ossias")
+            kept = [(i, row) for i, row in kept if (i, row) not in late]
+    return kept
+
+
+def _inner_bar_line_positions(symbols: list[EncodedSymbol]) -> list[float]:
+    """The x of the bar lines of a staff read, without the last one which ends the staff."""
+    xs = [
+        symbol.image_coordinates[0]
+        for symbol in symbols
+        if symbol.rhythm == "barline" and symbol.image_coordinates is not None
+    ]
+    return xs[:-1]
+
+
+def _is_variant_of(main: list[EncodedSymbol], other: list[EncodedSymbol]) -> bool:
+    """
+    A staff which the staff relation model puts into one system with the main staff, on a page
+    whose layout can't be resolved, is a printed variant of it if it has the same bars: the same
+    number of them, with their bar lines at the same places. Staffs of different systems don't
+    line up like that, even if the model takes them for one system (e.g. a handwritten page).
+    """
+    xs_main = _inner_bar_line_positions(main)
+    xs_other = _inner_bar_line_positions(other)
+    if len(xs_main) == 0 or len(xs_main) != len(xs_other):
+        return False
+    tolerance = variant_bar_tolerance * max(xs_main[-1], xs_other[-1])
+    return all(abs(x - y) <= tolerance for x, y in zip(xs_main, xs_other, strict=True))
+
+
+def _drop_variants(
+    results: dict[tuple[int, int], list[EncodedSymbol]],
+    system_of_staff: list[int],
+    is_grandstaff: list[bool],
+) -> None:
+    """
+    Removes the read of every staff which is a printed variant of the first staff of its
+    system, see _is_variant_of. Staffs are read on their own (one voice), results are keyed
+    (index of the staff, 0). Only staffs of systems of grand staffs are variants: with other
+    staffs a second staff could be a voice.
+    """
+    for system in sorted(set(system_of_staff)):
+        members = [i for i, k in enumerate(system_of_staff) if k == system]
+        if len(members) < 2 or not all(is_grandstaff[i] for i in members):  # noqa: PLR2004
+            continue
+        main = results.get((members[0], 0))
+        if main is None:
+            continue
+        for i in members[1:]:
+            if (i, 0) in results and _is_variant_of(main, results[(i, 0)]):
+                eprint("Staff", i, "is a variant of staff", members[0], "dropping it")
+                del results[(i, 0)]
+
+
 def _measure_rests_like(symbols: list[EncodedSymbol], is_grandstaff: bool) -> list[EncodedSymbol]:
     """
     Rests for a staff which is hidden in a system: one per measure of the symbols
@@ -591,19 +679,40 @@ def parse_staffs(
             for row_index, row in enumerate(staffs)
         ]
     parts = [tuple(range(len(row.staffs))) for row in staffs]
+    # Set where every staff is read on its own: the system each staff came from
+    system_of_staff: list[int] = []
     if len({len(staff.staffs) for staff in staffs}) > 1:
         # The voices are read across systems, a system with fewer staffs hides some
         assigned = _assign_parts(staffs)
         if assigned is None:
-            eprint("The layout changes on the page, reading every staff on its own")
-            singles = [(k, single) for k, row in enumerate(staffs) for single in row.break_apart()]
-            merged_systems = {
-                new_index: merged_systems[k]
-                for new_index, (k, _) in enumerate(singles)
-                if k in merged_systems
-            }
-            staffs = [single for _, single in singles]
-            parts = [(0,)] * len(staffs)
+            kept = _drop_ossias(staffs)
+            if len(kept) < len(staffs):
+                merged_systems = {
+                    new_index: merged_systems[k]
+                    for new_index, (k, _) in enumerate(kept)
+                    if k in merged_systems
+                }
+                staffs = [row for _, row in kept]
+                parts = [tuple(range(len(row.staffs))) for row in staffs]
+                if len({len(row.staffs) for row in staffs}) > 1:
+                    assigned = _assign_parts(staffs)
+                    if assigned is not None:
+                        parts = assigned
+                else:
+                    assigned = parts
+            if assigned is None:
+                eprint("The layout changes on the page, reading every staff on its own")
+                singles = [
+                    (k, single) for k, row in enumerate(staffs) for single in row.break_apart()
+                ]
+                merged_systems = {
+                    new_index: merged_systems[k]
+                    for new_index, (k, _) in enumerate(singles)
+                    if k in merged_systems
+                }
+                system_of_staff = [k for k, _ in singles]
+                staffs = [single for _, single in singles]
+                parts = [(0,)] * len(staffs)
         else:
             eprint("Staffs are hidden in some systems, parts of the systems:", assigned)
             parts = assigned
@@ -647,6 +756,8 @@ def parse_staffs(
             eprint("Skipping empty staff", index)
             continue
         results[key] = result_staff
+    if system_of_staff:
+        _drop_variants(results, system_of_staff, [row.staffs[0].is_grandstaff for row in staffs])
 
     voices = []
     for voice in range(number_of_voices):

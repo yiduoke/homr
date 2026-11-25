@@ -1,7 +1,14 @@
 import unittest
 
 from homr.model import MultiStaff, Staff, StaffPoint
-from homr.staff_parsing import _assign_parts, _clean_up_voice, _measure_rests_like
+from homr.staff_parsing import (
+    _assign_parts,
+    _clean_up_voice,
+    _drop_ossias,
+    _drop_variants,
+    _is_variant_of,
+    _measure_rests_like,
+)
 from homr.system_repair import (
     _common_layout,
     _ensure_same_number_of_staffs,
@@ -22,6 +29,32 @@ def make_staff(number: float, is_grandstaff: bool = False) -> Staff:
 
 def make_row(number: float, is_grandstaff: bool = False) -> MultiStaff:
     return MultiStaff([make_staff(number, is_grandstaff)], [])
+
+
+def wide_staff(
+    number: float, is_grandstaff: bool = True, min_x: float = 0.0, max_x: float = 1000.0
+) -> Staff:
+    """A staff from min_x to max_x at the height of make_staff."""
+    y_points = [10 * i + 100 * number for i in range(5)]
+    staff = Staff([StaffPoint(min_x, y_points, 0), StaffPoint(max_x, y_points, 0)])
+    staff.is_grandstaff = is_grandstaff
+    return staff
+
+
+def wide_row(number: float, min_x: float = 0.0, max_x: float = 1000.0) -> MultiStaff:
+    return MultiStaff([wide_staff(number, True, min_x, max_x)], [])
+
+
+def read_with_bar_lines(xs: list[float] | None) -> list[EncodedSymbol]:
+    """A staff read of a note and a bar line at every given x, the last one ends the staff."""
+    symbols = []
+    for x in xs or []:
+        note = EncodedSymbol("note_4")
+        note.image_coordinates = (x - 30, 100.0)
+        bar_line = EncodedSymbol("barline")
+        bar_line.image_coordinates = (x, 100.0)
+        symbols.extend([note, bar_line])
+    return symbols
 
 
 def make_grandstaff_row(number: int) -> MultiStaff:
@@ -423,3 +456,97 @@ class TestOssias(unittest.TestCase):
         rows = [MultiStaff([ossia, _sized_staff(0, 15, True)], [])]
 
         self.assertEqual([[True]], _layouts(drop_ossia_staffs(rows)))
+
+
+class TestVariants(unittest.TestCase):
+    def test_variant_has_the_bar_lines_of_its_main_staff(self) -> None:
+        # Vallee d'Obermann p. 42, bars 184-185 and their variant: two bars, same bar lines
+        main = read_with_bar_lines([672, 1180])
+        variant = read_with_bar_lines([665, 1184])
+
+        self.assertTrue(_is_variant_of(main, variant))
+
+    def test_staff_with_other_bar_lines_is_no_variant(self) -> None:
+        # A handwritten page where the staff relation model took two systems for one:
+        # four bars each, the bar lines are somewhere else
+        main = read_with_bar_lines([178, 319, 493, 736, 936])
+        other = read_with_bar_lines([278, 508, 710, 971])
+
+        self.assertFalse(_is_variant_of(main, other))
+
+    def test_staff_with_the_same_number_of_bars_elsewhere_is_no_variant(self) -> None:
+        main = read_with_bar_lines([300, 600, 900])
+        other = read_with_bar_lines([380, 560, 900])
+
+        self.assertFalse(_is_variant_of(main, other))
+
+    def test_one_bar_staffs_are_no_variants(self) -> None:
+        # No inner bar line to compare: the staff stays
+        self.assertFalse(_is_variant_of(read_with_bar_lines([900]), read_with_bar_lines([900])))
+
+    def test_staff_without_positions_is_no_variant(self) -> None:
+        main = read_with_bar_lines([672, 1180])
+        for symbol in main:
+            symbol.image_coordinates = None
+
+        self.assertFalse(_is_variant_of(main, read_with_bar_lines([665, 1184])))
+
+    def test_drop_variants_keeps_both_of_two_real_systems_grouped_as_one(self) -> None:
+        # Polish scores sample 93: five systems of a grand staff, the first two read as one system
+        # of two grand staffs. They are different systems and both stay.
+        results = {
+            (0, 0): read_with_bar_lines([178, 319, 493, 736, 936]),
+            (1, 0): read_with_bar_lines([278, 508, 710, 971]),
+            (2, 0): read_with_bar_lines([337, 538, 694, 789]),
+        }
+        before = dict(results)
+
+        _drop_variants(results, [0, 0, 1], [True, True, True])
+
+        self.assertEqual(before, results)
+
+    def test_drop_variants_drops_the_variant_only(self) -> None:
+        # Page 42: variants below the first two systems, a system of its own at the end
+        results = {
+            (0, 0): read_with_bar_lines([672, 1180]),
+            (1, 0): read_with_bar_lines([665, 1184]),
+            (2, 0): read_with_bar_lines([651, 1183]),
+            (3, 0): read_with_bar_lines([639, 1168]),
+            (4, 0): read_with_bar_lines([599, 1187]),
+        }
+
+        _drop_variants(results, [0, 0, 1, 1, 2], [True] * 5)
+
+        self.assertEqual([(0, 0), (2, 0), (4, 0)], sorted(results))
+
+    def test_drop_variants_keeps_the_voices_of_other_staffs(self) -> None:
+        # A voice and a piano staff with the same bars are no variants
+        results = {(0, 0): read_with_bar_lines([300, 900]), (1, 0): read_with_bar_lines([300, 900])}
+
+        _drop_variants(results, [0, 0], [False, True])
+
+        self.assertEqual([(0, 0), (1, 0)], sorted(results))
+
+
+class TestDropOssias(unittest.TestCase):
+    def test_drops_ossia_which_starts_far_right(self) -> None:
+        rows = [wide_row(0), wide_row(3, min_x=900), wide_row(6), wide_row(9)]
+
+        kept = _drop_ossias(rows)
+
+        self.assertEqual([0, 2, 3], [i for i, _ in kept])
+
+    def test_keeps_a_system_which_ends_early(self) -> None:
+        # A short last system starts at the left margin
+        rows = [wide_row(0), wide_row(3), wide_row(6), wide_row(9, max_x=900)]
+
+        self.assertEqual([0, 1, 2, 3], [i for i, _ in _drop_ossias(rows)])
+
+    def test_keeps_a_page_with_a_staff_which_is_no_grand_staff(self) -> None:
+        rows = [
+            MultiStaff([wide_staff(0, is_grandstaff=False)], []),
+            wide_row(3, min_x=900),
+            wide_row(6),
+        ]
+
+        self.assertEqual([0, 1, 2], [i for i, _ in _drop_ossias(rows)])
