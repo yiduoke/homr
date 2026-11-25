@@ -1,5 +1,5 @@
 """
-Octave CRF (HOMR_OCTAVE_CRF=1, off by default): a learned linear-chain CRF over the per-note
+Octave CRF (on by default since Round 7 variant P; HOMR_OCTAVE_CRF=0 turns it off): a learned linear-chain CRF over the per-note
 octave head (classes "_", "8va", "8vb") of a decoder with the output `out_octaves`.
 
 The model reads every note's octave mark on its own, so one note inside a printed 8va line can
@@ -35,7 +35,7 @@ DEFAULT_WEIGHTS = Path(__file__).with_name("octave_crf_weights.json")
 
 
 def octave_crf_enabled() -> bool:
-    return os.environ.get("HOMR_OCTAVE_CRF") == "1"
+    return os.environ.get("HOMR_OCTAVE_CRF", "1") == "1"
 
 
 def _island_table(values: Sequence[Any]) -> np.ndarray:
