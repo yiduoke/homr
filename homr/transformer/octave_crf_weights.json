@@ -1,0 +1,59 @@
+{
+ "states": [
+  "B",
+  "_",
+  "8va",
+  "8vb"
+ ],
+ "emission_scale": 1.0000000012930914,
+ "transitions": [
+  [
+   0.0,
+   -0.049792,
+   0.052482,
+   -0.002691
+  ],
+  [
+   -0.039691,
+   -0.054235,
+   -0.202663,
+   -0.1078
+  ],
+  [
+   0.035892,
+   -0.177073,
+   0.455692,
+   -0.036819
+  ],
+  [
+   0.003799,
+   -0.12329,
+   -0.02782,
+   0.274008
+  ]
+ ],
+ "island_gap": [
+  [
+   2.189088,
+   2.180904,
+   2.098422
+  ],
+  [
+   2.100177,
+   2.105127,
+   2.1132
+  ]
+ ],
+ "island_blip": [
+  [
+   2.351361,
+   2.226447
+  ],
+  [
+   2.361186,
+   1.999365
+  ]
+ ],
+ "fitted_on": "unseen render set dump dump_s7_unseen.npz, 7899 chains; floor 1.0, gap len 3, blip len 2, tzero False; no dev/test/Polish data; T x0.2, islands x3.0 (selected on the unseen render set)",
+ "note": "T[from][to]; B boundary. island_gap[X][k-1]: penalty of X,none^k,X; island_blip[X][k-1]: none,X^k,none; subtracted"
+}
